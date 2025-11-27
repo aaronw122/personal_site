@@ -1,0 +1,26 @@
+site_name: Writing
+site_url: http://localhost:5173/writing/          # prod URL for the /writing subpath
+docs_dir: /Users/aaron/Documents/Obsidian_AW/Writing   # just the folder you want public
+site_dir: ./src/writing                     # <- change to YOUR site's static dir
+
+theme:
+  name: null
+  custom_dir: src/writing_theme
+
+plugins:
+- roamlinks
+- search
+
+
+markdown_extensions:
+  - footnotes
+  - toc:
+      permalink: true
+  - sane_lists          # better list handling (less finicky about blank lines)
+  - def_list            # definition lists (Obsidian often uses these)
+  - tables              # GFM tables
+  - attr_list           # {#id .class} support
+  - md_in_html          # allow lists inside HTML blocks if you use them
+  - pymdownx.superfences
+
+use_directory_urls: true

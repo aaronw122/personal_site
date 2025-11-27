@@ -1,0 +1,157 @@
+:root {
+    --font-primary: "Lato", sans-serif;
+    --font-size-default: 16px;
+    --font-size-header: 32px;
+    --bg: #F82;
+    --bg-code: rgba(255, 255, 255, 0.1);
+    --fg-1: #212529;
+    --accent-color: rgb(75, 189, 255);
+    --br-xs: 4px;
+    --br-sm: 8px;
+    --br-md: 12px;
+    --br-lg: 16px;
+    overscroll-behavior: auto;
+
+}
+
+html {
+    font-family: var(--font-primary), sans-serif;
+    font-size: var(--font-size-default);
+    box-sizing: border-box;
+    position: relative;
+    min-height: 100%;
+}
+
+html::before {
+    content: '';
+    position: fixed;
+    top: -50vh; /* Start above viewport */
+    left: 0;
+    width: 100%;
+    height: 200vh; /* 2x viewport height */
+    background-image: url("../images/tie_dye.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -1;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    box-sizing: inherit;
+    align-items: stretch;
+    justify-content: center;
+    line-height: 1.6;
+    width: 100%;
+    max-width: 680px;
+    padding: 0 24px;
+    margin: 0 auto;
+    background: transparent;
+}
+
+h2{
+    margin-bottom: 0;
+    padding-bottom: 0px;
+}
+
+h4{
+    margin: 5px 0 5px 0
+}
+
+h5{
+    font-weight: 300;
+    margin-top: 1px;
+}
+
+img{
+    display: block;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.navbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    overflow: hidden;
+    margin: 0 auto;
+    position: static;
+    z-index: 1000;
+}
+
+.navbar a {
+    display: block;
+    color: #212529;
+    padding: 50px 20px 14px;
+    text-decoration: none;
+    text-align: center;
+}
+@media (max-width: 480px) {
+    .navbar{
+        gap: 10px;
+    }
+    .navbar a{
+        padding: 40px 10px 10px;
+    }
+}
+p{
+    margin: 10px 0 10px 0;
+}
+
+input,
+textarea{
+    border-radius: 3px;
+    font: 1em var(--font-primary);
+    padding: 5px;
+    width: 300px;
+    box-sizing: border-box;
+    border: 1px solid #999999;
+}
+
+textarea{
+    vertical-align: top;
+    max-width: 100%;
+}
+
+input:focus,
+textarea:focus {
+    outline: 1px solid black;
+}
+
+button{
+    margin-left: 0.5em;
+}
+
+.navbar a:hover {
+    /* underline */
+}
+
+.title {
+    text-align: left;
+    padding: 30px 0 0 0;
+}
+.bio{
+    display: flex;
+    gap: 12px;
+    flex-direction: row;
+}
+
+.right-img{
+    padding: 18px 12px 0 0;
+}
+
+@media (max-width: 480px) {
+    .right-img{
+        display: none;
+    }
+}
+
+.headerlink { display: none; }
+
+a, a:visited {
+    color: #212529
+}

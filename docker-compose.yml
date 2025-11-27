@@ -1,0 +1,9 @@
+services:
+  personal_site:
+    build: .
+    image: personal_site:latest
+    ports:
+      - "80:80"   # host:container
+    restart: unless-stopped
+
+
