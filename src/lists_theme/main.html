@@ -5,12 +5,12 @@
     <link rel="icon" type="image/png" href="/images/upside_down.png"/>
     <link rel="stylesheet" href="/css/styles.css">
     <meta charset="utf-8">
-    <title>lists | awill.co</title>
+    <title>{{ page.title }} | awill.co</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&amp;display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+    {{ extrahead }}
 </head>
 <body id="page-root">
 <div>
@@ -21,22 +21,15 @@
         <a href="/lists/">lists</a>
     </nav>
     <div class="title">
-        <h2>lists</h2>
+        <h2>{{ page.title }}</h2>
     </div>
     <div class="date">
-        <h5></h5>
+        <h5>{{page.meta.creation_date}}</h5>
     </div>
     <main class="prose">
-        <p>just some samples from my notes app.</p>
-<hr />
-<p><a href="questions/">questions</a></p>
-<p><a href="books/">books</a></p>
-<p><a href="media%20recs/">media recs</a></p>
-<p><a href="meditation%20corner/">meditation corner</a></p>
-<p><a href="cool%20people/">cool people</a></p>
-<p><a href="shows/">shows</a></p>
+        {{ page.content }}
     </main>
 </div>
-
+{{ scripts }}
 </body>
 </html>

@@ -1,11 +1,11 @@
-site_name: Writing
-site_url: https://awill.co/writing/ # prod URL for the /writing subpath
-docs_dir: /Users/aaron/Documents/Obsidian_AW/Writing # just the folder you want public
-site_dir: ./src/writing # <- change to YOUR site's static dir
+site_name: Lists
+site_url: https://awill.co/lists/ # prod URL for the /lists subpath
+docs_dir: /Users/aaron/Documents/Obsidian_AW/Lists # just the folder you want public
+site_dir: ./src/lists # <- change to YOUR site's static dir
 
 theme:
   name: null
-  custom_dir: src/writing_theme
+  custom_dir: src/lists_theme
 
 plugins:
   - roamlinks
