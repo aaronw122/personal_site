@@ -2,7 +2,7 @@
     --font-primary: "Lato", sans-serif;
     --font-size-default: 16px;
     --font-size-header: 32px;
-    --bg: #F82;
+    --bg: #f82;
     --bg-code: rgba(255, 255, 255, 0.1);
     --fg-1: #212529;
     --accent-color: rgb(75, 189, 255);
@@ -11,7 +11,6 @@
     --br-md: 12px;
     --br-lg: 16px;
     overscroll-behavior: auto;
-
 }
 
 html {
@@ -23,7 +22,7 @@ html {
 }
 
 html::before {
-    content: '';
+    content: "";
     position: fixed;
     top: -50vh; /* Start above viewport */
     left: 0;
@@ -45,26 +44,26 @@ body {
     line-height: 1.6;
     width: 100%;
     max-width: 680px;
-    padding: 0 24px;
+    padding: 0 24px 75px;
     margin: 0 auto;
     background: transparent;
 }
 
-h2{
+h2 {
     margin-bottom: 0;
     padding-bottom: 0px;
 }
 
-h4{
-    margin: 5px 0 5px 0
+h4 {
+    margin: 5px 0 5px 0;
 }
 
-h5{
+h5 {
     font-weight: 300;
     margin-top: 1px;
 }
 
-img{
+img {
     display: block;
     max-width: 100%;
     margin: 0 auto;
@@ -91,19 +90,19 @@ img{
     text-align: center;
 }
 @media (max-width: 480px) {
-    .navbar{
+    .navbar {
         gap: 10px;
     }
-    .navbar a{
+    .navbar a {
         padding: 40px 10px 10px;
     }
 }
-p{
+p {
     margin: 10px 0 10px 0;
 }
 
 input,
-textarea{
+textarea {
     border-radius: 3px;
     font: 1em var(--font-primary);
     padding: 5px;
@@ -112,7 +111,7 @@ textarea{
     border: 1px solid #999999;
 }
 
-textarea{
+textarea {
     vertical-align: top;
     max-width: 100%;
 }
@@ -122,7 +121,7 @@ textarea:focus {
     outline: 1px solid black;
 }
 
-button{
+button {
     margin-left: 0.5em;
 }
 
@@ -135,24 +134,27 @@ button{
     padding: 30px 0 0 0;
     text-transform: lowercase;
 }
-.bio{
+.bio {
     display: flex;
     gap: 12px;
     flex-direction: row;
 }
 
-.right-img{
+.right-img {
     padding: 18px 12px 0 0;
 }
 
 @media (max-width: 480px) {
-    .right-img{
+    .right-img {
         display: none;
     }
 }
 
-.headerlink { display: none; }
+.headerlink {
+    display: none;
+}
 
-a, a:visited {
-    color: #212529
+a,
+a:visited {
+    color: #212529;
 }
