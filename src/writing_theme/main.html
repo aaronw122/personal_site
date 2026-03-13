@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en-US">
     <head>
+        <link rel="preload" as="image" href="/images/tie_dye.jpg" fetchpriority="high">
         <script type="module" src="/js/index.js"></script>
         <link rel="icon" type="image/png" href="/images/upside_down.png" />
         <link rel="stylesheet" href="/css/styles.css" />
@@ -34,6 +35,7 @@
         {{ extrahead }}
     </head>
     <body id="page-root">
+        <img src="/images/tie_dye.jpg" alt="" role="presentation" decoding="sync" fetchpriority="high" class="bg-img">
         <div>
             <nav class="navbar">
                 <a href="/">home</a>

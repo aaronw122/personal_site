@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="EN_US">
 <head>
+    <link rel="preload" as="image" href="/images/tie_dye.jpg" fetchpriority="high">
     <link rel="icon" type="image/png" href="./images/upside_down.png"/>
-    <link rel="preload" as="image" href="/images/tie_dye.jpg">
     <script type="module" src="/js/index.js"></script>
     <link rel="stylesheet" href="/css/styles.css">
     <meta charset="utf-8">
@@ -22,6 +22,7 @@
 </head>
 
 <body id="page-root">
+    <img src="/images/tie_dye.jpg" alt="" role="presentation" decoding="sync" fetchpriority="high" class="bg-img">
     <nav class="navbar">
         <a href="/">home</a>
         <a href="/writing/">writing</a>
