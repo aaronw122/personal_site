@@ -23,10 +23,14 @@ function handleClick(e) {
     if (!anchor || anchor.dataset.noSpa === 'true' || !isInternalLink(anchor) || e.defaultPrevented || e.metaKey || e.ctrlKey ||
         e.shiftKey || e.altKey) return;
     e.preventDefault();
-    loadPage(anchor.href).catch(() => { window.location.href = anchor.href; });
+    loadPage(anchor.href).then(() => { currentUrl = window.location.href; }).catch(() => { window.location.href = anchor.href; });
 }
 
+let currentUrl = window.location.href;
+
 function handlePopState() {
+    if (window.location.href === currentUrl) return;
+    currentUrl = window.location.href;
     loadPage(window.location.href, true).catch(() => { window.location.reload(); });
 }
 
