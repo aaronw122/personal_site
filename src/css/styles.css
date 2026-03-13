@@ -34,8 +34,6 @@ html::before {
     background-position: center;
     background-repeat: no-repeat;
     z-index: -1;
-    will-change: transform;
-    backface-visibility: hidden;
 }
 
 body {
