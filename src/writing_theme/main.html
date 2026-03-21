@@ -32,6 +32,7 @@
             rel="stylesheet"
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css">
         {{ extrahead }}
     </head>
     <body id="page-root">
@@ -52,5 +53,18 @@
             <main class="prose">{{ page.content }}</main>
         </div>
         {{ scripts }}
+        <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('.prose img').forEach(function (img) {
+                    var a = document.createElement('a');
+                    a.href = img.src;
+                    a.classList.add('glightbox');
+                    img.parentNode.insertBefore(a, img);
+                    a.appendChild(img);
+                });
+                GLightbox({ selector: '.glightbox' });
+            });
+        </script>
     </body>
 </html>
