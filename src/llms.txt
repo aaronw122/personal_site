@@ -17,20 +17,10 @@ Contact: youfoundaaron@gmail.com
 
 ## Writing
 
-- [Ask Questions](https://awill.co/writing/ask%20questions/)
-- [Building musicMixer](https://awill.co/writing/building%20musicMixer/)
-- [Curation](https://awill.co/writing/curation/)
-- [Introspection](https://awill.co/writing/introspection/)
-- [Lessons from Nonpolar](https://awill.co/writing/lessons%20from%20nonpolar/)
-- [LLM Prompt](https://awill.co/writing/LLM%20prompt/)
-- [My System Prompt](https://awill.co/writing/my%20system%20prompt/)
-- [On Helping People Find Authentic Connection in the World](https://awill.co/writing/on%20helping%20people%20find%20authentic%20connection%20in%20the%20world/)
-- [On Leaving EG](https://awill.co/writing/on%20leaving%20EG/)
-- [On Understanding Hypebeast Culture](https://awill.co/writing/on%20understanding%20hypebeast%20culture/)
 - [Product Thinking](https://awill.co/writing/product%20thinking/)
-- [Prompt System Audit](https://awill.co/writing/promp%20system%20audit/)
-- [THIWS](https://awill.co/writing/thiws/)
-- [World After AGI](https://awill.co/writing/world%20after%20agi/)
+- [Curation](https://awill.co/writing/curation/)
+- [Ask Questions](https://awill.co/writing/ask%20questions/)
+- [Lessons from Nonpolar](https://awill.co/writing/lessons%20from%20nonpolar/)
 - [Fractal Blogs](https://awill.co/writing/fractal%20blogs/)
 
 ## Lists
