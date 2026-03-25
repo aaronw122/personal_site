@@ -158,3 +158,89 @@ a,
 a:visited {
     color: #212529;
 }
+
+/* blockquotes */
+blockquote {
+    margin: 1.5em 0;
+    padding: 0.75em 1.25em;
+    border-left: 3px solid #212529;
+    background: rgba(255, 255, 255, 0.15);
+    font-style: italic;
+}
+
+blockquote p {
+    margin: 0;
+}
+
+blockquote code {
+    font-style: normal;
+}
+
+/* tables */
+.prose {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5em 0;
+    font-size: 0.9rem;
+}
+
+th,
+td {
+    text-align: left;
+    padding: 0.5em 0.75em;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+th {
+    font-weight: 700;
+}
+
+
+/* code blocks */
+pre {
+    background: var(--bg-code);
+    border-radius: var(--br-sm);
+    padding: 1em;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin: 1.5em 0;
+}
+
+code {
+    font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
+    font-size: 0.875em;
+}
+
+:not(pre) > code {
+    background: var(--bg-code);
+    padding: 0.15em 0.4em;
+    border-radius: var(--br-xs);
+}
+
+/* lists */
+ul,
+ol {
+    padding-left: 1.5em;
+    margin: 0.75em 0;
+}
+
+li {
+    margin: 0.25em 0;
+}
+
+li > ul,
+li > ol {
+    margin: 0.25em 0;
+}
+
+/* horizontal rules */
+hr {
+    border: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.15);
+    margin: 2em 0;
+}
