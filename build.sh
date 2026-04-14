@@ -5,6 +5,6 @@ echo "→ Building MkDocs writing..."
 mkdocs build
 
 echo "→ Building React app..."
-npm run build
+bun run build
 
 echo "→ Done. Output in dist/"
