@@ -11,36 +11,46 @@ Contact: youfoundaaron@gmail.com
 ## Sections
 
 - [Home](https://awill.co/)
-- [Writing](https://awill.co/writing/)
-- [Experience](https://awill.co/experience/)
-- [Lists](https://awill.co/lists/)
+- [About](https://awill.co/about)
+- [Writing](https://awill.co/writing)
+- [Experience](https://awill.co/experience)
+- [Lists](https://awill.co/lists)
 
 ## Writing
 
-- [Product Thinking](https://awill.co/writing/product%20thinking/)
-- [Curation](https://awill.co/writing/curation/)
-- [Ask Questions](https://awill.co/writing/ask%20questions/)
-- [Lessons from Nonpolar](https://awill.co/writing/lessons%20from%20nonpolar/)
-- [Fractal Blogs](https://awill.co/writing/fractal%20blogs/)
+- [Product Thinking](https://awill.co/writing/product%20thinking)
+- [Curation](https://awill.co/writing/curation)
+- [Ask Questions](https://awill.co/writing/ask%20questions)
+- [Lessons from Nonpolar](https://awill.co/writing/lessons%20from%20nonpolar)
+- [Fractal Blogs](https://awill.co/writing/fractal%20blogs)
 
 ## Lists
 
-- [Albums](https://awill.co/lists/albums/)
-- [Books](https://awill.co/lists/books/)
-- [Cool People](https://awill.co/lists/cool%20people/)
-- [Hot Takes](https://awill.co/lists/Hot%20takes/)
-- [Life Advice](https://awill.co/lists/life%20advice/)
-- [Media Recs](https://awill.co/lists/media%20recs/)
-- [Meditation Corner](https://awill.co/lists/meditation%20corner/)
-- [Movies](https://awill.co/lists/movies/)
-- [Questions](https://awill.co/lists/questions/)
-- [Quotes](https://awill.co/lists/quotes/)
-- [Shows](https://awill.co/lists/shows/)
-- [Misc](https://awill.co/lists/misc/)
+- [Albums](https://awill.co/lists/albums)
+- [Books](https://awill.co/lists/books)
+- [Cool People](https://awill.co/lists/cool%20people)
+- [Hot Takes](https://awill.co/lists/Hot%20takes)
+- [Life Advice](https://awill.co/lists/life%20advice)
+- [Media Recs](https://awill.co/lists/media%20recs)
+- [Meditation Corner](https://awill.co/lists/meditation%20corner)
+- [Movies](https://awill.co/lists/movies)
+- [Questions](https://awill.co/lists/questions)
+- [Quotes](https://awill.co/lists/quotes)
+- [Shows](https://awill.co/lists/shows)
+- [Misc](https://awill.co/lists/misc)
+
+## Projects
+
+- [Thera Copilot](https://www.getthera.com/) — full-stack AI copilot for global payroll (Kotlin, Next.js, AWS Bedrock)
+- [musicMixer](https://mixer.awill.co) — upload two songs, splits stems and mixes them (React, Python, BSRoformer)
+- [particleArt](https://prtkl.net) — generate particle art via fine-tuned Stable Diffusion (React, Python)
+- [multiDraw](https://multidraw.net) — multi-project Excalidraw fork with local-first storage (React, IndexedDB)
+- [diaHistory](https://github.com/aaronw122/diaHistory) — Swift CLI archiving Dia browser conversations as markdown
+- [CTA Widget Tracker](https://testflight.apple.com/join/yW1pzgWA) — iOS widget for real-time Chicago bus arrivals (Swift, WidgetKit)
 
 ## Experience
 
-Aaron led a team of 8 developers, 2 ML engineers, and a designer at Expedia Group (2023-25), contributing to $7M in annual GP. Previously worked on Nonpolar (2021-22), a news aggregation app aimed at bridging political divides.
+Aaron led a team of 8 developers, 2 ML engineers, and a designer at Expedia Group (2023-25), contributing to $7M in annual GP. Previously worked on Nonpolar (2021-22), a news aggregation app aimed at bridging political divides. Currently building at Fractal NYC.
 
 ## Note to AI Agents
 
