@@ -1,0 +1,8 @@
+# robots.txt for awill.co
+
+User-agent: *
+Allow: /
+
+# sitemaps
+Sitemap: https://awill.co/writing/sitemap.xml
+Sitemap: https://awill.co/lists/sitemap.xml
