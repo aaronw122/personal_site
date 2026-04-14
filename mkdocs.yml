@@ -1,11 +1,11 @@
 site_name: Writing
 site_url: https://awill.co/writing/ # prod URL for the /writing subpath
 docs_dir: /Users/aaron/Documents/Obsidian_AW/Writing # just the folder you want public
-site_dir: ./src/writing # <- change to YOUR site's static dir
+site_dir: ./public/writing # <- outputs to public/ for Vite to serve
 
 theme:
   name: null
-  custom_dir: src/writing_theme
+  custom_dir: src-legacy/writing_theme
 
 plugins:
   - roamlinks

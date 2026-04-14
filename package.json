@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 420",
+    "dev": "vite --port 4200",
     "build": "vite build",
     "preview": "vite preview"
   },
@@ -18,8 +18,13 @@
     "vite": "^6.4.2"
   },
   "dependencies": {
+    "@tailwindcss/typography": "^0.5.19",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "react-router-dom": "^7.14.1"
+    "react-markdown": "^10.1.0",
+    "react-router-dom": "^7.14.1",
+    "rehype-raw": "^7.0.0",
+    "remark-frontmatter": "^5.0.0",
+    "remark-gfm": "^4.0.1"
   }
 }
