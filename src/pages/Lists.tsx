@@ -1,3 +1,5 @@
+import usePageTitle from "../hooks/usePageTitle";
+
 const lists = [
   { title: "questions", href: "/lists/questions/" },
   { title: "books", href: "/lists/books/" },
@@ -14,6 +16,7 @@ const lists = [
 ];
 
 export default function Lists() {
+  usePageTitle("lists");
   return (
     <div>
       <h2>lists</h2>

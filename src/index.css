@@ -20,6 +20,7 @@ html {
   position: relative;
   min-height: 100%;
   background-color: var(--color-surface);
+  overscroll-behavior: auto;
 }
 
 body {
@@ -31,6 +32,7 @@ body {
 
 /* headings */
 h2 {
+  font-size: 32px;
   margin-bottom: 0;
   padding-bottom: 0;
 }
@@ -52,10 +54,13 @@ img {
 }
 
 /* links */
-a,
-a:visited {
+a {
   color: #212529;
   text-decoration: none;
+}
+
+a:visited {
+  color: #212529;
 }
 
 /* blockquotes */
@@ -146,5 +151,20 @@ p {
 
 /* headerlinks (mkdocs compat) */
 .headerlink {
+  display: none;
+}
+
+/* prose overflow (mkdocs compat) */
+.prose {
+  overflow-x: auto;
+}
+
+/* hide scrollbar utility */
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
   display: none;
 }

@@ -1,3 +1,5 @@
+import usePageTitle from "../hooks/usePageTitle";
+
 const articles = [
   { title: "product thinking", href: "/writing/product%20thinking/" },
   { title: "fractal blogs", href: "/writing/fractal%20blogs/" },
@@ -16,6 +18,7 @@ const articles = [
 ];
 
 export default function Writing() {
+  usePageTitle("writing");
   return (
     <div>
       <h2>writing</h2>

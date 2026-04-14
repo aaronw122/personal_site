@@ -1,9 +1,12 @@
+import usePageTitle from "../hooks/usePageTitle";
+
 export default function About() {
+  usePageTitle("about");
   return (
     <div>
       <h2>about</h2>
 
-      <div className="flex flex-row gap-8 mt-4 max-[640px]:flex-col">
+      <div className="flex flex-row gap-3 mt-4 max-[480px]:flex-col">
         <div className="flex-1">
           <p>hey! i'm aaron.</p>
           <p>
@@ -28,7 +31,7 @@ export default function About() {
             </a>
           </p>
         </div>
-        <div className="flex-shrink-0 max-w-[250px] max-[640px]:max-w-full max-[640px]:mx-auto">
+        <div className="flex-shrink-0 max-w-[250px] max-[480px]:max-w-full max-[480px]:mx-auto pt-[18px] pr-[12px]">
           <img
             src="/images/Platform_9_34_cropped.png"
             alt="photo of aaron"
