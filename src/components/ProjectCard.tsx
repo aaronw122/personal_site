@@ -18,7 +18,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         {project.description}
       </p>
       <span className="text-sm underline underline-offset-2">
-        {project.blogUrl ? "read the blog post" : project.linkText}
+        {project.linkText}
       </span>
       <p className="text-xs italic opacity-50 mt-2 mb-0">{project.stack}</p>
     </a>

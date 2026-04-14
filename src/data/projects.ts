@@ -19,7 +19,7 @@ export const FEATURED_PROJECTS: Project[] = [
   {
     name: "musicMixer",
     description:
-      "upload two songs, splits stems with bsroformer, and mixes vocals from one with instrumentals from the other.",
+      "upload two songs, splits stems with bs roformer sw, and mixes vocals from one with instrumentals from the other.",
     url: "https://mixer.awill.co",
     linkText: "mixer.awill.co",
     stack: "react, python, bsroformer",
