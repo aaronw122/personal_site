@@ -28,7 +28,7 @@ spec: docs/intents/personal-site-revamp.md
 5. Create root `index.html` (Vite entry point) with Google Fonts, favicon, OG meta, tie-dye preload
 6. Create `src/main.tsx`, `src/App.tsx` (minimal)
 7. Create `src/index.css` with Tailwind import + theme tokens matching existing CSS vars
-8. Update `package.json` scripts: `dev` (port 420), `build`, `preview`
+8. Update `package.json` scripts: `dev` (po im rrt 420), `build`, `preview`
 9. Create `nginx.conf` for SPA fallback + static MkDocs serving
 10. Update `Dockerfile` to COPY `dist/` instead of `src/`
 11. Update `.gitignore` (add `dist/`, `node_modules/`)
@@ -88,7 +88,8 @@ src/
 2. **Bio + Photo:** concise 2-3 sentence bio on left, photo on right (stacked on mobile, photo VISIBLE)
 3. **Project Showcase:** horizontal scroll, 6 cards + "see more" CTA card → `/experience`
 4. **Magic Quote:** "as a child i wanted to believe the magic..."
-5. **Footer**
+5. **Social Links:** twitter, github, linkedin
+6. **Footer**
 
 ### Components:
 ```
@@ -104,7 +105,7 @@ src/
     Home.tsx            — assembles hero + showcase + quote
 ```
 
-### Proposed 6 projects (from experience page):
+### Proposed 5 projects (from experience page):
 1. **musicMixer** — upload 2 songs, extract vocals + instrumentals, create mashup (mixer.awill.co)
 2. **particleArt** — fine-tuned Stable Diffusion for text-to-particle-art (prtkl.net)
 3. **multiDraw** — multi-project Excalidraw clone, local-first (multidraw.net)
@@ -125,7 +126,7 @@ src/
 
 **Goal:** Full bio on `/about`, experience page, writing/lists indexes as React components.
 
-- **`About.tsx`** — full 5-paragraph bio from current homepage + photo + social links
+- **`About.tsx`** — full 5-paragraph bio from current homepage
 - **`Experience.tsx`** — all work history + full project list (converted from current HTML)
 - **`Writing.tsx`** — article index (links use `<a>` to static MkDocs pages)
 - **`Lists.tsx`** — lists index (links use `<a>` to static MkDocs pages)
@@ -151,10 +152,13 @@ src/
 
 **Goal:** `npm run build` → `dist/` → Docker → works.
 
-1. Build script: `npm run build` (Vite copies `public/` to `dist/` automatically)
-2. nginx.conf with hybrid SPA/static routing
-3. Updated Dockerfile: `COPY dist /usr/share/nginx/html`
-4. Smoke test: `docker compose up --build`, verify all routes
+1. Update `build.sh` — run `mkdocs build` then `npm run build` (MkDocs outputs to `public/`, Vite copies to `dist/`)
+2. Update `buildlist.sh` — same pattern with `mkdocs build -f mkdocs-lists.yml`
+3. nginx.conf with hybrid SPA/static routing
+4. Updated Dockerfile: `COPY dist /usr/share/nginx/html`
+5. Update `.zed/tasks.json` if script behavior changes
+6. `deploy.sh` — no changes needed (already runs `docker compose up`)
+7. Smoke test: `docker compose up --build`, verify all routes
 
 ---
 
