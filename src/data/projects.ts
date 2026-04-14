@@ -3,6 +3,7 @@ export interface Project {
   description: string
   url: string
   linkText: string
+  blogUrl?: string
   stack: string
 }
 
@@ -29,6 +30,7 @@ export const FEATURED_PROJECTS: Project[] = [
       "type text, generates particle art via a fine-tuned stable diffusion model.",
     url: "https://prtkl.net",
     linkText: "prtkl.net",
+    blogUrl: "/writing/fine%20tuning%20stable%20diffusion%20to%20create%20particle%20art",
     stack: "react, stable diffusion, python",
   },
   {

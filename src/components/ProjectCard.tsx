@@ -7,7 +7,7 @@ interface ProjectCardProps {
 export default function ProjectCard({ project }: ProjectCardProps) {
   return (
     <a
-      href={project.url}
+      href={project.blogUrl || project.url}
       target="_blank"
       rel="noopener noreferrer"
       className="flex flex-col w-[280px] min-w-[280px] snap-start border border-black/15 rounded-md p-5 bg-black/[0.03]
@@ -18,7 +18,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         {project.description}
       </p>
       <span className="text-sm underline underline-offset-2">
-        {project.linkText}
+        {project.blogUrl ? "read the blog post" : project.linkText}
       </span>
       <p className="text-xs italic opacity-50 mt-2 mb-0">{project.stack}</p>
     </a>
