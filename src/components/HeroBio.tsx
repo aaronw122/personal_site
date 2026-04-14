@@ -8,7 +8,7 @@ export default function HeroBio() {
         <h5 className="text-base font-light mt-0.5">new york, ny</h5>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-6 items-start">
+      <div className="flex flex-col min-[481px]:flex-row gap-3 items-start">
         <div className="flex-1">
           <p className="text-base leading-relaxed">
             hey, i'm aaron. pm turned engineer. i build things that help people
@@ -21,11 +21,11 @@ export default function HeroBio() {
           </p>
         </div>
 
-        <div className="w-full sm:w-[200px] sm:min-w-[200px]">
+        <div className="w-full min-[481px]:w-[200px] min-[481px]:min-w-[200px] pt-[18px] pr-[12px]">
           <img
             src="/images/Platform_9_34_cropped.png"
             alt="photo of aaron"
-            className="rounded-lg w-full max-w-[200px] mx-auto sm:mx-0"
+            className="rounded-[var(--radius-md)] w-full max-w-[200px] mx-auto min-[481px]:mx-0"
           />
         </div>
       </div>

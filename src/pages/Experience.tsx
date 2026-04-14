@@ -1,4 +1,7 @@
+import usePageTitle from "../hooks/usePageTitle";
+
 export default function Experience() {
+  usePageTitle("experience");
   return (
     <div>
       <h2>experience</h2>
