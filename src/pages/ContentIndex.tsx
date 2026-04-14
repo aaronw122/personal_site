@@ -15,9 +15,13 @@ export default function ContentIndex({ section, loadIndex }: Props) {
   const [content, setContent] = useState<string | null>(null);
 
   useEffect(() => {
-    loadIndex().then((raw) => {
-      setContent(processMarkdown(stripFrontmatter(raw), section));
-    });
+    loadIndex()
+      .then((raw) => {
+        setContent(processMarkdown(stripFrontmatter(raw), section));
+      })
+      .catch(() => {
+        setContent("");
+      });
   }, [loadIndex, section]);
 
   if (!content) return <div>loading...</div>;
