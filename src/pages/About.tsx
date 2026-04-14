@@ -6,38 +6,29 @@ export default function About() {
     <div>
       <h2>about</h2>
 
-      <div className="flex flex-row gap-3 mt-4 max-[480px]:flex-col">
-        <div className="flex-1">
-          <p>hey! i'm aaron.</p>
-          <p>
-            aspiring renaissance man. engineer currently building at fractal nyc.
-          </p>
-          <p>
-            spent two years as a PM at expedia building products that drove $7M
-            in annual profit. switched to engineering because i wanted to build
-            things instead. check out my projects{" "}
-            <a href="/experience/#projects">here.</a>
-          </p>
-          <p>
-            i live for learning new things, the outdoors, meeting new people, and
-            live music.
-          </p>
-          <p>
-            i'd describe most of my friends as misfits. i'm drawn to people who
-            are independent, curious, and have a thirst for adventure. if that
-            sounds like you, reach out to{" "}
-            <a href="mailto:youfoundaaron@gmail.com">
-              <i>youfoundaaron@gmail.com</i>
-            </a>
-          </p>
-        </div>
-        <div className="flex-shrink-0 max-w-[250px] max-[480px]:max-w-full max-[480px]:mx-auto pt-[18px] pr-[12px]">
-          <img
-            src="/images/Platform_9_34_cropped.png"
-            alt="photo of aaron"
-            className="rounded-[var(--radius-md)]"
-          />
-        </div>
+      <div className="mt-4">
+        <p>hey! i'm aaron.</p>
+        <p>
+          aspiring renaissance man. engineer currently building at fractal nyc.
+        </p>
+        <p>
+          spent two years as a PM at expedia building products that drove $7M
+          in annual profit. switched to engineering because i wanted to build
+          things instead. check out my projects{" "}
+          <a href="/experience/#projects" className="underline underline-offset-2">here.</a>
+        </p>
+        <p>
+          i live for learning new things, the outdoors, meeting new people, and
+          live music.
+        </p>
+        <p>
+          i'd describe most of my friends as misfits. i'm drawn to people who
+          are independent, curious, and have a thirst for adventure. if that
+          sounds like you, reach out to{" "}
+          <a href="mailto:youfoundaaron@gmail.com">
+            <i>youfoundaaron@gmail.com</i>
+          </a>
+        </p>
       </div>
 
       <p className="mt-6 italic">

@@ -1,7 +1,9 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @theme {
-  --font-primary: "Lato", sans-serif;
+  --font-primary: "Geist", sans-serif;
+  --font-serif: "Instrument Serif", serif;
   --color-bg: #f82;
   --color-bg-code: rgba(255, 255, 255, 0.1);
   --color-fg-1: #212529;
@@ -30,133 +32,43 @@ body {
   background: transparent;
 }
 
-/* headings */
-h2 {
-  font-size: 32px;
-  margin-bottom: 0;
-  padding-bottom: 0;
-}
+/* heading hierarchy — inspired by joyceis.online */
+h1 { font-family: var(--font-serif); font-size: 2rem; font-weight: 400; margin: 1em 0 0.8em; }
+h2 { font-size: 1.125rem; font-weight: 600; margin: 1em 0 0.8em; }
+h3 { font-size: 1.05rem; font-weight: 650; margin: 0.8em 0 0.6em; }
+h4 { font-size: 1rem; font-weight: 500; margin: 0.8em 0 0.6em; }
+h5 { font-size: 0.95em; font-weight: 400; margin: 0.6em 0 0.5em; }
+h6 { font-size: 0.875em; font-weight: 400; margin: 0.6em 0 0.5em; }
 
-h4 {
-  margin: 5px 0;
-}
+p { margin: 0.75em 0; }
 
-h5 {
-  font-weight: 300;
-  margin-top: 1px;
-}
+strong, b { font-weight: 600; }
 
-/* images */
-img {
-  display: block;
-  max-width: 100%;
-  margin: 0 auto;
-}
+/* override typography plugin heading sizes inside prose */
+.prose h1 { font-family: var(--font-serif); font-size: 2rem; font-weight: 400; }
+.prose h2 { font-size: 1.125rem; font-weight: 600; }
+.prose h3 { font-size: 1rem; font-weight: 600; }
+.prose h4 { font-size: 1rem; font-weight: 600; }
 
-/* links */
-a {
-  color: #212529;
-  text-decoration: none;
-}
+/* tighten hr in prose */
+.prose hr { margin: 1.5em 0; border-top: 1px solid rgba(0, 0, 0, 0.15); }
 
-a:visited {
-  color: #212529;
-}
-
-/* blockquotes */
-blockquote {
-  margin: 1.5em 0;
-  padding: 0.75em 1.25em;
-  border-left: 3px solid #212529;
-  background: rgba(255, 255, 255, 0.15);
-  font-style: italic;
-}
-
-blockquote p {
-  margin: 0;
-}
-
-blockquote code {
-  font-style: normal;
-}
-
-/* tables */
-table {
-  width: 100%;
+/* prose table borders */
+.prose table {
   border-collapse: collapse;
-  margin: 1.5em 0;
-  font-size: 0.9rem;
 }
 
-th,
-td {
-  text-align: left;
+.prose th,
+.prose td {
+  border: 1px solid rgba(0, 0, 0, 0.2);
   padding: 0.5em 0.75em;
-  border: 1px solid rgba(0, 0, 0, 0.3);
 }
 
-th {
-  font-weight: 700;
-}
-
-/* code blocks */
-pre {
-  background: var(--color-bg-code);
-  border-radius: var(--radius-sm);
-  padding: 1em;
-  overflow-x: auto;
-  font-size: 0.875rem;
-  line-height: 1.5;
-  margin: 1.5em 0;
-}
-
-code {
-  font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
-  font-size: 0.875em;
-}
-
-:not(pre) > code {
-  background: var(--color-bg-code);
-  padding: 0.15em 0.4em;
-  border-radius: var(--radius-xs);
-}
-
-/* lists */
-ul,
-ol {
-  padding-left: 1.5em;
-  margin: 0.75em 0;
-}
-
-li {
-  margin: 0.25em 0;
-}
-
-li > ul,
-li > ol {
-  margin: 0.25em 0;
-}
-
-/* horizontal rules */
-hr {
-  border: none;
-  border-top: 1px solid rgba(0, 0, 0, 0.15);
-  margin: 2em 0;
-}
-
-/* paragraphs */
-p {
-  margin: 10px 0;
-}
-
-/* headerlinks (mkdocs compat) */
-.headerlink {
-  display: none;
-}
-
-/* prose overflow (mkdocs compat) */
-.prose {
-  overflow-x: auto;
+/* link color */
+a,
+a:visited {
+  color: var(--color-fg-1);
+  font-weight: 400;
 }
 
 /* hide scrollbar utility */

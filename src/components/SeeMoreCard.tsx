@@ -5,8 +5,8 @@ export default function SeeMoreCard() {
     <Link
       to="/experience#projects"
       className="flex items-center justify-center w-[280px] min-w-[280px] snap-start
-        rounded-xl border-2 border-dashed border-current/20 p-5
-        transition-all duration-200 hover:border-current/40 hover:bg-white/5"
+        border border-black/15 rounded-md p-5 bg-black/[0.03]
+        transition-colors duration-200 hover:bg-black/[0.06]"
     >
       <span className="text-lg">see more &rarr;</span>
     </Link>

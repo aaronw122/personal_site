@@ -1,6 +1,8 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
 
 export default function HeroBio() {
+  const [lightbox, setLightbox] = useState(false);
+
   return (
     <section>
       <div className="mb-6">
@@ -11,24 +13,42 @@ export default function HeroBio() {
       <div className="flex flex-col min-[481px]:flex-row gap-3 items-start">
         <div className="flex-1">
           <p className="text-base leading-relaxed">
-            hey, i'm aaron. pm turned engineer. i build things that help people
-            connect, create, and learn.
+            hey! i'm aaron. aspiring renaissance man. engineer currently building at fractal nyc.
           </p>
-          <p className="mt-3">
-            <Link to="/about" className="underline underline-offset-2">
-              read more about me &rarr;
-            </Link>
+          <p className="text-base leading-relaxed">
+            i spent two years as a PM at expedia building products that drove $7M in annual profit. switched to engineering because i wanted to build things instead. check out my projects below.
           </p>
         </div>
 
-        <div className="w-full min-[481px]:w-[200px] min-[481px]:min-w-[200px] pt-[18px] pr-[12px]">
+        <div className="w-full min-[481px]:w-[200px] min-[481px]:min-w-[200px] pt-4.5 pr-3">
           <img
             src="/images/Platform_9_34_cropped.png"
             alt="photo of aaron"
-            className="rounded-[var(--radius-md)] w-full max-w-[200px] mx-auto min-[481px]:mx-0"
+            className="rounded-md w-full max-w-[200px] mx-auto min-[481px]:mx-0 cursor-pointer"
+            onClick={() => setLightbox(true)}
           />
         </div>
       </div>
+
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+          onClick={() => setLightbox(false)}
+        >
+          <button
+            className="absolute top-4 right-4 text-white text-3xl leading-none cursor-pointer"
+            onClick={() => setLightbox(false)}
+          >
+            &times;
+          </button>
+          <img
+            src="/images/Platform_9_34_cropped.png"
+            alt="photo of aaron"
+            className="max-w-[90vw] max-h-[85vh] rounded-md"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </section>
   );
 }

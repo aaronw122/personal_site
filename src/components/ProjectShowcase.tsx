@@ -8,7 +8,7 @@ export default function ProjectShowcase() {
       <h3 className="text-lg font-bold mb-4">what i've built</h3>
 
       <div
-        className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 hide-scrollbar"
+        className="flex gap-4 overflow-x-auto snap-x pb-4 hide-scrollbar max-[480px]:-mx-6 max-[480px]:pl-6 max-[480px]:scroll-pl-6"
       >
         {FEATURED_PROJECTS.map((project) => (
           <ProjectCard key={project.name} project={project} />
