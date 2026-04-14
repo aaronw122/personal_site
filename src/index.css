@@ -1,0 +1,150 @@
+@import "tailwindcss";
+
+@theme {
+  --font-primary: "Lato", sans-serif;
+  --color-bg: #f82;
+  --color-bg-code: rgba(255, 255, 255, 0.1);
+  --color-fg-1: #212529;
+  --color-accent: rgb(75, 189, 255);
+  --color-surface: #f0ebe4;
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}
+
+html {
+  font-family: var(--font-primary), sans-serif;
+  font-size: 16px;
+  box-sizing: border-box;
+  position: relative;
+  min-height: 100%;
+  background-color: var(--color-surface);
+}
+
+body {
+  box-sizing: inherit;
+  line-height: 1.6;
+  margin: 0;
+  background: transparent;
+}
+
+/* headings */
+h2 {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+h4 {
+  margin: 5px 0;
+}
+
+h5 {
+  font-weight: 300;
+  margin-top: 1px;
+}
+
+/* images */
+img {
+  display: block;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* links */
+a,
+a:visited {
+  color: #212529;
+  text-decoration: none;
+}
+
+/* blockquotes */
+blockquote {
+  margin: 1.5em 0;
+  padding: 0.75em 1.25em;
+  border-left: 3px solid #212529;
+  background: rgba(255, 255, 255, 0.15);
+  font-style: italic;
+}
+
+blockquote p {
+  margin: 0;
+}
+
+blockquote code {
+  font-style: normal;
+}
+
+/* tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+  font-size: 0.9rem;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.5em 0.75em;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+th {
+  font-weight: 700;
+}
+
+/* code blocks */
+pre {
+  background: var(--color-bg-code);
+  border-radius: var(--radius-sm);
+  padding: 1em;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 1.5em 0;
+}
+
+code {
+  font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
+  font-size: 0.875em;
+}
+
+:not(pre) > code {
+  background: var(--color-bg-code);
+  padding: 0.15em 0.4em;
+  border-radius: var(--radius-xs);
+}
+
+/* lists */
+ul,
+ol {
+  padding-left: 1.5em;
+  margin: 0.75em 0;
+}
+
+li {
+  margin: 0.25em 0;
+}
+
+li > ul,
+li > ol {
+  margin: 0.25em 0;
+}
+
+/* horizontal rules */
+hr {
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+  margin: 2em 0;
+}
+
+/* paragraphs */
+p {
+  margin: 10px 0;
+}
+
+/* headerlinks (mkdocs compat) */
+.headerlink {
+  display: none;
+}
