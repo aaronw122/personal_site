@@ -1,0 +1,5 @@
+# robots.txt for awill.co
+
+User-agent: *
+Allow: /
+
