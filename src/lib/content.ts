@@ -16,20 +16,6 @@ export interface ContentEntry {
   loader: () => Promise<string>;
 }
 
-function slugFromPath(p: string): string {
-  // Use the filename without extension as the slug — no encoding
-  // React Router decodes URL params, so slugs must be unencoded to match
-  return p.split("/").pop()!.replace(/\.md$/, "");
-}
-
-function extractFrontmatterTitle(raw: string): string | null {
-  const match = raw.match(/^---\n([\s\S]*?)\n---/);
-  if (!match) return null;
-  const titleLine = match[1].split("\n").find((l) => l.startsWith("title:"));
-  if (!titleLine) return null;
-  return titleLine.replace("title:", "").trim().replace(/^["']|["']$/g, "");
-}
-
 export function stripFrontmatter(raw: string): string {
   return raw.replace(/^---\n[\s\S]*?\n---\n*/, "");
 }
@@ -62,19 +48,6 @@ export function processMarkdown(
   return result;
 }
 
-function buildEntries(
-  modules: Record<string, () => Promise<unknown>>,
-): ContentEntry[] {
-  return Object.entries(modules)
-    .filter(([p]) => !p.endsWith("/index.md"))
-    .map(([p, loader]) => ({
-      slug: slugFromPath(p),
-      title: slugFromPath(p),
-      loader: loader as () => Promise<string>,
-    }))
-    .sort((a, b) => a.title.localeCompare(b.title));
-}
-
 export function getWritingEntries(): ContentEntry[] {
   return buildEntries(writingModules);
 }
@@ -97,4 +70,33 @@ export async function loadEntry(
     title: fmTitle || entry.title,
     content: stripFrontmatter(raw),
   };
+}
+
+// — Private helpers —
+
+function slugFromPath(p: string): string {
+  // Use the filename without extension as the slug — no encoding
+  // React Router decodes URL params, so slugs must be unencoded to match
+  return p.split("/").pop()!.replace(/\.md$/, "");
+}
+
+function extractFrontmatterTitle(raw: string): string | null {
+  const match = raw.match(/^---\n([\s\S]*?)\n---/);
+  if (!match) return null;
+  const titleLine = match[1].split("\n").find((l) => l.startsWith("title:"));
+  if (!titleLine) return null;
+  return titleLine.replace("title:", "").trim().replace(/^["']|["']$/g, "");
+}
+
+function buildEntries(
+  markdownModules: Record<string, () => Promise<unknown>>,
+): ContentEntry[] {
+  return Object.entries(markdownModules)
+    .filter(([p]) => !p.endsWith("/index.md"))
+    .map(([p, loader]) => ({
+      slug: slugFromPath(p),
+      title: slugFromPath(p),
+      loader: loader as () => Promise<string>,
+    }))
+    .sort((a, b) => a.title.localeCompare(b.title));
 }

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Lightbox from "./Lightbox";
 
 export default function HeroBio() {
   const [lightbox, setLightbox] = useState(false);
@@ -30,25 +31,12 @@ export default function HeroBio() {
         </div>
       </div>
 
-      {lightbox && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
-          onClick={() => setLightbox(false)}
-        >
-          <button
-            className="absolute top-4 right-4 text-white text-3xl leading-none cursor-pointer"
-            onClick={() => setLightbox(false)}
-          >
-            &times;
-          </button>
-          <img
-            src="/images/Platform_9_34_cropped.png"
-            alt="photo of aaron"
-            className="max-w-[90vw] max-h-[85vh] rounded-md"
-            onClick={(e) => e.stopPropagation()}
-          />
-        </div>
-      )}
+      <Lightbox
+        open={lightbox}
+        onClose={() => setLightbox(false)}
+        src="/images/Platform_9_34_cropped.png"
+        alt="photo of aaron"
+      />
     </section>
   );
 }
