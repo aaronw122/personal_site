@@ -8,8 +8,8 @@ const PALETTE = [
 ] as const;
 
 /* ── splotch tuning ── */
-const MIN_SPLOTCHES = 2;
-const MAX_SPLOTCHES = 3;
+const MIN_SPLOTCHES = 1;
+const MAX_SPLOTCHES = 2;
 const SPAWN_MIN_MS = 3_000;
 const SPAWN_MAX_MS = 6_000;
 const LIFETIME_MIN_FRAMES = 180;   // 6s  @ 30 fps
@@ -18,8 +18,8 @@ const CONTENT_WIDTH = 680;
 const MARGIN_OVERLAP = 40;
 const SPIRAL_TURNS = 3;
 const BLOBS_PER_TURN = 14;
-const MAX_OPACITY = 0.65;
-const MIN_OPACITY = 0.30;
+const MAX_OPACITY = 0.25;
+const MIN_OPACITY = 0.15;
 
 interface Splotch {
   x: number;
@@ -89,22 +89,29 @@ export default function GenerativeSwirls() {
         });
       }
 
-      function scheduleSpawn(p: import("p5").default) {
-        const delay = randomBetween(SPAWN_MIN_MS, SPAWN_MAX_MS);
+      // spawn a wave of splotches staggered over time, then stop
+      function spawnWave(p: import("p5").default) {
+        if (cancelled) return;
+        const count = Math.random() < 0.67 ? 2 : 1;
+        for (let i = 0; i < count; i++) {
+          const staggerDelay = randomBetween(0, 3000);
+          setTimeout(() => {
+            if (cancelled) return;
+            spawnSplotch(p);
+            if (!running) {
+              running = true;
+              p.loop();
+            }
+          }, staggerDelay);
+        }
+      }
+
+      // schedule next wave after a 1-2s break
+      function scheduleNextWave(p: import("p5").default) {
         spawnTimer = setTimeout(() => {
           if (cancelled) return;
-          if (splotches.length < MIN_SPLOTCHES) {
-            const burst = MIN_SPLOTCHES - splotches.length;
-            for (let i = 0; i < burst; i++) spawnSplotch(p);
-          } else {
-            spawnSplotch(p);
-          }
-          if (!running) {
-            running = true;
-            p.loop();
-          }
-          scheduleSpawn(p);
-        }, delay);
+          spawnWave(p);
+        }, randomBetween(1000, 2000));
       }
 
       function drawSplotch(p: import("p5").default, s: Splotch) {
@@ -159,7 +166,7 @@ export default function GenerativeSwirls() {
           p.frameRate(30);
           p.noLoop();
           running = false;
-          scheduleSpawn(p);
+          spawnWave(p);
         };
 
         p.draw = () => {
@@ -178,6 +185,7 @@ export default function GenerativeSwirls() {
           if (splotches.length === 0) {
             running = false;
             p.noLoop();
+            scheduleNextWave(p);
           }
         };
 
