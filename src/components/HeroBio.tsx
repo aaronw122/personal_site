@@ -25,7 +25,7 @@ export default function HeroBio() {
           <img
             src="/images/Platform_9_34_cropped.png"
             alt="photo of aaron"
-            className="rounded-md w-full max-w-[200px] mx-auto min-[481px]:mx-0 cursor-pointer"
+            className="w-full max-w-[200px] mx-auto min-[481px]:mx-0 cursor-pointer"
             onClick={() => setLightbox(true)}
           />
         </div>
