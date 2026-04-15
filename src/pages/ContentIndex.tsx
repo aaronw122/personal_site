@@ -24,7 +24,7 @@ export default function ContentIndex({ section, loadIndex }: Props) {
       });
   }, [loadIndex, section]);
 
-  if (!content) return <div>loading...</div>;
+  if (content === null) return <div>loading...</div>;
 
   return (
     <div>

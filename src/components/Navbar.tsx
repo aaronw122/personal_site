@@ -1,17 +1,5 @@
 import { NavLink } from "react-router-dom";
 
-function SiteLogo() {
-  return (
-    <img
-      src="/images/upside_down_transparent.png"
-      alt="site logo"
-      width="36"
-      height="36"
-      className=""
-    />
-  );
-}
-
 export default function Navbar() {
   return (
     <nav className="flex flex-row justify-between items-center w-full pt-[50px] max-[480px]:pt-[40px]">
@@ -46,5 +34,16 @@ export default function Navbar() {
         </NavLink>
       </div>
     </nav>
+  );
+}
+
+function SiteLogo() {
+  return (
+    <img
+      src="/images/upside_down_transparent.png"
+      alt="site logo"
+      width="36"
+      height="36"
+    />
   );
 }
