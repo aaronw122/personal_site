@@ -1,0 +1,96 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@font-face {
+  font-family: "Geist";
+  src: url("/fonts/Geist.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Instrument Serif";
+  src: url("/fonts/InstrumentSerif.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@theme {
+  --font-primary: "Geist", sans-serif;
+  --font-serif: "Instrument Serif", serif;
+  --color-bg: #f82;
+  --color-bg-code: rgba(255, 255, 255, 0.1);
+  --color-fg-1: #212529;
+  --color-accent: rgb(75, 189, 255);
+  --color-surface: #f0ebe4;
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}
+
+html {
+  font-family: var(--font-primary), sans-serif;
+  font-size: 16px;
+  box-sizing: border-box;
+  position: relative;
+  min-height: 100%;
+  background-color: var(--color-surface);
+  overscroll-behavior: auto;
+}
+
+body {
+  box-sizing: inherit;
+  line-height: 1.6;
+  margin: 0;
+  background: transparent;
+}
+
+/* heading hierarchy — inspired by joyceis.online */
+h1 { font-family: var(--font-serif); font-size: 2rem; font-weight: 400; margin: 1em 0 0.8em; }
+h2 { font-size: 1.125rem; font-weight: 600; margin: 1em 0 0.8em; }
+h3 { font-size: 1.05rem; font-weight: 650; margin: 0.8em 0 0.6em; }
+h4 { font-size: 1rem; font-weight: 500; margin: 0.8em 0 0.6em; }
+h5 { font-size: 0.95em; font-weight: 400; margin: 0.6em 0 0.5em; }
+h6 { font-size: 0.875em; font-weight: 400; margin: 0.6em 0 0.5em; }
+
+p { margin: 0.75em 0; }
+
+strong, b { font-weight: 600; }
+
+/* override typography plugin heading sizes inside prose */
+.prose h1 { font-family: var(--font-serif); font-size: 2rem; font-weight: 400; }
+.prose h2 { font-size: 1.125rem; font-weight: 600; }
+.prose h3 { font-size: 1rem; font-weight: 600; }
+.prose h4 { font-size: 1rem; font-weight: 600; }
+
+/* tighten hr in prose */
+.prose hr { margin: 1.5em 0; border-top: 1px solid rgba(0, 0, 0, 0.15); }
+
+/* prose table borders */
+.prose table {
+  border-collapse: collapse;
+}
+
+.prose th,
+.prose td {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  padding: 0.5em 0.75em;
+}
+
+/* link color */
+a,
+a:visited {
+  color: var(--color-fg-1);
+  font-weight: 400;
+}
+
+/* hide scrollbar utility */
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
