@@ -85,6 +85,66 @@ a:visited {
   font-weight: 400;
 }
 
+/* notebook paper card */
+.notebook-card {
+  position: relative;
+  overflow: hidden;
+  background-color: #faf6f0;
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 27px,
+      rgba(120, 140, 165, 0.12) 27px,
+      rgba(120, 140, 165, 0.12) 28px
+    );
+  background-position: 0 32px;
+}
+
+/* red margin line */
+.notebook-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 36px;
+  width: 1px;
+  height: 100%;
+  background: rgba(232, 142, 142, 0.4);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* spiral holes and frilly torn edge */
+.notebook-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 18px;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  background:
+    /* neomorphic hole shadows — soft inset ring */
+    repeating-radial-gradient(
+      circle at 9px 0,
+      rgba(0, 0, 0, 0.08) 3.5px,
+      rgba(0, 0, 0, 0.03) 4.5px,
+      transparent 5px
+    )
+    0 14px / 18px 28px repeat-y,
+    /* hole fill — surface color showing through as the "punch" */
+    repeating-radial-gradient(
+      circle at 9px 0,
+      #e8e3dc 0,
+      #e8e3dc 3.5px,
+      transparent 3.5px
+    )
+    0 14px / 18px 28px repeat-y,
+    /* frill strip base — slightly different tone from card paper */
+    linear-gradient(to right, #ece7e0, #f2ede6 50%, #faf6f0);
+}
+
 /* hide scrollbar utility */
 .hide-scrollbar {
   scrollbar-width: none;
