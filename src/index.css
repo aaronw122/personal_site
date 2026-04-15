@@ -54,7 +54,7 @@ h4 { font-size: 1rem; font-weight: 500; margin: 0.8em 0 0.6em; }
 h5 { font-size: 0.95em; font-weight: 400; margin: 0.6em 0 0.5em; }
 h6 { font-size: 0.875em; font-weight: 400; margin: 0.6em 0 0.5em; }
 
-p { margin: 0.75em 0; }
+.prose p { margin: 0.75em 0; }
 
 strong, b { font-weight: 600; }
 
@@ -89,16 +89,39 @@ a:visited {
 .notebook-card {
   position: relative;
   overflow: hidden;
+  background: transparent;
+  filter: drop-shadow(2px 3px 3px rgba(0, 0, 0, 0.08));
+  /* punch-through holes — site background shows through */
+  -webkit-mask-image: radial-gradient(circle at 12px 11.5px, transparent 4px, white 4.5px);
+  mask-image: radial-gradient(circle at 12px 11.5px, transparent 4px, white 4.5px);
+  -webkit-mask-size: 100% 23px;
+  mask-size: 100% 23px;
+  -webkit-mask-position: 0 0;
+  mask-position: 0 0;
+  -webkit-mask-repeat: repeat-y;
+  mask-repeat: repeat-y;
+}
+
+/* paper background — offset right so frill area is transparent */
+.notebook-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 24px;
   background-color: #faf6f0;
   background-image:
+    /* clean header zone for title — no lines */
+    linear-gradient(to bottom, #faf6f0 43px, transparent 43px),
+    /* ruled lines — 23px spacing, aligned so text sits between lines */
     repeating-linear-gradient(
       to bottom,
       transparent,
-      transparent 27px,
-      rgba(120, 140, 165, 0.12) 27px,
-      rgba(120, 140, 165, 0.12) 28px
+      transparent 22px,
+      rgba(120, 140, 165, 0.12) 22px,
+      rgba(120, 140, 165, 0.12) 23px
     );
-  background-position: 0 32px;
+  background-position: 0 0, 0 21px;
+  pointer-events: none;
+  z-index: -1;
 }
 
 /* red margin line */
@@ -112,37 +135,6 @@ a:visited {
   background: rgba(232, 142, 142, 0.4);
   pointer-events: none;
   z-index: 1;
-}
-
-/* spiral holes and frilly torn edge */
-.notebook-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 18px;
-  height: 100%;
-  pointer-events: none;
-  z-index: 2;
-  background:
-    /* neomorphic hole shadows — soft inset ring */
-    repeating-radial-gradient(
-      circle at 9px 0,
-      rgba(0, 0, 0, 0.08) 3.5px,
-      rgba(0, 0, 0, 0.03) 4.5px,
-      transparent 5px
-    )
-    0 14px / 18px 28px repeat-y,
-    /* hole fill — surface color showing through as the "punch" */
-    repeating-radial-gradient(
-      circle at 9px 0,
-      #e8e3dc 0,
-      #e8e3dc 3.5px,
-      transparent 3.5px
-    )
-    0 14px / 18px 28px repeat-y,
-    /* frill strip base — slightly different tone from card paper */
-    linear-gradient(to right, #ece7e0, #f2ede6 50%, #faf6f0);
 }
 
 /* hide scrollbar utility */
