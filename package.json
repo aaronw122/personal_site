@@ -25,6 +25,7 @@
     "react-router-dom": "^7.14.1",
     "rehype-raw": "^7.0.0",
     "remark-frontmatter": "^5.0.0",
-    "remark-gfm": "^4.0.1"
+    "remark-gfm": "^4.0.1",
+    "web-haptics": "^0.0.6"
   }
 }
