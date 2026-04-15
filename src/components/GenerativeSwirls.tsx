@@ -4,27 +4,22 @@ import useIsDesktop from "../hooks/useIsDesktop";
 /* ── colour palette (from site theme) ── */
 const PALETTE = [
   [255, 136, 34],   // orange  #ff8822  (--color-bg / #f82)
-  [240, 235, 228],  // cream   #f0ebe4  (--color-surface)
   [75, 189, 255],   // blue    rgb(75, 189, 255) (--color-accent)
 ] as const;
 
 /* ── splotch tuning ── */
-const MIN_SPLOTCHES = 4;
-const MAX_SPLOTCHES = 6;
+const MIN_SPLOTCHES = 2;
+const MAX_SPLOTCHES = 3;
 const SPAWN_MIN_MS = 3_000;
 const SPAWN_MAX_MS = 6_000;
 const LIFETIME_MIN_FRAMES = 180;   // 6s  @ 30 fps
 const LIFETIME_MAX_FRAMES = 420;   // 14s @ 30 fps
-const PATHS_PER_SPLOTCH_MIN = 20;
-const PATHS_PER_SPLOTCH_MAX = 40;
 const CONTENT_WIDTH = 680;
 const MARGIN_OVERLAP = 40;
-const TOP_STRIP = 150;
-const BOTTOM_STRIP = 150;
-const NOISE_SCALE = 0.005;
-const PATH_STEPS = 12;
-const MAX_OPACITY = 0.40;
-const MIN_OPACITY = 0.15;
+const SPIRAL_TURNS = 3;
+const BLOBS_PER_TURN = 14;
+const MAX_OPACITY = 0.65;
+const MIN_OPACITY = 0.30;
 
 interface Splotch {
   x: number;
@@ -35,7 +30,6 @@ interface Splotch {
   age: number;
   lifetime: number;
   seed: number;
-  pathCount: number;
 }
 
 function randomBetween(min: number, max: number): number {
@@ -75,10 +69,6 @@ export default function GenerativeSwirls() {
           () => [randomBetween(0, colLeft + MARGIN_OVERLAP), randomBetween(0, p.height)],
           // right gutter
           () => [randomBetween(colRight - MARGIN_OVERLAP, p.width), randomBetween(0, p.height)],
-          // top strip
-          () => [randomBetween(0, p.width), randomBetween(0, TOP_STRIP)],
-          // bottom strip
-          () => [randomBetween(0, p.width), randomBetween(p.height - BOTTOM_STRIP, p.height)],
         ];
 
         return zones[Math.floor(Math.random() * zones.length)]();
@@ -90,13 +80,12 @@ export default function GenerativeSwirls() {
         splotches.push({
           x,
           y,
-          size: randomBetween(80, 200),
+          size: randomBetween(50, 80),
           color: PALETTE[Math.floor(Math.random() * PALETTE.length)],
           maxOpacity: randomBetween(MIN_OPACITY, MAX_OPACITY),
           age: 0,
           lifetime: Math.floor(randomBetween(LIFETIME_MIN_FRAMES, LIFETIME_MAX_FRAMES)),
           seed: Math.random() * 1000,
-          pathCount: Math.floor(randomBetween(PATHS_PER_SPLOTCH_MIN, PATHS_PER_SPLOTCH_MAX)),
         });
       }
 
@@ -132,38 +121,35 @@ export default function GenerativeSwirls() {
         if (opacity <= 0) return;
 
         const [r, g, b] = s.color;
-        const timeSeed = s.seed + s.age * 0.003;
+        const rotation = -progress * p.TWO_PI;
 
-        p.noFill();
+        p.noStroke();
 
-        for (let i = 0; i < s.pathCount; i++) {
-          const angle0 = (i / s.pathCount) * p.TWO_PI;
-          const jitter = randomBetween(0, s.size * 0.2);
-          let px = s.x + Math.cos(angle0) * jitter;
-          let py = s.y + Math.sin(angle0) * jitter;
+        const totalBlobs = SPIRAL_TURNS * BLOBS_PER_TURN;
 
-          const baseWeight = randomBetween(1.5, 4);
-          p.stroke(r, g, b, opacity * 255);
+        p.noStroke();
 
-          p.beginShape();
-          p.splineVertex(px, py);
-          p.splineVertex(px, py);
+        for (let i = 0; i < totalBlobs; i++) {
+          const t = i / totalBlobs;
 
-          for (let step = 0; step < PATH_STEPS; step++) {
-            const noiseAngle =
-              p.noise(px * NOISE_SCALE, py * NOISE_SCALE, timeSeed + i * 0.1) *
-              p.TWO_PI * 2;
-            const stepLen = s.size / PATH_STEPS;
-            px += Math.cos(noiseAngle) * stepLen;
-            py += Math.sin(noiseAngle) * stepLen;
+          const angle = -t * SPIRAL_TURNS * p.TWO_PI + rotation;
+          const baseRadius = t * s.size;
 
-            const taper = 1 - step / PATH_STEPS;
-            p.strokeWeight(baseWeight * fade * taper);
-            p.splineVertex(px, py);
+          const noiseVal = p.noise(t * 2 + s.seed, 0, s.seed);
+          const displacement = (noiseVal - 0.5) * s.size * 0.25;
+          const radius = baseRadius + displacement;
+
+          const bx = s.x + Math.cos(angle) * radius;
+          const by = s.y + Math.sin(angle) * radius;
+
+          const blobSize = (4 + t * s.size * 0.15) * (0.7 + p.noise(i + s.seed) * 0.6);
+
+          for (let layer = 3; layer >= 0; layer--) {
+            const layerScale = 1 + layer * 0.4;
+            const layerAlpha = opacity * 255 * (0.15 - layer * 0.03);
+            p.fill(r, g, b, layerAlpha);
+            p.ellipse(bx, by, blobSize * layerScale, blobSize * layerScale);
           }
-
-          p.splineVertex(px, py);
-          p.endShape();
         }
       }
 
@@ -240,7 +226,7 @@ export default function GenerativeSwirls() {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-0 pointer-events-none"
+      className="fixed inset-0 -z-1 pointer-events-none"
       aria-hidden="true"
     />
   );
