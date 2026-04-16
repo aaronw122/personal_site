@@ -70,7 +70,7 @@ export function useTornClip(seed: string): React.CSSProperties {
 }
 
 const STRIP_WIDTH = 24;
-const HOLE_SPACING = 23;
+const HOLE_SPACING = 23; // Must match mask-size y-value in .notebook-card (index.css)
 const VIEWBOX_HEIGHT = 280; // fixed viewBox, stretches to fit
 
 interface TornEdgeProps {
@@ -137,6 +137,7 @@ export default function TornEdge({ seed }: TornEdgeProps) {
       viewBox={`0 0 ${STRIP_WIDTH} ${VIEWBOX_HEIGHT}`}
       preserveAspectRatio="none"
     >
+      {/* Paper color — keep in sync with --color-paper in index.css */}
       <path d={pathData} fill="#faf6f0" />
     </svg>
   );

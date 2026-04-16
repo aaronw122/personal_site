@@ -26,7 +26,16 @@ export default function HeroBio() {
             src="/images/Platform_9_34_cropped.png"
             alt="photo of aaron"
             className="w-full max-w-[200px] mx-auto min-[481px]:mx-0 cursor-pointer"
+            tabIndex={0}
+            role="button"
+            aria-label="View full size photo"
             onClick={() => setLightbox(true)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setLightbox(true);
+              }
+            }}
           />
         </div>
       </div>

@@ -17,7 +17,7 @@ export interface ContentEntry {
 }
 
 export function stripFrontmatter(raw: string): string {
-  return raw.replace(/^---\n[\s\S]*?\n---\n*/, "");
+  return raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n*/, "");
 }
 
 // Convert [[wikilinks]] to standard markdown links and fix image paths
@@ -81,7 +81,7 @@ function slugFromPath(p: string): string {
 }
 
 function extractFrontmatterTitle(raw: string): string | null {
-  const match = raw.match(/^---\n([\s\S]*?)\n---/);
+  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!match) return null;
   const titleLine = match[1].split("\n").find((l) => l.startsWith("title:"));
   if (!titleLine) return null;
