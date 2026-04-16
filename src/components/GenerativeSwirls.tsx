@@ -8,10 +8,7 @@ const PALETTE = [
 ] as const;
 
 /* ── splotch tuning ── */
-const MIN_SPLOTCHES = 1;
 const MAX_SPLOTCHES = 2;
-const SPAWN_MIN_MS = 3_000;
-const SPAWN_MAX_MS = 6_000;
 const LIFETIME_MIN_FRAMES = 180;   // 6s  @ 30 fps
 const LIFETIME_MAX_FRAMES = 420;   // 14s @ 30 fps
 const CONTENT_WIDTH = 680;

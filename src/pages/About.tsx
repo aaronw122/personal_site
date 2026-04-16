@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import usePageTitle from "../hooks/usePageTitle";
 
 export default function About() {
@@ -15,7 +16,7 @@ export default function About() {
           spent two years as a PM at expedia building products that drove $7M
           in annual profit. switched to engineering because i wanted to build
           things instead. check out my projects{" "}
-          <a href="/experience/#projects" className="underline underline-offset-2">here.</a>
+          <Link to="/experience#projects" className="underline underline-offset-2">here.</Link>
         </p>
         <p>
           i live for learning new things, the outdoors, meeting new people, and
