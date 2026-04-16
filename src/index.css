@@ -99,8 +99,10 @@ a:visited {
   font-weight: 400;
 }
 
-/* notebook paper card */
-.notebook-card {
+/* notebook paper — shared base for cards and pages */
+.notebook-card,
+.notebook-page {
+  --nb-header: 0px;
   position: relative;
   overflow: hidden;
   background: transparent;
@@ -116,30 +118,51 @@ a:visited {
   mask-repeat: repeat-y;
 }
 
+/* notebook page — no drop-shadow, line spacing matches prose text */
+.notebook-page {
+  filter: none;
+  line-height: 26px;
+  -webkit-mask-size: 100% 26px;
+  mask-size: 100% 26px;
+  -webkit-mask-image: radial-gradient(circle at 12px 13px, transparent 4px, white 4.5px);
+  mask-image: radial-gradient(circle at 12px 13px, transparent 4px, white 4.5px);
+}
+
+.notebook-page .prose {
+  line-height: 26px;
+}
+
 /* paper background — offset right so frill area is transparent */
-.notebook-card::before {
+.notebook-card::before,
+.notebook-page::before {
   content: "";
   position: absolute;
   inset: 0 0 0 24px;
   background-color: var(--color-paper);
   background-image:
-    /* clean header zone for title — no lines */
-    linear-gradient(to bottom, var(--color-paper) 43px, transparent 43px),
-    /* ruled lines — 23px spacing, aligned so text sits between lines */
+    /* optional header zone — set --nb-header on the card to enable */
+    linear-gradient(to bottom, var(--color-paper) var(--nb-header), transparent var(--nb-header)),
+    /* ruled lines — 23px spacing */
     repeating-linear-gradient(
       to bottom,
       transparent,
       transparent 22px,
-      rgba(120, 140, 165, 0.12) 22px,
-      rgba(120, 140, 165, 0.12) 23px
+      rgba(155, 210, 230, 0.45) 22px,
+      rgba(155, 210, 230, 0.45) 23px
     );
   background-position: 0 0, 0 21px;
   pointer-events: none;
   z-index: -1;
 }
 
+/* notebook page: no ruled lines */
+.notebook-page::before {
+  background-image: none;
+}
+
 /* red margin line */
-.notebook-card::after {
+.notebook-card::after,
+.notebook-page::after {
   content: "";
   position: absolute;
   top: 0;
