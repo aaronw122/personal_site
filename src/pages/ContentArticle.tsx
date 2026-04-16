@@ -17,7 +17,20 @@ function LightboxImage(props: React.ImgHTMLAttributes<HTMLImageElement>) {
 
   return (
     <>
-      <img {...props} className="cursor-pointer" onClick={() => setOpen(true)} />
+      <img
+        {...props}
+        className="cursor-pointer"
+        tabIndex={0}
+        role="button"
+        aria-label="View full size image"
+        onClick={() => setOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setOpen(true);
+          }
+        }}
+      />
       <Lightbox
         open={open}
         onClose={() => setOpen(false)}
@@ -45,16 +58,24 @@ export default function ContentArticle({ section, entries }: Props) {
 
   useEffect(() => {
     if (!slug) return;
+    let cancelled = false;
     setLoading(true);
     loadEntry(entries, slug)
       .then((result) => {
-        setArticle(result);
-        setLoading(false);
+        if (!cancelled) {
+          setArticle(result);
+          setLoading(false);
+        }
       })
       .catch(() => {
-        setArticle(null);
-        setLoading(false);
+        if (!cancelled) {
+          setArticle(null);
+          setLoading(false);
+        }
       });
+    return () => {
+      cancelled = true;
+    };
   }, [slug, entries]);
 
   if (loading) return <div>loading...</div>;
