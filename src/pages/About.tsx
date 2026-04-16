@@ -6,7 +6,7 @@ export default function About() {
     <div>
       <h2>about</h2>
 
-      <div className="mt-4">
+      <div className="prose mt-4">
         <p>hey! i'm aaron.</p>
         <p>
           aspiring renaissance man. engineer currently building at fractal nyc.

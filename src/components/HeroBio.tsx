@@ -12,7 +12,7 @@ export default function HeroBio() {
       </div>
 
       <div className="flex flex-col min-[481px]:flex-row gap-3 items-start">
-        <div className="flex-1">
+        <div className="prose flex-1">
           <p className="text-base leading-relaxed">
             hey! i'm aaron. aspiring renaissance man. engineer currently building at fractal nyc.
           </p>
