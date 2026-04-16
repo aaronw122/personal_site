@@ -22,6 +22,7 @@
   --color-bg-code: rgba(255, 255, 255, 0.1);
   --color-fg-1: #212529;
   --color-accent: rgb(75, 189, 255);
+  --color-paper: #faf6f0;
   --color-surface: #f0ebe4;
   --radius-xs: 4px;
   --radius-sm: 8px;
@@ -103,11 +104,11 @@ a:visited {
   position: relative;
   overflow: hidden;
   background: transparent;
-  filter: drop-shadow(2px 3px 3px rgba(0, 0, 0, 0.08));
+  box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.08);
   /* punch-through holes — site background shows through */
   -webkit-mask-image: radial-gradient(circle at 12px 11.5px, transparent 4px, white 4.5px);
   mask-image: radial-gradient(circle at 12px 11.5px, transparent 4px, white 4.5px);
-  -webkit-mask-size: 100% 23px;
+  -webkit-mask-size: 100% 23px; /* Must match HOLE_SPACING in TornEdge.tsx */
   mask-size: 100% 23px;
   -webkit-mask-position: 0 0;
   mask-position: 0 0;
@@ -120,10 +121,10 @@ a:visited {
   content: "";
   position: absolute;
   inset: 0 0 0 24px;
-  background-color: #faf6f0;
+  background-color: var(--color-paper);
   background-image:
     /* clean header zone for title — no lines */
-    linear-gradient(to bottom, #faf6f0 43px, transparent 43px),
+    linear-gradient(to bottom, var(--color-paper) 43px, transparent 43px),
     /* ruled lines — 23px spacing, aligned so text sits between lines */
     repeating-linear-gradient(
       to bottom,
