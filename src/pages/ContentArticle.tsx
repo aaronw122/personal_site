@@ -50,6 +50,7 @@ export default function ContentArticle({ section, entries }: Props) {
   const { slug } = useParams<{ slug: string }>();
   const [article, setArticle] = useState<{
     title: string;
+    date: string | null;
     content: string;
   } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -93,6 +94,15 @@ export default function ContentArticle({ section, entries }: Props) {
   return (
     <div>
       <h2>{article.title}</h2>
+      {article.date && (
+        <p className="text-sm opacity-50 -mt-2 mb-4">
+          {new Date(article.date + "T00:00:00").toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
+        </p>
+      )}
       <div className="prose prose-neutral max-w-none marker:text-[var(--color-fg-1)]">
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkFrontmatter]}

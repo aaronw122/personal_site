@@ -59,15 +59,16 @@ export function getListsEntries(): ContentEntry[] {
 export async function loadEntry(
   entries: ContentEntry[],
   slug: string,
-): Promise<{ title: string; content: string } | null> {
+): Promise<{ title: string; date: string | null; content: string } | null> {
   // React Router decodes URL params, so compare decoded slugs
   const decoded = decodeURIComponent(slug);
   const entry = entries.find((e) => e.slug === decoded);
   if (!entry) return null;
   const raw = await entry.loader();
-  const fmTitle = extractFrontmatterTitle(raw);
+  const fm = extractFrontmatter(raw);
   return {
-    title: fmTitle || entry.title,
+    title: fm.title || entry.title,
+    date: fm.creation_date || null,
     content: stripFrontmatter(raw),
   };
 }
@@ -80,12 +81,18 @@ function slugFromPath(p: string): string {
   return p.split("/").pop()!.replace(/\.md$/, "");
 }
 
-function extractFrontmatterTitle(raw: string): string | null {
+function extractFrontmatter(raw: string): Record<string, string> {
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
-  if (!match) return null;
-  const titleLine = match[1].split("\n").find((l) => l.startsWith("title:"));
-  if (!titleLine) return null;
-  return titleLine.replace("title:", "").trim().replace(/^["']|["']$/g, "");
+  if (!match) return {};
+  const result: Record<string, string> = {};
+  for (const line of match[1].split("\n")) {
+    const idx = line.indexOf(":");
+    if (idx === -1) continue;
+    const key = line.slice(0, idx).trim();
+    const val = line.slice(idx + 1).trim().replace(/^["']|["']$/g, "");
+    if (key && val) result[key] = val;
+  }
+  return result;
 }
 
 function buildEntries(
