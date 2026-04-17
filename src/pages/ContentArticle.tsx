@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkFrontmatter from "remark-frontmatter";
@@ -11,6 +11,7 @@ import {
   processMarkdown,
 } from "../lib/content";
 import Lightbox from "../components/Lightbox";
+import { usePaperAirplane } from "../context/PaperAirplaneContext";
 
 function LightboxImage(props: React.ImgHTMLAttributes<HTMLImageElement>) {
   const [open, setOpen] = useState(false);
@@ -48,6 +49,8 @@ interface Props {
 
 export default function ContentArticle({ section, entries }: Props) {
   const { slug } = useParams<{ slug: string }>();
+  const { reportDestination, phase } = usePaperAirplane();
+  const titleRef = useRef<HTMLHeadingElement>(null);
   const [article, setArticle] = useState<{
     title: string;
     date: string | null;
@@ -79,6 +82,12 @@ export default function ContentArticle({ section, entries }: Props) {
     };
   }, [slug, entries]);
 
+  useEffect(() => {
+    if (article && phase !== "idle" && titleRef.current) {
+      reportDestination(titleRef.current.getBoundingClientRect());
+    }
+  }, [article, phase, reportDestination]);
+
   if (loading) return <div>loading...</div>;
   if (!article) {
     return (
@@ -93,7 +102,7 @@ export default function ContentArticle({ section, entries }: Props) {
 
   return (
     <div>
-      <h2>{article.title}</h2>
+      <h2 ref={titleRef}>{article.title}</h2>
       {article.date && (
         <p className="text-sm opacity-50 -mt-2 mb-4">
           {new Date(article.date + "T00:00:00").toLocaleDateString("en-US", {
