@@ -1,6 +1,9 @@
+import { useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import type { Project } from "../data/projects";
 import TornEdge, { useTornClip } from "./TornEdge";
+import { usePaperAirplane } from "../context/PaperAirplaneContext";
+import useIsDesktop from "../hooks/useIsDesktop";
 
 interface ProjectCardProps {
   project: Project;
@@ -29,12 +32,48 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   const href = project.blogUrl || project.url;
   const isInternal = href.startsWith("/");
   const clipStyle = useTornClip(project.name);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const { triggerAnimation } = usePaperAirplane();
+  const isDesktop = useIsDesktop();
+
+  const handleActivate = useCallback(() => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    triggerAnimation(rect, href, project);
+  }, [triggerAnimation, href, project]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        handleActivate();
+      }
+    },
+    [handleActivate],
+  );
 
   if (isInternal) {
+    if (!isDesktop) {
+      return (
+        <Link to={href} className={cardClassName} style={clipStyle}>
+          <CardContent project={project} />
+        </Link>
+      );
+    }
+
     return (
-      <Link to={href} className={cardClassName} style={clipStyle}>
+      <div
+        ref={cardRef}
+        role="link"
+        tabIndex={0}
+        data-airplane-card
+        className={`${cardClassName} cursor-pointer`}
+        style={clipStyle}
+        onClick={handleActivate}
+        onKeyDown={handleKeyDown}
+      >
         <CardContent project={project} />
-      </Link>
+      </div>
     );
   }
 
