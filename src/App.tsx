@@ -1,11 +1,10 @@
-import React, { Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Experience from "./pages/Experience";
 import ContentIndex from "./pages/ContentIndex";
-const ContentArticle = React.lazy(() => import("./pages/ContentArticle"));
+import ContentArticle from "./pages/ContentArticle";
 import NotFound from "./pages/NotFound";
 import { getWritingEntries, getListsEntries } from "./lib/content";
 
@@ -34,9 +33,7 @@ export default function App() {
         <Route
           path="/writing/:slug"
           element={
-            <Suspense fallback={null}>
-              <ContentArticle section="writing" entries={writingEntries} />
-            </Suspense>
+            <ContentArticle section="writing" entries={writingEntries} />
           }
         />
         <Route
@@ -48,9 +45,7 @@ export default function App() {
         <Route
           path="/lists/:slug"
           element={
-            <Suspense fallback={null}>
-              <ContentArticle section="lists" entries={listsEntries} />
-            </Suspense>
+            <ContentArticle section="lists" entries={listsEntries} />
           }
         />
         <Route path="*" element={<NotFound />} />
