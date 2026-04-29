@@ -6,7 +6,7 @@ export default function BackgroundImage() {
       role="presentation"
       decoding="sync"
       fetchPriority="high"
-      className="fixed top-[-50vh] left-0 w-full h-[200vh] object-cover object-center -z-1 pointer-events-none m-0"
+      className="background-image"
     />
   );
 }

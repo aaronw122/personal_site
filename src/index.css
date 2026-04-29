@@ -264,3 +264,122 @@ a:visited {
     1  TornEdge red margin line (::after pseudo)
    50  Lightbox overlay
 --- */
+
+/* ========================================================================
+   Component CSS — Overlay & Utility Components (Agent A)
+   ======================================================================== */
+
+/* --- component: BackgroundImage --- */
+.background-image {
+  position: fixed;
+  top: -50vh;
+  left: 0;
+  width: 100%;
+  height: 200vh;
+  object-fit: cover;
+  object-position: center;
+  z-index: -1;
+  pointer-events: none;
+  margin: 0;
+}
+
+/* --- component: TornEdge --- */
+.torn-edge-svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 24px;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* --- component: GenerativeSwirls --- */
+.generative-swirls {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* --- component: Lightbox --- */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  outline: none;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  color: white;
+  font-size: 1.875rem;
+  line-height: 1;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.lightbox-image {
+  max-width: 90vw;
+  max-height: 85vh;
+  border-radius: var(--radius-md);
+}
+
+/* --- component: SeeMoreCard --- */
+.see-more-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 320px;
+  min-width: 320px;
+  scroll-snap-align: start;
+  padding: 20px 20px 20px 44px;
+  transition: all 200ms;
+}
+
+.see-more-card:hover {
+  transform: translateY(-2px);
+}
+
+.see-more-label {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+/* --- component: Footer --- */
+.site-footer {
+  text-align: center;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: #737373;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  margin-top: 3rem;
+  border-top: 1px solid #d4d4d4;
+}
+
+.site-footer-copyright {
+  margin-bottom: 0.5rem;
+}
+
+.site-footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.site-footer-links a {
+  text-decoration: none;
+  color: #737373;
+}
+
+.site-footer-links a:hover {
+  color: #404040;
+}

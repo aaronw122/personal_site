@@ -231,7 +231,7 @@ export default function GenerativeSwirls() {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 -z-1 pointer-events-none"
+      className="generative-swirls"
       aria-hidden="true"
     />
   );
