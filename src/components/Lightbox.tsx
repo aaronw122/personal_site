@@ -71,13 +71,13 @@ export default function Lightbox({ open, onClose, src, alt }: LightboxProps) {
       aria-modal="true"
       aria-label={alt || "Enlarged image"}
       tabIndex={-1}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 outline-none"
+      className="lightbox-overlay"
       onClick={onClose}
       onKeyDown={handleKeyDown}
     >
       <button
         ref={closeRef}
-        className="absolute top-4 right-4 text-white text-3xl leading-none cursor-pointer"
+        className="lightbox-close"
         aria-label="Close lightbox"
         onClick={onClose}
       >
@@ -86,7 +86,7 @@ export default function Lightbox({ open, onClose, src, alt }: LightboxProps) {
       <img
         src={src}
         alt={alt}
-        className="max-w-[90vw] max-h-[85vh] rounded-md"
+        className="lightbox-image"
         onClick={(e) => e.stopPropagation()}
       />
     </div>
