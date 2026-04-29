@@ -264,3 +264,120 @@ a:visited {
     1  TornEdge red margin line (::after pseudo)
    50  Lightbox overlay
 --- */
+
+/* --- component: Navbar --- */
+.navbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding-top: 50px;
+}
+
+.navbar-links {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.navbar-link {
+  color: var(--color-fg-1);
+  text-decoration: none;
+  padding: 0.5rem 0.75rem;
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding-top: 40px;
+  }
+  .navbar-links {
+    gap: 0.5rem;
+  }
+  .navbar-link {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
+/* --- component: Layout --- */
+.layout-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-bottom: 75px;
+}
+
+.layout-main {
+  line-height: 1.6;
+  text-transform: lowercase;
+}
+
+/* --- component: HeroBio --- */
+.hero-header {
+  margin-bottom: 1.5rem;
+}
+
+.hero-name {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 700;
+}
+
+.hero-location {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 300;
+  margin-top: 0.125rem;
+}
+
+.hero-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.hero-bio {
+  flex: 1;
+}
+
+.hero-bio-text {
+  font-size: 1rem;
+  line-height: 1.625;
+}
+
+.hero-photo-wrapper {
+  width: 100%;
+  padding-top: 1.125rem;
+  padding-right: 0.75rem;
+}
+
+.hero-photo {
+  width: 100%;
+  max-width: 200px;
+  margin-left: auto;
+  margin-right: auto;
+  cursor: pointer;
+}
+
+@media (min-width: 481px) {
+  .hero-content {
+    flex-direction: row;
+  }
+  .hero-photo-wrapper {
+    width: 200px;
+    min-width: 200px;
+  }
+  .hero-photo {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
