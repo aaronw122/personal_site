@@ -1,6 +1,12 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* --- CSS reset --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+img, picture, video, canvas, svg { display: block; max-width: 100%; }
+button, input, select, textarea { font: inherit; }
+a { text-decoration: none; }
+
 @font-face {
   font-family: "Geist";
   src: url("/fonts/Geist.woff2") format("woff2");
@@ -15,7 +21,7 @@
   font-display: swap;
 }
 
-@theme {
+:root {
   --font-primary: "Geist", sans-serif;
   --font-serif: "Instrument Serif", serif;
   --color-bg: #f82;
@@ -96,6 +102,45 @@ blockquote, blockquote p {
   border: 1px solid rgba(0, 0, 0, 0.2);
   padding: 0.5em 0.75em;
 }
+
+/* --- vanilla prose base (replaces @tailwindcss/typography foundation) --- */
+.prose {
+  color: var(--color-fg-1);
+  max-width: 65ch;
+}
+.prose a {
+  text-decoration: underline;
+  color: inherit;
+}
+.prose code {
+  background: var(--color-bg-code);
+  padding: 0.15em 0.35em;
+  border-radius: var(--radius-xs);
+  font-size: 0.875em;
+}
+.prose pre {
+  background: var(--color-fg-1);
+  color: var(--color-paper);
+  padding: 1em;
+  overflow-x: auto;
+  border-radius: var(--radius-sm);
+}
+.prose pre code {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+}
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+}
+.prose > :first-child { margin-top: 0; }
+.prose > :last-child { margin-bottom: 0; }
+
+/* prose-full: remove max-width constraint (replaces max-w-none) */
+.prose-full { max-width: none; }
 
 /* link color */
 a,
@@ -188,3 +233,34 @@ a:visited {
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* --- notebook card layout --- */
+.notebook-card-inner {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 20px 20px 44px;
+  transition: all 200ms;
+}
+.notebook-card-inner:hover {
+  transform: translateY(-2px);
+}
+
+/* --- prose content wrapper --- */
+.prose-content {
+  max-width: none;
+}
+.prose-content ul,
+.prose-content ol {
+  list-style-position: inside;
+}
+.prose-content ::marker {
+  color: var(--color-fg-1);
+}
+
+/* --- z-index stacking order ---
+   -1  BackgroundImage (fixed, behind everything)
+   -1  GenerativeSwirls (fixed canvas, behind everything)
+    0  Main content (default)
+    1  TornEdge red margin line (::after pseudo)
+   50  Lightbox overlay
+--- */
