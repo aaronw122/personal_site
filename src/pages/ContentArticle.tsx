@@ -19,7 +19,7 @@ function LightboxImage(props: React.ImgHTMLAttributes<HTMLImageElement>) {
     <>
       <img
         {...props}
-        className="cursor-pointer"
+        className="lightbox-trigger"
         tabIndex={0}
         role="button"
         aria-label="View full size image"
@@ -95,7 +95,7 @@ export default function ContentArticle({ section, entries }: Props) {
     <div>
       <h2>{article.title}</h2>
       {article.date && (
-        <p className="text-sm opacity-50 -mt-2 mb-4">
+        <p className="article-date">
           {new Date(article.date + "T00:00:00").toLocaleDateString("en-US", {
             year: "numeric",
             month: "long",
@@ -103,7 +103,7 @@ export default function ContentArticle({ section, entries }: Props) {
           })}
         </p>
       )}
-      <div className="prose prose-neutral max-w-none marker:text-[var(--color-fg-1)]">
+      <div className="prose prose-content">
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkFrontmatter]}
           rehypePlugins={[rehypeRaw]}
@@ -112,9 +112,9 @@ export default function ContentArticle({ section, entries }: Props) {
           {processMarkdown(article.content, section)}
         </ReactMarkdown>
       </div>
-      <hr className="my-8" />
+      <hr className="article-hr" />
       <p>
-        <Link to={`/${section}`} className="underline underline-offset-2">
+        <Link to={`/${section}`} className="link-underline">
           &larr; back to {section}
         </Link>
       </p>
