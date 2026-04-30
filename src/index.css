@@ -3,6 +3,7 @@
 img, picture, video, canvas, svg { display: block; max-width: 100%; }
 button, input, select, textarea { font: inherit; }
 a { text-decoration: none; }
+hr { border: none; border-top: 1px solid rgba(0, 0, 0, 0.15); }
 
 @font-face {
   font-family: "Geist";
@@ -248,9 +249,18 @@ a:visited {
 }
 .prose-content ul,
 .prose-content ol {
-  list-style-position: inside;
+  list-style-position: outside;
+  padding-left: 1.5em;
 }
-.prose-content ::marker {
+
+.prose-content ul ul,
+.prose-content ul ol,
+.prose-content ol ul,
+.prose-content ol ol {
+  padding-left: 1.25em;
+}
+
+.prose-content li::marker {
   color: var(--color-fg-1);
 }
 
@@ -621,6 +631,8 @@ a:visited {
 .article-hr {
   margin-top: 2rem;
   margin-bottom: 2rem;
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
 }
 .lightbox-trigger {
   cursor: pointer;
