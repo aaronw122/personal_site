@@ -132,8 +132,7 @@ export default function TornEdge({ seed }: TornEdgeProps) {
 
   return (
     <svg
-      className="absolute left-0 top-0 w-[24px] h-full pointer-events-none"
-      style={{ zIndex: 2 }}
+      className="torn-edge-svg"
       viewBox={`0 0 ${STRIP_WIDTH} ${VIEWBOX_HEIGHT}`}
       preserveAspectRatio="none"
     >

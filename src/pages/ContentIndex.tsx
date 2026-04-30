@@ -29,7 +29,7 @@ export default function ContentIndex({ section, loadIndex }: Props) {
   return (
     <div>
       <h2>{section}</h2>
-      <div className="prose prose-neutral max-w-none marker:text-[var(--color-fg-1)]">
+      <div className="prose prose-content">
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkFrontmatter]}
         >

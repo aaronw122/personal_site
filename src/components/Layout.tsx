@@ -9,9 +9,9 @@ export default function Layout() {
     <>
       <BackgroundImage />
       <GenerativeSwirls />
-      <div className="flex flex-col items-stretch w-full max-w-[680px] mx-auto px-6 pb-[75px]">
+      <div className="layout-shell">
         <Navbar />
-        <main className="leading-[1.6] lowercase">
+        <main className="layout-main">
           <Outlet />
         </main>
         <Footer />

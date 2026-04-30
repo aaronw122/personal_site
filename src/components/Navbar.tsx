@@ -2,34 +2,22 @@ import { NavLink } from "react-router-dom";
 
 export default function Navbar() {
   return (
-    <nav className="flex flex-row justify-between items-center w-full pt-[50px] max-[480px]:pt-[40px]">
+    <nav className="navbar">
       <NavLink to="/" aria-label="home">
         <SiteLogo />
       </NavLink>
 
-      <div className="flex flex-row items-center gap-3 max-[480px]:gap-2">
-        <NavLink
-          to="/about"
-          className="text-fg-1 no-underline px-3 py-2 max-[480px]:px-2"
-        >
+      <div className="navbar-links">
+        <NavLink to="/about" className="navbar-link">
           about
         </NavLink>
-        <NavLink
-          to="/experience"
-          className="text-fg-1 no-underline px-3 py-2 max-[480px]:px-2"
-        >
+        <NavLink to="/experience" className="navbar-link">
           experience
         </NavLink>
-        <NavLink
-          to="/writing"
-          className="text-fg-1 no-underline px-3 py-2 max-[480px]:px-2"
-        >
+        <NavLink to="/writing" className="navbar-link">
           writing
         </NavLink>
-        <NavLink
-          to="/lists"
-          className="text-fg-1 no-underline px-3 py-2 max-[480px]:px-2"
-        >
+        <NavLink to="/lists" className="navbar-link">
           lists
         </NavLink>
       </div>

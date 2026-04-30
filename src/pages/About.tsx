@@ -7,7 +7,7 @@ export default function About() {
     <div>
       <h2>about</h2>
 
-      <div className="prose mt-4">
+      <div className="prose about-prose">
         <p>hey! i'm aaron.</p>
         <p>
           aspiring renaissance man. engineer currently building at fractal nyc.
@@ -16,7 +16,7 @@ export default function About() {
           spent two years as a PM at expedia building products that drove $7M
           in annual profit. switched to engineering because i wanted to build
           things instead. check out my projects{" "}
-          <Link to="/experience#projects" className="underline underline-offset-2">here.</Link>
+          <Link to="/experience#projects" className="link-underline">here.</Link>
         </p>
         <p>
           i live for learning new things, the outdoors, meeting new people, and
@@ -32,7 +32,7 @@ export default function About() {
         </p>
       </div>
 
-      <p className="mt-6 italic">
+      <p className="about-quote">
         as a child i wanted to believe the magic in the books i read was real.
         its not, but turns out tech is a close second.
       </p>
