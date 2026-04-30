@@ -7,20 +7,20 @@ interface ProjectCardProps {
 }
 
 const cardClassName =
-  "flex flex-col w-[320px] min-w-[320px] snap-start pl-11 pr-5 pt-5 pb-5 notebook-card transition-all duration-200 hover:-translate-y-0.5";
+  "notebook-card notebook-card-inner project-card";
 
 function CardContent({ project }: ProjectCardProps) {
   return (
     <>
       <TornEdge seed={project.name} />
-      <h4 className="text-base !mt-0 leading-[23px]">{project.name}</h4>
-      <p className="text-sm pt-[15px] leading-[23px] opacity-70 flex-1">
+      <h4 className="project-card-title">{project.name}</h4>
+      <p className="project-card-desc">
         {project.description}
       </p>
-      <span className="text-sm pt-[23px] leading-[23px] underline underline-offset-2">
+      <span className="project-card-link">
         {project.linkText}
       </span>
-      <p className="text-xs leading-[23px] italic opacity-50">{project.stack}</p>
+      <p className="project-card-stack">{project.stack}</p>
     </>
   );
 }
