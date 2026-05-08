@@ -23,7 +23,7 @@ hr { border: none; border-top: 1px solid rgba(0, 0, 0, 0.15); }
   --font-primary: "Geist", sans-serif;
   --font-serif: "Instrument Serif", serif;
   --color-bg: #f82;
-  --color-bg-code: rgba(255, 255, 255, 0.1);
+  --color-bg-code: rgba(0, 0, 0, 0.05);
   --color-fg-1: #212529;
   --color-accent: rgb(75, 189, 255);
   --color-paper: #faf6f0;
@@ -117,8 +117,8 @@ blockquote, blockquote p {
   font-size: 0.875em;
 }
 .prose pre {
-  background: var(--color-fg-1);
-  color: var(--color-paper);
+  background: #e8e6e3;
+  color: var(--color-fg-1);
   padding: 1em;
   overflow-x: auto;
   border-radius: var(--radius-sm);
