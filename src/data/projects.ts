@@ -14,6 +14,7 @@ export const FEATURED_PROJECTS: Project[] = [
       "full-stack AI copilot for a global payroll platform. streaming SSE chat UI with backend orchestration for tool calling.",
     url: "https://www.getthera.com/",
     linkText: "getthera.com",
+    blogUrl: "/writing/thera copilot",
     stack: "kotlin, next.js, aws bedrock",
   },
   {

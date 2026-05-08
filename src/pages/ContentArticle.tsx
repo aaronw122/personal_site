@@ -2,8 +2,11 @@ import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
 import remarkFrontmatter from "remark-frontmatter";
 import rehypeRaw from "rehype-raw";
+import rehypeHighlight from "rehype-highlight";
+import "highlight.js/styles/github.css";
 import usePageTitle from "../hooks/usePageTitle";
 import {
   type ContentEntry,
@@ -93,7 +96,7 @@ export default function ContentArticle({ section, entries }: Props) {
 
   return (
     <div>
-      <h2>{article.title}</h2>
+      <h1 className="article-title">{article.title}</h1>
       {article.date && (
         <p className="article-date">
           {new Date(article.date + "T00:00:00").toLocaleDateString("en-US", {
@@ -105,8 +108,8 @@ export default function ContentArticle({ section, entries }: Props) {
       )}
       <div className="prose prose-content">
         <ReactMarkdown
-          remarkPlugins={[remarkGfm, remarkFrontmatter]}
-          rehypePlugins={[rehypeRaw]}
+          remarkPlugins={[remarkGfm, remarkBreaks, remarkFrontmatter]}
+          rehypePlugins={[rehypeRaw, rehypeHighlight]}
           components={{ img: LightboxImage }}
         >
           {processMarkdown(article.content, section)}
