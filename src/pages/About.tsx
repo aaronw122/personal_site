@@ -12,14 +12,14 @@ export default function About() {
           so much so that i got a detention in the second grade for reading too much.
         </p>
         <p>
-          at age 14, i started caddying at evanston golf club. caddying had a big impact on me -
-          it exposed me to people from all different backgrounds, and taught me that charisma beats smarts.
-          i also got a full ride to the university of michigan as an evans scholar.
+          at age 14, i started caddying at evanston golf club. through caddying, i got exposed to people
+          from all different backgrounds, and learned that charisma beats smarts.
+          i also received a full ride to the university of michigan as an evans scholar.
         </p>
         <p>
           in college, i worked on a tarpit idea to build an app to bridge the political divide.
           we pivoted to a newsletter, and failed miserably, but i learned a lot. mainly how to lead teams,
-          and that i was interested in tech.
+          and the magic of tech.
         </p>
         <p>
           i spent 2 years at expedia as a pm building products that drove $7m in annual profit.
