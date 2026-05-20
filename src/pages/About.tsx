@@ -1,6 +1,8 @@
 import usePageTitle from "../hooks/usePageTitle";
 import EmailTooltip from "../components/EmailTooltip";
 
+export default function About() {
+  usePageTitle("about");
   return (
     <div>
       <h2>about</h2>
