@@ -585,6 +585,67 @@ a:visited {
   margin-top: 1.5rem;
   font-style: italic;
 }
+.email-tooltip-wrap {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.email-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  font-style: normal;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 1000;
+}
+.email-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #333;
+}
+.email-tooltip-wrap:hover .email-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+.email-tooltip-copy {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 4px;
+  background: #555;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.email-tooltip-copy:hover {
+  background: #666;
+}
+.email-tooltip-copy.copied {
+  background: #0066cc;
+}
 .link-underline {
   text-decoration: underline;
   text-underline-offset: 2px;
