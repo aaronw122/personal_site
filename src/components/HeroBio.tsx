@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Lightbox from "./Lightbox";
-import EmailTooltip from "./EmailTooltip";
 
 export default function HeroBio() {
   const [lightbox, setLightbox] = useState(false);
@@ -19,9 +18,6 @@ export default function HeroBio() {
           </p>
           <p className="hero-bio-text">
             i spent two years as a PM at expedia building products that drove $7M in annual profit. switched to engineering because i wanted to build things instead. check out my projects below.
-          </p>
-          <p className="home-reach-out">
-            please <EmailTooltip />! i love meeting new people.
           </p>
         </div>
 
