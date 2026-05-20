@@ -1,4 +1,4 @@
-import { useRef, useCallback } from "react";
+import { useRef } from "react";
 
 const EMAIL = "youfoundaaron@gmail.com";
 
@@ -11,7 +11,7 @@ const COPIED_HTML =
 export default function EmailTooltip() {
   const btnRef = useRef<HTMLButtonElement>(null);
 
-  const copyEmail = useCallback(() => {
+  function copyEmail() {
     navigator.clipboard.writeText(EMAIL).then(() => {
       const btn = btnRef.current;
       if (!btn) return;
@@ -22,7 +22,7 @@ export default function EmailTooltip() {
         btn.innerHTML = COPY_HTML;
       }, 2000);
     });
-  }, []);
+  }
 
   return (
     <span className="email-tooltip-wrap">
