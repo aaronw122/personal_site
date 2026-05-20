@@ -31,7 +31,7 @@ export default function Experience() {
         <Entry title="product at expedia" date="2023–2025">
           led a team of 8 developers, two machine learning engineers and one
           designer to help our travellers get better prices on hotels. contributed
-          to 7M in annual GP.
+          to 7M in annual GP. also shipped react code.
         </Entry>
 
         <Entry title="nonpolar" date="2021–2022">
@@ -74,6 +74,12 @@ export default function Experience() {
           <a href="https://github.com/aaronw122/diaHistory" className="link-underline">github.</a>
         </Entry>
 
+        <Entry title="claude connect" date="2026">
+          an mcp server that lets you ask claude about a teammate's work and
+          get answers in seconds.{" "}
+          <a href="https://github.com/aaronw122/ClaudeConnect" className="link-underline">github</a>
+        </Entry>
+
         <Entry title="CTA widget tracker" date="2025">
           every day i take the same bus to work, but i hate going through many
           clicks just to know what time it comes. i dreamed of having a widget on
@@ -83,7 +89,7 @@ export default function Experience() {
           </a>
         </Entry>
 
-        <Entry title="twitter offline poster" date="2026">
+        <Entry title="twitter offline poster" date="2025">
           wanted to post on twitter without logging in and seeing brainrot.
           vibecoded this tool in a day with codex(jun '25). damn near one shot it.{" "}
           <a href="https://easytweet.xyz" className="link-underline">easytweet.xyz</a>

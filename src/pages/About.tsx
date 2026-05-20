@@ -1,4 +1,5 @@
 import usePageTitle from "../hooks/usePageTitle";
+import EmailTooltip from "../components/EmailTooltip";
 
 export default function About() {
   usePageTitle("about");
@@ -32,10 +33,8 @@ export default function About() {
         <p>
           i'd describe most of my friends as misfits. i'm drawn to people who
           are independent, curious, and have a thirst for adventure. if that
-          sounds like you, reach out to{" "}
-          <a href="mailto:youfoundaaron@gmail.com">
-            <i>youfoundaaron@gmail.com</i>
-          </a>
+          sounds like you,{" "}
+          <EmailTooltip />
         </p>
       </div>
       <p className="about-quote">
