@@ -14,6 +14,7 @@ import {
   processMarkdown,
 } from "../lib/content";
 import Lightbox from "../components/Lightbox";
+import MarkdownLink from "../components/MarkdownLink";
 
 function LightboxImage(props: React.ImgHTMLAttributes<HTMLImageElement>) {
   const [open, setOpen] = useState(false);
@@ -110,7 +111,7 @@ export default function ContentArticle({ section, entries }: Props) {
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkBreaks, remarkFrontmatter]}
           rehypePlugins={[rehypeRaw, rehypeHighlight]}
-          components={{ img: LightboxImage }}
+          components={{ img: LightboxImage, a: MarkdownLink }}
         >
           {processMarkdown(article.content, section)}
         </ReactMarkdown>
