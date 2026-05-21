@@ -9,9 +9,6 @@ export default function Home() {
     <div>
       <HeroBio />
       <ProjectShowcase />
-      <p className="home-reach-out">
-        please <EmailTooltip />! i love meeting new people.
-      </p>
     </div>
   );
 }
