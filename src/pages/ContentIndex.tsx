@@ -4,6 +4,7 @@ import remarkGfm from "remark-gfm";
 import remarkFrontmatter from "remark-frontmatter";
 import usePageTitle from "../hooks/usePageTitle";
 import { stripFrontmatter, processMarkdown } from "../lib/content";
+import MarkdownLink from "../components/MarkdownLink";
 
 interface Props {
   section: "writing" | "lists";
@@ -32,6 +33,7 @@ export default function ContentIndex({ section, loadIndex }: Props) {
       <div className="prose prose-content">
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkFrontmatter]}
+          components={{ a: MarkdownLink }}
         >
           {content}
         </ReactMarkdown>
