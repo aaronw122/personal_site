@@ -1,0 +1,37 @@
+# Hetzner BACKUP stack for awill.co — a hot standby that mirrors the homeserver.
+#
+# How failover works (no DNS involved):
+#   awill.co's Cloudflare tunnel (id 2baf11a2…) runs as TWO cloudflared replicas
+#   sharing one token — one on the homeserver, one here. Cloudflare treats them as
+#   redundant connections and routes to whichever are alive. If the homeserver loses
+#   power/network, its connection drops and ALL awill.co traffic flows here within
+#   seconds. Both replicas serve identical content, so active/active is fine.
+#
+# This mirrors the homeserver exactly: nginx publishes host :80, and a host-network
+# cloudflared reaches it at localhost:80 (the tunnel's dashboard ingress is
+# awill.co -> http://localhost:80, shared by both replicas).
+#
+# Deploy from the mac (build context is shipped to the Hetzner daemon):
+#   docker --context hetzner compose -f docker-compose.hetzner.yml --env-file .env.hetzner up -d --build
+# Token lives in .env.hetzner (gitignored), never in this file or git.
+
+services:
+  personal_site:
+    build: .
+    image: personal_site:latest
+    restart: unless-stopped
+    ports:
+      - "80:80" # host:container — host-network cloudflared reaches this at localhost:80
+
+  # Second replica of awill.co's tunnel. Same token as the homeserver = redundant
+  # connection. Host networking so the dashboard ingress (awill.co -> localhost:80)
+  # resolves to the nginx container above.
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    network_mode: host
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CF_TUNNEL_TOKEN}
+    depends_on:
+      - personal_site

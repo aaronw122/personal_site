@@ -6,8 +6,8 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "@writing": "/Users/aaron/Documents/Obsidian_AW/Writing",
-      "@lists": "/Users/aaron/Documents/Obsidian_AW/Lists",
+      "@writing": "/Users/aaron/Documents/Obsidian_AW/published/writing",
+      "@lists": "/Users/aaron/Documents/Obsidian_AW/published/lists",
     },
   },
   build: {
