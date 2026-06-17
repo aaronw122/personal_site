@@ -33,7 +33,7 @@
 
 /* --- the book -------------------------------------------------------------- */
 .era-book {
-  --era-paper: #f1efe9;
+  --era-paper: #f4f0ea;
   /* grow to whichever screen dimension is the limit, so the open spread fills
      the viewport without overflowing (width: 2 pages; height: page * 1.4) */
   --page-w: clamp(150px, min(47vw, 62vh), 560px);
@@ -80,7 +80,7 @@
   top: 0;
   width: 50%;
   height: 100%;
-  background: var(--era-paper, #f1efe9);
+  background: var(--era-paper, #f4f0ea);
   z-index: 1;
 }
 .era-page-base--left { left: 0; box-shadow: inset -14px 0 24px -14px rgba(0, 0, 0, 0.28); }
@@ -175,7 +175,7 @@
 
 /* --- paper pages ----------------------------------------------------------- */
 .era-page {
-  background-color: var(--era-paper, #f1efe9);
+  background-color: var(--era-paper, #f4f0ea);
   background-image: radial-gradient(130% 100% at 50% 0%, rgba(255, 255, 255, 0.4), transparent 60%);
 }
 /* No per-page spine seam — every spread reads as one continuous sheet. A single
