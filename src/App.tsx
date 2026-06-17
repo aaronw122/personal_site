@@ -5,6 +5,7 @@ import About from "./pages/About";
 import Experience from "./pages/Experience";
 import ContentIndex from "./pages/ContentIndex";
 import ContentArticle from "./pages/ContentArticle";
+import Era from "./pages/Era";
 import NotFound from "./pages/NotFound";
 import { getWritingEntries, getListsEntries } from "./lib/content";
 
@@ -20,6 +21,8 @@ const loadListsIndex = () =>
 export default function App() {
   return (
     <Routes>
+      {/* standalone immersive notebook — no site chrome */}
+      <Route path="/era" element={<Era />} />
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
