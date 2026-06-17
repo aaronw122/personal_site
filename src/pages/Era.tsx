@@ -64,10 +64,10 @@ function CoverFrame() {
 
 /* One transparent PNG per page, laid over the solid paper. Until the artwork
    exists, it falls back to a labelled placeholder (or the original text), so the
-   notebook stays reviewable. Drop the files into /public/era/. */
+   notebook stays reviewable. Drop the files into /public/era-art/. */
 function PageImage({ src, label, children }: { src: string; label: string; children?: ReactNode }) {
   const [failed, setFailed] = useState(false);
-  const file = src.replace("/era/", "");
+  const file = src.replace("/era-art/", "");
 
   if (failed) {
     if (children) {
@@ -121,7 +121,7 @@ const LEAVES: Leaf[] = [
   {
     // intro (right) / quill device sketch (back → left of quill spread)
     front: (
-      <PageImage src="/era/intro.png" label="intro">
+      <PageImage src="/era-art/intro.png" label="intro">
         <p>
           over the years, we've been conditioned to use our phones and computers
           in unhealthy ways. it's difficult for me to use my phone without a
@@ -136,7 +136,7 @@ const LEAVES: Leaf[] = [
         </p>
       </PageImage>
     ),
-    back: <PageImage src="/era/quill-device.png" label="quill — device" />,
+    back: <PageImage src="/era-art/quill-device.png" label="quill — device" />,
     frontClass: "era-page",
     backClass: "era-page",
     frontLabel: "turn to the quill spread",
@@ -145,7 +145,7 @@ const LEAVES: Leaf[] = [
   {
     // quill writing (right) / tiger device sketch (back → left of tiger spread)
     front: (
-      <PageImage src="/era/quill-writing.png" label="quill — writing">
+      <PageImage src="/era-art/quill-writing.png" label="quill — writing">
         <h2 className="era-quill-title">quill</h2>
         <p>
           you are most in tune with a pen in your hand — writing thoughts and
@@ -168,7 +168,7 @@ const LEAVES: Leaf[] = [
         <p>having a way to access intelligence away from the noise is special — you deserve it.</p>
       </PageImage>
     ),
-    back: <PageImage src="/era/tiger-device.png" label="tiger — device" />,
+    back: <PageImage src="/era-art/tiger-device.png" label="tiger — device" />,
     frontClass: "era-page",
     backClass: "era-page",
     frontLabel: "turn to the tiger spread",
@@ -176,7 +176,7 @@ const LEAVES: Leaf[] = [
   },
   {
     // tiger writing (right) / blank end page
-    front: <PageImage src="/era/tiger-writing.png" label="tiger — writing" />,
+    front: <PageImage src="/era-art/tiger-writing.png" label="tiger — writing" />,
     back: null,
     frontClass: "era-page",
     backClass: "era-page",
