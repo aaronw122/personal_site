@@ -33,7 +33,7 @@
 
 /* --- the book -------------------------------------------------------------- */
 .era-book {
-  --era-paper: #f4f0ea;
+  --era-paper: #f7f5f2;
   /* grow to whichever screen dimension is the limit, so the open spread fills
      the viewport without overflowing (width: 2 pages; height: page * 1.4) */
   --page-w: clamp(150px, min(47vw, 62vh), 560px);
@@ -80,7 +80,7 @@
   top: 0;
   width: 50%;
   height: 100%;
-  background: var(--era-paper, #f4f0ea);
+  background: var(--era-paper, #f7f5f2);
   z-index: 1;
 }
 .era-page-base--left { left: 0; box-shadow: inset -14px 0 24px -14px rgba(0, 0, 0, 0.28); }
@@ -175,8 +175,9 @@
 
 /* --- paper pages ----------------------------------------------------------- */
 .era-page {
-  background-color: var(--era-paper, #f4f0ea);
-  background-image: radial-gradient(130% 100% at 50% 0%, rgba(255, 255, 255, 0.4), transparent 60%);
+  /* flat fill, no highlight — so the page is EXACTLY the Figma swatch (#f7f5f2)
+     everywhere, with nothing lightening it to break the match */
+  background-color: var(--era-paper, #f7f5f2);
 }
 /* No per-page spine seam — every spread reads as one continuous sheet. A single
    soft gutter shadow at the book's center adds depth (see .era-book::after). */
@@ -298,7 +299,7 @@
 
 /* --- mobile: one page at a time (single-page flip), used at <= 700px --------- */
 .era-mobile {
-  --era-paper: #f4f0ea;
+  --era-paper: #f7f5f2;
   position: relative;
   width: min(90vw, 64vh);
   height: calc(min(90vw, 64vh) * 1.4);
