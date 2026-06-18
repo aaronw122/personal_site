@@ -242,6 +242,18 @@
 .era-writing p { margin: 0 0 0.5em; }
 .era-writing p:last-child { margin-bottom: 0; }
 
+/* the "elevator pitch" (a markdown blockquote) — emphasized callout */
+.era-pitch {
+  font-size: 1.22em;
+  line-height: 1.08;
+  color: #3a2a17;
+  background: rgba(58, 42, 23, 0.06);
+  border-left: 3px solid rgba(58, 42, 23, 0.45);
+  border-radius: 0 8px 8px 0;
+  padding: 0.4em 0.7em;
+  margin: 0 0 0.7em;
+}
+
 /* --- transparent page artwork (one PNG per page, on the solid paper) --------
    Full-bleed: each PNG carries its own internal margins, so it fills the page
    edge-to-edge and object-fit keeps its aspect without distortion. */
