@@ -9,28 +9,28 @@ import "./EraDevices.css";
 
 // live content — editing this .md and redeploying updates the page
 import raw from "@era-content/era devices.md?raw";
-// device sketches (bundled + content-hashed)
-import quillDevice from "../era-art/quill-device.png";
-import tigerDevice from "../era-art/tiger-device.png";
 
-// map the Obsidian image embeds in the .md to the bundled device sketches
-const IMAGES: Record<string, string> = {
-  "ChatGPT Image Jun 17 2026 (1).png": quillDevice,
-  "ChatGPT Image Jun 17 2026 (2).png": tigerDevice,
-};
+// resolve Obsidian image embeds against the vault's attachment folder by
+// basename, so swapping/renaming images never needs a code change
+const imageModules = import.meta.glob("@era-images/*.png", {
+  eager: true,
+  query: "?url",
+  import: "default",
+}) as Record<string, string>;
+const IMAGES: Record<string, string> = {};
+for (const [path, url] of Object.entries(imageModules)) {
+  const base = path.split("/").pop();
+  if (base) IMAGES[base] = url;
+}
 
 function prepare(md: string): string {
-  return (
-    md
-      // drop private author notes (e.g. "**aaron note:** ...")
-      .replace(/^\s*\*\*aaron note:\*\*.*$/gim, "")
-      // Obsidian ![[embed]] -> standard markdown image pointing at the bundled asset
-      .replace(/!\[\[([^\]]+)\]\]/g, (_m, name: string) => {
-        const url = IMAGES[name.trim()];
-        return url ? `![${name.trim()}](${url})` : "";
-      })
-      .trim()
-  );
+  // verbatim content — only resolve ![[embeds]] to real image URLs
+  return md
+    .replace(/!\[\[([^\]]+)\]\]/g, (_m, name: string) => {
+      const url = IMAGES[name.trim()];
+      return url ? `![${name.trim()}](${url})` : "";
+    })
+    .trim();
 }
 
 export default function EraDevices() {
