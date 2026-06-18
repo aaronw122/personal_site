@@ -63,13 +63,11 @@ function playPageTurn() {
   }
 }
 
-// Vite content-hashes these on import, so every artwork update gets a fresh URL
-// (no stale CDN/browser cache — the root cause of "I don't see the new image").
-import introImg from "../era-art/intro.png";
+// device sketches stay as images (transparent, content-hashed)
 import quillDeviceImg from "../era-art/quill-device.png";
-import quillWritingImg from "../era-art/quill-writing.png";
 import tigerDeviceImg from "../era-art/tiger-device.png";
-import tigerWritingImg from "../era-art/tiger-writing.png";
+// notebook writing is real text now — rendered live from the .md in a handwriting font
+import rawMd from "@era-content/era/era devices 2.md?raw";
 
 /* Engraved corner flourish — drawn once, mirrored into all four corners.
    Loosely inspired by the LIFE "Noble Note" cover. */
@@ -117,11 +115,33 @@ const COVER: ReactNode = (
     </div>
   </>
 );
-const INTRO = <Art src={introImg} alt="intro — over the years" />;
+// split the .md into intro / quill / tiger writing, as plain paragraphs
+function paragraphs(block: string): string[] {
+  return block
+    .replace(/!\[\[[^\]]+\]\]/g, "") // drop image embeds
+    .split(/\n{2,}/) // blank line = paragraph break
+    .map((p) => p.replace(/\s*\n\s*/g, " ").trim())
+    .filter(Boolean);
+}
+const _quillSplit = rawMd.split(/^###\s+Quill\s*$/im);
+const _tigerSplit = (_quillSplit[1] || "").split(/^###\s+Tiger\s*$/im);
+const INTRO_PARAS = paragraphs(_quillSplit[0] || "");
+const QUILL_PARAS = paragraphs(_tigerSplit[0] || "");
+const TIGER_PARAS = paragraphs(_tigerSplit[1] || "");
+
+const Writing = ({ paras }: { paras: string[] }) => (
+  <div className="era-writing">
+    {paras.map((p, i) => (
+      <p key={i}>{p}</p>
+    ))}
+  </div>
+);
+
+const INTRO = <Writing paras={INTRO_PARAS} />;
 const QUILL_DEVICE = <Art src={quillDeviceImg} alt="quill device sketch" />;
-const QUILL_WRITING = <Art src={quillWritingImg} alt="quill writing" />;
+const QUILL_WRITING = <Writing paras={QUILL_PARAS} />;
 const TIGER_DEVICE = <Art src={tigerDeviceImg} alt="tiger device sketch" />;
-const TIGER_WRITING = <Art src={tigerWritingImg} alt="tiger writing" />;
+const TIGER_WRITING = <Writing paras={TIGER_PARAS} />;
 
 type Leaf = { front: ReactNode; back: ReactNode; frontClass: string; backClass: string };
 

@@ -228,6 +228,25 @@
   color: #2a2622;
 }
 
+/* --- notebook writing (real text in a handwriting font) -------------------- */
+.era-writing {
+  position: absolute;
+  inset: 7% 9% 8% 10%;
+  overflow-y: auto;
+  font-family: "Reenie Beanie", var(--font-serif);
+  color: #2a2622;
+  font-size: clamp(1.35rem, 4vw, 2.05rem);
+  line-height: 1.15;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(60, 50, 40, 0.28) transparent;
+}
+.era-writing::-webkit-scrollbar { width: 5px; }
+.era-writing::-webkit-scrollbar-thumb {
+  background: rgba(60, 50, 40, 0.28);
+  border-radius: 3px;
+}
+.era-writing p { margin: 0 0 0.55em; }
+
 /* --- transparent page artwork (one PNG per page, on the solid paper) --------
    Full-bleed: each PNG carries its own internal margins, so it fills the page
    edge-to-edge and object-fit keeps its aspect without distortion. */
