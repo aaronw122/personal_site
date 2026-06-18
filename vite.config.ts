@@ -9,6 +9,7 @@ export default defineConfig({
       "@writing": "/Users/aaron/Documents/Obsidian_AW/published/writing",
       "@lists": "/Users/aaron/Documents/Obsidian_AW/published/lists",
       "@era-content": "/Users/aaron/Documents/Obsidian_AW/networking/companies",
+      "@era-images": "/Users/aaron/Documents/Obsidian_AW/Code/Images 1",
     },
   },
   build: {
