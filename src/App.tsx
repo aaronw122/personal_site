@@ -6,6 +6,7 @@ import Experience from "./pages/Experience";
 import ContentIndex from "./pages/ContentIndex";
 import ContentArticle from "./pages/ContentArticle";
 import Era from "./pages/Era";
+import EraDevices from "./pages/EraDevices";
 import NotFound from "./pages/NotFound";
 import { getWritingEntries, getListsEntries } from "./lib/content";
 
@@ -22,9 +23,11 @@ export default function App() {
   return (
     <Routes>
       {/* standalone immersive notebook — no site chrome */}
-      <Route path="/era" element={<Era />} />
+      <Route path="/era-notebook" element={<Era />} />
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
+        {/* simple md-driven page */}
+        <Route path="/era" element={<EraDevices />} />
         <Route path="/about" element={<About />} />
         <Route path="/experience" element={<Experience />} />
         <Route

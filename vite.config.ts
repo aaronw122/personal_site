@@ -8,6 +8,7 @@ export default defineConfig({
     alias: {
       "@writing": "/Users/aaron/Documents/Obsidian_AW/published/writing",
       "@lists": "/Users/aaron/Documents/Obsidian_AW/published/lists",
+      "@era-content": "/Users/aaron/Documents/Obsidian_AW/networking/companies",
     },
   },
   build: {
