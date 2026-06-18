@@ -228,24 +228,19 @@
   color: #2a2622;
 }
 
-/* --- notebook writing (real text in a handwriting font) -------------------- */
+/* --- notebook writing (real text in a handwriting font) --------------------
+   font-size is set by JS (Writing component) to auto-fit each page; no scroll */
 .era-writing {
   position: absolute;
   inset: 7% 9% 8% 10%;
-  overflow-y: auto;
+  overflow: hidden;
   font-family: "Reenie Beanie", var(--font-serif);
   color: #2a2622;
-  font-size: clamp(1.35rem, 4vw, 2.05rem);
-  line-height: 1.15;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(60, 50, 40, 0.28) transparent;
+  font-size: 24px; /* fallback before JS fits */
+  line-height: 1.12;
 }
-.era-writing::-webkit-scrollbar { width: 5px; }
-.era-writing::-webkit-scrollbar-thumb {
-  background: rgba(60, 50, 40, 0.28);
-  border-radius: 3px;
-}
-.era-writing p { margin: 0 0 0.55em; }
+.era-writing p { margin: 0 0 0.5em; }
+.era-writing p:last-child { margin-bottom: 0; }
 
 /* --- transparent page artwork (one PNG per page, on the solid paper) --------
    Full-bleed: each PNG carries its own internal margins, so it fills the page

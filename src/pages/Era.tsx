@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type {
   KeyboardEvent as ReactKeyboardEvent,
   ReactNode,
@@ -129,13 +129,36 @@ const INTRO_PARAS = paragraphs(_quillSplit[0] || "");
 const QUILL_PARAS = paragraphs(_tigerSplit[0] || "");
 const TIGER_PARAS = paragraphs(_tigerSplit[1] || "");
 
-const Writing = ({ paras }: { paras: string[] }) => (
-  <div className="era-writing">
-    {paras.map((p, i) => (
-      <p key={i}>{p}</p>
-    ))}
-  </div>
-);
+// renders the writing and auto-scales the font down until it fits the page
+function Writing({ paras }: { paras: string[] }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const MAX = 42;
+    const MIN = 9;
+    const fit = () => {
+      let size = MAX;
+      el.style.fontSize = size + "px";
+      while (size > MIN && el.scrollHeight > el.clientHeight) {
+        size -= 1;
+        el.style.fontSize = size + "px";
+      }
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    // re-fit once the handwriting font has actually loaded (metrics differ)
+    if (document.fonts?.ready) document.fonts.ready.then(fit).catch(() => {});
+    return () => window.removeEventListener("resize", fit);
+  }, [paras]);
+  return (
+    <div className="era-writing" ref={ref}>
+      {paras.map((p, i) => (
+        <p key={i}>{p}</p>
+      ))}
+    </div>
+  );
+}
 
 const INTRO = <Writing paras={INTRO_PARAS} />;
 const QUILL_DEVICE = <Art src={quillDeviceImg} alt="quill device sketch" />;
