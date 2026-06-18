@@ -8,7 +8,7 @@ import MarkdownLink from "../components/MarkdownLink";
 import "./EraDevices.css";
 
 // live content — editing this .md and redeploying updates the page
-import raw from "@era-content/era devices.md?raw";
+import raw from "@era-content/era/era devices 2.md?raw";
 
 // resolve Obsidian image embeds against the vault's attachment folder by
 // basename, so swapping/renaming images never needs a code change
