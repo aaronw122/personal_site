@@ -31,6 +31,14 @@
 .era-back:visited { color: rgba(255, 255, 255, 0.55); }
 .era-back:hover { color: rgba(255, 255, 255, 0.95); }
 
+/* until first paint settles, no transitions — prevents the book/leaves from
+   animating in from their default (un-translated, full-width) state on load */
+.era-stage:not(.is-ready) .era-book,
+.era-stage:not(.is-ready) .era-leaf,
+.era-stage:not(.is-ready) .era-mpage {
+  transition: none !important;
+}
+
 /* --- the book -------------------------------------------------------------- */
 .era-book {
   --era-paper: #f7f5f2;

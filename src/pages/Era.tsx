@@ -119,6 +119,14 @@ export default function Era() {
   // index of the leaf/page currently mid-flip — kept on top until its transition
   // ends so the turning sheet never slips behind the destination page.
   const [turning, setTurning] = useState<number | null>(null);
+  // enable transitions only AFTER first paint, so the closed/centered layout
+  // appears instantly instead of animating in from the un-translated state.
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setReady(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
 
   // clamp when the layout mode (and thus page count) changes
   useEffect(() => { setPage((p) => Math.min(p, max)); }, [max]);
@@ -165,7 +173,7 @@ export default function Era() {
   };
 
   return (
-    <div className="era-stage">
+    <div className={`era-stage${ready ? " is-ready" : ""}`}>
       <Link to="/" className="era-back">← awill.co</Link>
 
       {isMobile ? (
