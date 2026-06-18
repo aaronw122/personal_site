@@ -173,12 +173,19 @@ export default function Era() {
           {MOBILE.map((pg, i) => {
             const flipped = i < page;
             const z = turning === i ? 200 : flipped ? 100 + i : 100 + MOBILE.length - i;
+            // once a page has finished turning, hide it so no "left page" /
+            // spine line shows — mobile is strictly one page at a time
+            const hidden = flipped && turning !== i;
             return (
               <div
                 key={i}
                 className="era-mpage"
                 onTransitionEnd={endTurn(i)}
-                style={{ zIndex: z, transform: flipped ? "rotateY(-180deg)" : "rotateY(0deg)" }}
+                style={{
+                  zIndex: z,
+                  transform: flipped ? "rotateY(-180deg)" : "rotateY(0deg)",
+                  visibility: hidden ? "hidden" : "visible",
+                }}
               >
                 <div className={`era-face era-face--front ${pg.cover ? "era-cover" : "era-page"}`} {...tap(() => step(1), "next page")}>
                   {pg.content}
