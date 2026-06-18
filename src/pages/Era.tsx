@@ -9,55 +9,18 @@ import { Link } from "react-router-dom";
 import usePageTitle from "../hooks/usePageTitle";
 import "./Era.css";
 
-// Synthesized page-turn sound (paper rustle) — no audio asset needed.
-// Reuses one AudioContext, created lazily on the first page turn (a user gesture).
-let _audioCtx: AudioContext | null = null;
+// Page-turn sound — plays the provided mp3 on each turn (clone allows overlap).
+import turnSound from "../era-art/page-turn.mp3";
+let _audio: HTMLAudioElement | null = null;
 function playPageTurn() {
   try {
-    const Ctx =
-      window.AudioContext ||
-      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!Ctx) return;
-    if (!_audioCtx) _audioCtx = new Ctx();
-    const ctx = _audioCtx;
-    if (ctx.state === "suspended") void ctx.resume();
-
-    const now = ctx.currentTime;
-    const dur = 0.34;
-
-    // white-noise burst = the paper rustle
-    const buffer = ctx.createBuffer(1, Math.floor(ctx.sampleRate * dur), ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
-    const noise = ctx.createBufferSource();
-    noise.buffer = buffer;
-
-    const hp = ctx.createBiquadFilter();
-    hp.type = "highpass";
-    hp.frequency.value = 600;
-
-    // bandpass sweep up-then-down mimics a page lifting and settling
-    const bp = ctx.createBiquadFilter();
-    bp.type = "bandpass";
-    bp.Q.value = 0.6;
-    bp.frequency.setValueAtTime(1200, now);
-    bp.frequency.exponentialRampToValueAtTime(4000, now + 0.1);
-    bp.frequency.exponentialRampToValueAtTime(1800, now + dur);
-
-    // two soft swells: the flick, then the settle
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(0.4, now + 0.03);
-    gain.gain.exponentialRampToValueAtTime(0.07, now + 0.16);
-    gain.gain.exponentialRampToValueAtTime(0.26, now + 0.2);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
-
-    noise.connect(hp);
-    hp.connect(bp);
-    bp.connect(gain);
-    gain.connect(ctx.destination);
-    noise.start(now);
-    noise.stop(now + dur);
+    if (!_audio) {
+      _audio = new Audio(turnSound);
+      _audio.preload = "auto";
+    }
+    const a = _audio.cloneNode(true) as HTMLAudioElement;
+    a.volume = 0.7;
+    void a.play().catch(() => {});
   } catch {
     /* audio not available — silently skip */
   }
