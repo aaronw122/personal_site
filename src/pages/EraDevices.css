@@ -1,0 +1,20 @@
+/* era devices — simple md-driven page (rendered inside the site layout) */
+
+/* device sketches sit on a clean paper card so the transparent art reads well */
+.era-md .prose img {
+  display: block;
+  width: 100%;
+  max-width: 440px;
+  margin: 1.75rem auto;
+  padding: 1rem 1.25rem;
+  background: var(--color-paper);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: var(--radius-md);
+  box-shadow: 2px 4px 14px rgba(0, 0, 0, 0.09);
+}
+
+/* device section headings */
+.era-md .prose h3 {
+  margin-top: 2em;
+  font-size: 1.4rem;
+}
