@@ -78,22 +78,31 @@ const COVER: ReactNode = (
     </div>
   </>
 );
-// split the .md into intro / quill / tiger writing, as plain paragraphs
-function paragraphs(block: string): string[] {
-  return block
+// split the .md into intro / quill / tiger writing. Markdown blockquotes (the
+// "elevator pitch" lines) become emphasized callouts in the notebook.
+type Block = { quote: boolean; text: string };
+function blocks(section: string): Block[] {
+  return section
     .replace(/!\[\[[^\]]+\]\]/g, "") // drop image embeds
-    .split(/\n{2,}/) // blank line = paragraph break
-    .map((p) => p.replace(/\s*\n\s*/g, " ").trim())
-    .filter(Boolean);
+    .split(/\n{2,}/) // blank line = block break
+    .map((raw) => raw.trim())
+    .filter(Boolean)
+    .map((raw) => {
+      const quote = raw.startsWith(">");
+      const text = (quote ? raw.replace(/^>\s?/gm, "") : raw)
+        .replace(/\s*\n\s*/g, " ")
+        .trim();
+      return { quote, text };
+    });
 }
 const _quillSplit = rawMd.split(/^###\s+Quill\s*$/im);
 const _tigerSplit = (_quillSplit[1] || "").split(/^###\s+Tiger\s*$/im);
-const INTRO_PARAS = paragraphs(_quillSplit[0] || "");
-const QUILL_PARAS = paragraphs(_tigerSplit[0] || "");
-const TIGER_PARAS = paragraphs(_tigerSplit[1] || "");
+const INTRO_BLOCKS = blocks(_quillSplit[0] || "");
+const QUILL_BLOCKS = blocks(_tigerSplit[0] || "");
+const TIGER_BLOCKS = blocks(_tigerSplit[1] || "");
 
 // renders the writing and auto-scales the font down until it fits the page
-function Writing({ paras }: { paras: string[] }) {
+function Writing({ items }: { items: Block[] }) {
   const ref = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     const el = ref.current;
@@ -113,21 +122,25 @@ function Writing({ paras }: { paras: string[] }) {
     // re-fit once the handwriting font has actually loaded (metrics differ)
     if (document.fonts?.ready) document.fonts.ready.then(fit).catch(() => {});
     return () => window.removeEventListener("resize", fit);
-  }, [paras]);
+  }, [items]);
   return (
     <div className="era-writing" ref={ref}>
-      {paras.map((p, i) => (
-        <p key={i}>{p}</p>
-      ))}
+      {items.map((b, i) =>
+        b.quote ? (
+          <p key={i} className="era-pitch">{b.text}</p>
+        ) : (
+          <p key={i}>{b.text}</p>
+        ),
+      )}
     </div>
   );
 }
 
-const INTRO = <Writing paras={INTRO_PARAS} />;
+const INTRO = <Writing items={INTRO_BLOCKS} />;
 const QUILL_DEVICE = <Art src={quillDeviceImg} alt="quill device sketch" />;
-const QUILL_WRITING = <Writing paras={QUILL_PARAS} />;
+const QUILL_WRITING = <Writing items={QUILL_BLOCKS} />;
 const TIGER_DEVICE = <Art src={tigerDeviceImg} alt="tiger device sketch" />;
-const TIGER_WRITING = <Writing paras={TIGER_PARAS} />;
+const TIGER_WRITING = <Writing items={TIGER_BLOCKS} />;
 
 type Leaf = { front: ReactNode; back: ReactNode; frontClass: string; backClass: string };
 
