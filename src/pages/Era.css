@@ -341,13 +341,14 @@
    font-size is set by JS (Writing component) to auto-fit each page; no scroll */
 .era-writing {
   position: absolute;
-  /* vertically centered so leftover space is even top/bottom (text size
-     unchanged — centering only redistributes the whitespace) */
+  /* top-aligned: every page (quill, tiger) starts at the same fixed top padding;
+     a short page (quill) just has extra space at the bottom. Intro overrides to
+     centered via .era-writing--center. */
   inset: 3% 5% 3% 5%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   font-family: "Reenie Beanie", var(--font-serif);
   color: #2a2622;
   font-size: 24px; /* fallback before JS fits */
