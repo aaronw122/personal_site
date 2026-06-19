@@ -484,5 +484,8 @@
   transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1),
     opacity 320ms ease-out;
 }
+/* mobile back face: transparent (not cream paper) so it doesn't paint a white
+   sliver while the page rotates past edge-on; kept for previous-page tap target */
+.era-mobile-back { background: transparent; }
 /* the cover sits flush full-width on mobile (no spine offset needed) */
 .era-mobile .era-cover-frame { opacity: 0.85; }
