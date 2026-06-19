@@ -19,35 +19,6 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* fullscreen toggle (top-right). Hidden where the Fullscreen API is absent
-   (e.g. iPhone Safari) — the dvh sizing already maximizes the viewport there. */
-.era-fs {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  z-index: 50;
-  width: 38px;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 9px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  transition: background 160ms ease, color 160ms ease;
-}
-.era-fs:hover { background: rgba(255, 255, 255, 0.16); color: rgba(255, 255, 255, 0.95); }
-.era-fs svg { width: 18px; height: 18px; display: block; }
-
-/* immersive fallback (iPhone Safari, no Fullscreen API): hide the chrome so the
-   notebook is as edge-to-edge as the browser allows; keep the toggle to exit */
-.era-stage.is-immersive .era-back,
-.era-stage.is-immersive .era-nav {
-  opacity: 0;
-  pointer-events: none;
-}
 
 .era-back {
   position: absolute;
@@ -173,39 +144,6 @@
 .era-page-base--left { left: 0; box-shadow: inset -14px 0 24px -14px rgba(0, 0, 0, 0.28); }
 .era-page-base--right { left: 50%; box-shadow: inset 14px 0 24px -14px rgba(0, 0, 0, 0.28); }
 .era-book.is-closed .era-page-base--left { opacity: 0; }
-
-/* page-block on the fore-edge so a closed cover reads as a notebook with pages.
-   Painted ABOVE the cover (z 130) — true 3D depth fights the flip-book's z-index
-   stacking and gets hidden behind the cover, so this is the robust way. Fine
-   horizontal striations = page edges; a shade toward the cover adds depth.
-   Front: peeks off the right edge; back: off the left. */
-.era-pages {
-  position: absolute;
-  top: 2.5%;
-  height: 95%;
-  width: 11px;
-  z-index: 130;
-  opacity: 0;
-  transition: opacity 250ms ease;
-  pointer-events: none;
-  background-color: #ece2cc;
-  background-image:
-    linear-gradient(to right, rgba(60, 40, 14, 0.4), rgba(60, 40, 14, 0) 55%),
-    repeating-linear-gradient(to bottom, #f4efe3 0 1.5px, #d3c8ac 1.5px 3px);
-}
-.era-pages--front {
-  right: -8px;
-  border-radius: 0 3px 3px 0;
-  box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.32);
-}
-.era-pages--back {
-  left: -8px;
-  border-radius: 3px 0 0 3px;
-  transform: scaleX(-1);
-  box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.32);
-}
-.era-book.is-closed .era-pages--front { opacity: 1; }
-.era-book.is-closed-back .era-pages--back { opacity: 1; }
 
 /* --- flipping leaves ------------------------------------------------------- */
 .era-leaf {
