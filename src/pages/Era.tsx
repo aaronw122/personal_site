@@ -203,7 +203,15 @@ function Writing({ items, independent = false }: { items: Block[]; independent?:
     measure();
     window.addEventListener("resize", measure);
     // re-measure once the handwriting font has actually loaded (metrics differ)
-    if (document.fonts?.ready) document.fonts.ready.then(measure).catch(() => {});
+    // re-measure once the handwriting font is actually loaded. load() targets
+    // Reenie Beanie specifically — fonts.ready can resolve before a lazily-used
+    // webfont finishes, leaving the text fitted to the taller fallback serif
+    // (which is what left empty space at the bottom of the longer pages).
+    if (document.fonts?.load) {
+      document.fonts.load("24px 'Reenie Beanie'").then(measure).catch(() => {});
+    } else if (document.fonts?.ready) {
+      document.fonts.ready.then(measure).catch(() => {});
+    }
     return () => {
       window.removeEventListener("resize", measure);
       if (!independent) fitStore.remove(id);
