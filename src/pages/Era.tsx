@@ -222,7 +222,11 @@ function Writing({ items, independent = false }: { items: Block[]; independent?:
     };
   }, [items, independent]);
   return (
-    <div className="era-writing" ref={ref} style={{ fontSize: applied + "px" }}>
+    <div
+      className={`era-writing${independent ? " era-writing--center" : ""}`}
+      ref={ref}
+      style={{ fontSize: applied + "px" }}
+    >
       <div className="era-writing-inner" ref={contentRef}>
         {items.map((b, i) => (
           <p key={i}>{b.text}</p>
