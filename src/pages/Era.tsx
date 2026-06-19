@@ -167,6 +167,7 @@ let _fitId = 0;
 // renders the writing; the applied font size is the shared (consistent) fit
 function Writing({ items, independent = false }: { items: Block[]; independent?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const idRef = useRef(_fitId++);
   const sharedMin = useSyncExternalStore(
     (cb) => fitStore.subscribe(cb),
@@ -181,11 +182,14 @@ function Writing({ items, independent = false }: { items: Block[]; independent?:
     if (!el) return;
     const id = idRef.current;
     const measure = () => {
-      // probe this page's own max-fit (largest size where content fits), then
-      // report it; the rendered size is the shared store min
+      // probe this page's own max-fit. The text is vertically centered, so we
+      // compare the inner content's natural height to the box (centering breaks
+      // scrollHeight on the box itself).
+      const content = contentRef.current;
+      if (!content) return;
       let size = FIT_MAX;
       el.style.fontSize = size + "px";
-      while (size > FIT_MIN && el.scrollHeight > el.clientHeight) {
+      while (size > FIT_MIN && content.scrollHeight > el.clientHeight) {
         size -= 0.7;
         el.style.fontSize = size + "px";
       }
@@ -219,9 +223,11 @@ function Writing({ items, independent = false }: { items: Block[]; independent?:
   }, [items, independent]);
   return (
     <div className="era-writing" ref={ref} style={{ fontSize: applied + "px" }}>
-      {items.map((b, i) => (
-        <p key={i}>{b.text}</p>
-      ))}
+      <div className="era-writing-inner" ref={contentRef}>
+        {items.map((b, i) => (
+          <p key={i}>{b.text}</p>
+        ))}
+      </div>
     </div>
   );
 }
