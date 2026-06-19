@@ -416,6 +416,8 @@
   line-height: 1.12;
 }
 .era-writing-inner { width: 100%; }
+/* the intro page is vertically centered (the device pages stay top-aligned) */
+.era-writing--center { justify-content: center; }
 .era-writing p { margin: 0 0 0.5em; }
 .era-writing p:last-child { margin-bottom: 0; }
 
