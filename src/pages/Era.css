@@ -41,6 +41,9 @@
 .era-stage:not(.is-ready) .era-mpage {
   transition: none !important;
 }
+.era-stage:not(.is-ready) .era-mpage .era-face {
+  transition: none !important;
+}
 
 /* --- the book -------------------------------------------------------------- */
 .era-book {
@@ -479,13 +482,15 @@
   inset: 0;
   transform-origin: left center;
   transform-style: preserve-3d;
-  /* opacity fades faster than the rotation so the turning page disappears
-     mid-turn instead of lingering as a blank back / desktop-style spread */
-  transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1),
-    opacity 320ms ease-out;
+  transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
 }
-/* mobile back face: transparent (not cream paper) so it doesn't paint a white
-   sliver while the page rotates past edge-on; kept for previous-page tap target */
-.era-mobile-back { background: transparent; }
+.era-mobile .era-face {
+  transition: opacity 320ms ease-out;
+}
+.era-mobile .era-mpage.is-flipped .era-face {
+  opacity: 0;
+}
+/* mobile back face remains a real page-sized tap target for previous-page turns */
+.era-mobile-back { background: var(--era-paper, #f7f5f2); }
 /* the cover sits flush full-width on mobile (no spine offset needed) */
 .era-mobile .era-cover-frame { opacity: 0.85; }
