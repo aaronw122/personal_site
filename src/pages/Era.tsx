@@ -303,38 +303,49 @@ export default function Era() {
     return () => cancelAnimationFrame(id);
   }, []);
 
-  // fullscreen toggle — maximizes the immersive view (great on mobile). Hidden
-  // where the Fullscreen API isn't available (e.g. iPhone Safari); supports the
-  // webkit-prefixed form for desktop/iPad Safari.
+  // fullscreen toggle — always shown. Uses the real Fullscreen API where it
+  // exists (Android Chrome, desktop, iPad Safari, webkit-prefixed included); on
+  // iPhone Safari (no element Fullscreen API) it falls back to an immersive CSS
+  // mode that hides the chrome and nudges the URL bar away.
   const stageRef = useRef<HTMLDivElement>(null);
-  const [fsSupported] = useState(() => {
+  const fsApi = useState(() => {
     if (typeof document === "undefined") return false;
     const el = document.documentElement as any;
     return !!(el.requestFullscreen || el.webkitRequestFullscreen);
-  });
-  const [isFs, setIsFs] = useState(false);
+  })[0];
+  const [active, setActive] = useState(false); // true when fullscreen OR immersive
   useEffect(() => {
+    if (!fsApi) return;
     const doc = document as any;
-    const onChange = () => setIsFs(!!(document.fullscreenElement || doc.webkitFullscreenElement));
+    const onChange = () => setActive(!!(document.fullscreenElement || doc.webkitFullscreenElement));
     document.addEventListener("fullscreenchange", onChange);
     document.addEventListener("webkitfullscreenchange", onChange);
     return () => {
       document.removeEventListener("fullscreenchange", onChange);
       document.removeEventListener("webkitfullscreenchange", onChange);
     };
-  }, []);
+  }, [fsApi]);
   const toggleFs = () => {
     const doc = document as any;
     const el = stageRef.current as any;
-    try {
-      if (document.fullscreenElement || doc.webkitFullscreenElement) {
-        (document.exitFullscreen || doc.webkitExitFullscreen).call(document);
-      } else if (el) {
-        const p = (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
-        if (p && p.catch) p.catch(() => {});
+    if (fsApi) {
+      try {
+        if (document.fullscreenElement || doc.webkitFullscreenElement) {
+          (document.exitFullscreen || doc.webkitExitFullscreen).call(document);
+        } else if (el) {
+          const p = (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+          if (p && p.catch) p.catch(() => {});
+        }
+      } catch {
+        /* fullscreen denied — ignore */
       }
-    } catch {
-      /* fullscreen denied — ignore */
+    } else {
+      // no Fullscreen API (iPhone Safari): immersive CSS mode
+      setActive((a) => {
+        const next = !a;
+        if (next) setTimeout(() => window.scrollTo(0, 1), 50);
+        return next;
+      });
     }
   };
 
@@ -389,23 +400,21 @@ export default function Era() {
   };
 
   return (
-    <div ref={stageRef} className={`era-stage${ready ? " is-ready" : ""}`}>
+    <div ref={stageRef} className={`era-stage${ready ? " is-ready" : ""}${active && !fsApi ? " is-immersive" : ""}`}>
       <Link to="/" className="era-back">← awill.co</Link>
-      {fsSupported && (
-        <button
-          className="era-fs"
-          onClick={toggleFs}
-          aria-label={isFs ? "exit fullscreen" : "enter fullscreen"}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            {isFs ? (
-              <path d="M8 4v4H4 M16 4v4h4 M8 20v-4H4 M16 20v-4h4" />
-            ) : (
-              <path d="M4 8V4h4 M20 8V4h-4 M4 16v4h4 M20 16v4h-4" />
-            )}
-          </svg>
-        </button>
-      )}
+      <button
+        className="era-fs"
+        onClick={toggleFs}
+        aria-label={active ? "exit fullscreen" : "enter fullscreen"}
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          {active ? (
+            <path d="M8 4v4H4 M16 4v4h4 M8 20v-4H4 M16 20v-4h4" />
+          ) : (
+            <path d="M4 8V4h4 M20 8V4h-4 M4 16v4h4 M20 16v4h-4" />
+          )}
+        </svg>
+      </button>
 
       {isMobile ? (
         <div className="era-mobile" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>

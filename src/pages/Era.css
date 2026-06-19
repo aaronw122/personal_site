@@ -41,6 +41,14 @@
 .era-fs:hover { background: rgba(255, 255, 255, 0.16); color: rgba(255, 255, 255, 0.95); }
 .era-fs svg { width: 18px; height: 18px; display: block; }
 
+/* immersive fallback (iPhone Safari, no Fullscreen API): hide the chrome so the
+   notebook is as edge-to-edge as the browser allows; keep the toggle to exit */
+.era-stage.is-immersive .era-back,
+.era-stage.is-immersive .era-nav {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .era-back {
   position: absolute;
   top: 22px;
