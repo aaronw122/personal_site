@@ -357,12 +357,14 @@
    font-size is set by JS (Writing component) to auto-fit each page; no scroll */
 .era-writing {
   position: absolute;
-  inset: 7% 9% 8% 10%;
+  /* tighter margins + line-height give the auto-fit more room, so the
+     consistent quill/tiger pair (and the intro) fill more of the page */
+  inset: 5% 7% 6% 8%;
   overflow: hidden;
   font-family: "Reenie Beanie", var(--font-serif);
   color: #2a2622;
   font-size: 24px; /* fallback before JS fits */
-  line-height: 1.12;
+  line-height: 1.05;
 }
 .era-writing p { margin: 0 0 0.5em; }
 .era-writing p:last-child { margin-bottom: 0; }

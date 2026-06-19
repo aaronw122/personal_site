@@ -165,13 +165,17 @@ const fitStore = {
 let _fitId = 0;
 
 // renders the writing; the applied font size is the shared (consistent) fit
-function Writing({ items }: { items: Block[] }) {
+function Writing({ items, independent = false }: { items: Block[]; independent?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const idRef = useRef(_fitId++);
-  const shared = useSyncExternalStore(
+  const sharedMin = useSyncExternalStore(
     (cb) => fitStore.subscribe(cb),
     () => fitStore.min(),
   );
+  // independent pages (the shorter intro) fit their own page; shared pages
+  // (quill/tiger) all render at the store min so they stay consistent
+  const [own, setOwn] = useState(FIT_MAX);
+  const applied = independent ? own : sharedMin;
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -185,10 +189,16 @@ function Writing({ items }: { items: Block[] }) {
         size -= 0.7;
         el.style.fontSize = size + "px";
       }
-      fitStore.set(id, size);
-      // always land on the shared min — even if our own value was unchanged and
-      // store.set skipped a re-render, this keeps every page at one size
-      el.style.fontSize = fitStore.min() + "px";
+      if (independent) {
+        // fill our own page; ignore the shared store entirely
+        setOwn(size);
+        el.style.fontSize = size + "px";
+      } else {
+        fitStore.set(id, size);
+        // land on the shared min even if our value was unchanged (store.set may
+        // skip a re-render) so every shared page stays one size
+        el.style.fontSize = fitStore.min() + "px";
+      }
     };
     measure();
     window.addEventListener("resize", measure);
@@ -196,11 +206,11 @@ function Writing({ items }: { items: Block[] }) {
     if (document.fonts?.ready) document.fonts.ready.then(measure).catch(() => {});
     return () => {
       window.removeEventListener("resize", measure);
-      fitStore.remove(id);
+      if (!independent) fitStore.remove(id);
     };
-  }, [items]);
+  }, [items, independent]);
   return (
-    <div className="era-writing" ref={ref} style={{ fontSize: shared + "px" }}>
+    <div className="era-writing" ref={ref} style={{ fontSize: applied + "px" }}>
       {items.map((b, i) => (
         <p key={i}>{b.text}</p>
       ))}
@@ -218,7 +228,7 @@ function DevicePage({ src, alt, pitch }: { src: string; alt: string; pitch: stri
   );
 }
 
-const INTRO = <Writing items={INTRO_BLOCKS} />;
+const INTRO = <Writing items={INTRO_BLOCKS} independent />;
 const QUILL_DEVICE = <DevicePage src={quillDeviceImg} alt="quill device sketch" pitch={QUILL_PITCH} />;
 const QUILL_WRITING = <Writing items={QUILL_BODY} />;
 const TIGER_DEVICE = <DevicePage src={tigerDeviceImg} alt="tiger device sketch" pitch={TIGER_PITCH} />;
