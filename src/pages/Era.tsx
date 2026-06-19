@@ -458,7 +458,7 @@ export default function Era() {
                 <div className={`era-face era-face--front ${pg.cover ? "era-cover" : "era-page"}`} {...tap(() => step(1), "next page")}>
                   {pg.content}
                 </div>
-                <div className="era-face era-face--back era-page" {...tap(() => step(-1), "previous page")} />
+                <div className="era-face era-face--back era-mobile-back" {...tap(() => step(-1), "previous page")} />
               </div>
             );
           })}
