@@ -80,11 +80,11 @@
 /* closed: slide right half to center, then tilt (rotateY) so the page-edge
    thickness on the fore-edge is visible — a real 3D book, à la scastiel.dev */
 .era-book.is-closed {
-  transform: translateX(calc(var(--page-w) * -0.5)) rotateY(-26deg);
+  transform: translateX(calc(var(--page-w) * -0.5));
 }
-/* closed from the back: slide left half to center, tilt the other way */
+/* closed from the back: slide the left half (the back cover) to center */
 .era-book.is-closed-back {
-  transform: translateX(calc(var(--page-w) * 0.5)) rotateY(26deg);
+  transform: translateX(calc(var(--page-w) * 0.5));
 }
 .era-book.is-closed-back .era-page-base--right { opacity: 0; }
 .era-book.is-closed-back::after,
@@ -166,46 +166,38 @@
 .era-page-base--right { left: 50%; box-shadow: inset 14px 0 24px -14px rgba(0, 0, 0, 0.28); }
 .era-book.is-closed .era-page-base--left { opacity: 0; }
 
-/* real 3D page-block thickness on the fore-edge (scastiel.dev technique): a face
-   hinged at the cover's outer edge and rotated 90° so, with the closed book
-   tilted, you see the stack of page edges. Front: right edge; back: left edge. */
-.era-cover3d {
+/* page-block on the fore-edge so a closed cover reads as a notebook with pages.
+   Painted ABOVE the cover (z 130) — true 3D depth fights the flip-book's z-index
+   stacking and gets hidden behind the cover, so this is the robust way. Fine
+   horizontal striations = page edges; a shade toward the cover adds depth.
+   Front: peeks off the right edge; back: off the left. */
+.era-pages {
   position: absolute;
-  top: 0;
-  width: 50%;
-  height: 100%;
-  transform-style: preserve-3d;
+  top: 2.5%;
+  height: 95%;
+  width: 11px;
+  z-index: 130;
   opacity: 0;
   transition: opacity 250ms ease;
   pointer-events: none;
-  z-index: 2;
-}
-.era-cover3d--front { left: 50%; }
-.era-cover3d--back { left: 0; }
-.era-cover3d-edge {
-  position: absolute;
-  top: 1.5%;
-  height: 97%;
-  width: var(--era-thick, 30px);
-  background-color: #e7ddc6;
-  /* fine page-edge striations + a soft shade toward the cover */
+  background-color: #ece2cc;
   background-image:
-    repeating-linear-gradient(to bottom, #efe9db 0 2px, #d4c9ad 2px 3px);
+    linear-gradient(to right, rgba(60, 40, 14, 0.4), rgba(60, 40, 14, 0) 55%),
+    repeating-linear-gradient(to bottom, #f4efe3 0 1.5px, #d3c8ac 1.5px 3px);
 }
-.era-cover3d--front .era-cover3d-edge {
-  right: 0;
-  transform-origin: right center;
-  transform: rotateY(90deg);
-  box-shadow: inset 6px 0 10px -6px rgba(0, 0, 0, 0.4);
+.era-pages--front {
+  right: -8px;
+  border-radius: 0 3px 3px 0;
+  box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.32);
 }
-.era-cover3d--back .era-cover3d-edge {
-  left: 0;
-  transform-origin: left center;
-  transform: rotateY(-90deg);
-  box-shadow: inset -6px 0 10px -6px rgba(0, 0, 0, 0.4);
+.era-pages--back {
+  left: -8px;
+  border-radius: 3px 0 0 3px;
+  transform: scaleX(-1);
+  box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.32);
 }
-.era-book.is-closed .era-cover3d--front { opacity: 1; }
-.era-book.is-closed-back .era-cover3d--back { opacity: 1; }
+.era-book.is-closed .era-pages--front { opacity: 1; }
+.era-book.is-closed-back .era-pages--back { opacity: 1; }
 
 /* --- flipping leaves ------------------------------------------------------- */
 .era-leaf {
@@ -300,7 +292,10 @@
   bottom: 0;
   width: 6%;
   background: #6f4a28;
-  z-index: 3;
+  /* cull the strip when its cover leaf flips, so it never bleeds into the
+     gutter on an open spread (it used to, only hidden by being cream before) */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 .era-spine--left {
   left: 0;
