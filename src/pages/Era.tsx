@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import type {
   KeyboardEvent as ReactKeyboardEvent,
   ReactNode,
@@ -101,30 +101,67 @@ const INTRO_BLOCKS = blocks(_quillSplit[0] || "");
 const QUILL_BLOCKS = blocks(_tigerSplit[0] || "");
 const TIGER_BLOCKS = blocks(_tigerSplit[1] || "");
 
-// renders the writing and auto-scales the font down until it fits the page
+// shared auto-fit: each writing page measures the largest font size at which it
+// still fits, and EVERY page renders at the global minimum of those — so quill,
+// tiger and intro read at one consistent size (the longest page sets the size,
+// the shorter ones shrink to match) instead of each fitting independently.
+const FIT_MAX = 42;
+const FIT_MIN = 9;
+const fitStore = {
+  sizes: new Map<number, number>(),
+  listeners: new Set<() => void>(),
+  set(id: number, size: number) {
+    if (this.sizes.get(id) === size) return;
+    this.sizes.set(id, size);
+    this.listeners.forEach((l) => l());
+  },
+  remove(id: number) {
+    if (this.sizes.delete(id)) this.listeners.forEach((l) => l());
+  },
+  min() {
+    return this.sizes.size ? Math.min(...this.sizes.values()) : FIT_MAX;
+  },
+  subscribe(l: () => void) {
+    this.listeners.add(l);
+    return () => this.listeners.delete(l);
+  },
+};
+let _fitId = 0;
+
+// renders the writing; the applied font size is the shared (consistent) fit
 function Writing({ items }: { items: Block[] }) {
   const ref = useRef<HTMLDivElement>(null);
+  const idRef = useRef(_fitId++);
+  const shared = useSyncExternalStore(
+    (cb) => fitStore.subscribe(cb),
+    () => fitStore.min(),
+  );
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const MAX = 42;
-    const MIN = 9;
-    const fit = () => {
-      let size = MAX;
+    const id = idRef.current;
+    const measure = () => {
+      // probe this page's own max-fit (largest size where content fits), then
+      // report it; the rendered size comes from the shared store (the min)
+      let size = FIT_MAX;
       el.style.fontSize = size + "px";
-      while (size > MIN && el.scrollHeight > el.clientHeight) {
+      while (size > FIT_MIN && el.scrollHeight > el.clientHeight) {
         size -= 1;
         el.style.fontSize = size + "px";
       }
+      fitStore.set(id, size);
     };
-    fit();
-    window.addEventListener("resize", fit);
-    // re-fit once the handwriting font has actually loaded (metrics differ)
-    if (document.fonts?.ready) document.fonts.ready.then(fit).catch(() => {});
-    return () => window.removeEventListener("resize", fit);
+    measure();
+    window.addEventListener("resize", measure);
+    // re-measure once the handwriting font has actually loaded (metrics differ)
+    if (document.fonts?.ready) document.fonts.ready.then(measure).catch(() => {});
+    return () => {
+      window.removeEventListener("resize", measure);
+      fitStore.remove(id);
+    };
   }, [items]);
   return (
-    <div className="era-writing" ref={ref}>
+    <div className="era-writing" ref={ref} style={{ fontSize: shared + "px" }}>
       {items.map((b, i) =>
         b.quote ? (
           <p key={i} className="era-pitch">{b.text}</p>
@@ -263,6 +300,9 @@ export default function Era() {
             // once a page has finished turning, hide it so no "left page" /
             // spine line shows — mobile is strictly one page at a time
             const hidden = flipped && turning !== i;
+            // mobile turns one page at a time: the turning page fades out as it
+            // rotates (faster than the rotation) so it just "disappears" instead
+            // of revealing its blank back / a desktop-style two-page spread.
             return (
               <div
                 key={i}
@@ -271,6 +311,7 @@ export default function Era() {
                 style={{
                   zIndex: z,
                   transform: flipped ? "rotateY(-180deg)" : "rotateY(0deg)",
+                  opacity: flipped ? 0 : 1,
                   visibility: hidden ? "hidden" : "visible",
                 }}
               >
