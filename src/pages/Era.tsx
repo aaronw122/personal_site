@@ -26,6 +26,29 @@ function playPageTurn() {
   }
 }
 
+// Page-turn haptic — a single soft tap on each flip (Android: navigator.vibrate;
+// iOS Safari: web-haptics' hidden-switch trick). No-op where unsupported.
+import { WebHaptics } from "web-haptics";
+let _haptics: WebHaptics | null = null;
+function getHaptics(): WebHaptics | null {
+  if (typeof window === "undefined") return null;
+  if (!_haptics) {
+    try {
+      _haptics = new WebHaptics();
+    } catch {
+      _haptics = null;
+    }
+  }
+  return _haptics;
+}
+function playPageHaptic() {
+  try {
+    void getHaptics()?.trigger("soft");
+  } catch {
+    /* haptics not available — silently skip */
+  }
+}
+
 // device sketches stay as images (transparent, content-hashed)
 import quillDeviceImg from "../era-art/quill-device.png";
 import tigerDeviceImg from "../era-art/tiger-device.png";
@@ -349,13 +372,19 @@ export default function Era() {
     return () => cancelAnimationFrame(id);
   }, []);
 
+  // prime the haptics engine (mounts the hidden iOS switch) before the first turn
+  useEffect(() => { getHaptics(); }, []);
+
   // clamp when the layout mode (and thus page count) changes
   useEffect(() => { setPage((p) => Math.min(p, max)); }, [max]);
 
-  // play a page-turn sound whenever a flip begins (covers clicks, arrows,
-  // taps and swipes — they all set `turning`)
+  // play the page-turn sound + a soft haptic whenever a flip begins (covers
+  // clicks, arrows, taps and swipes — they all set `turning`)
   useEffect(() => {
-    if (turning !== null) playPageTurn();
+    if (turning !== null) {
+      playPageTurn();
+      playPageHaptic();
+    }
   }, [turning]);
 
   useEffect(() => {
