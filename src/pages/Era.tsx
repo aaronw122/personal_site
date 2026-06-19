@@ -9,18 +9,54 @@ import { Link } from "react-router-dom";
 import usePageTitle from "../hooks/usePageTitle";
 import "./Era.css";
 
-// Page-turn sound — plays the provided mp3 on each turn (clone allows overlap).
+// Page-turn sound — played through the Web Audio API (a sound-effect path) rather
+// than an <audio> element, so iOS doesn't treat it as media: no "Now Playing" on
+// the lock screen and it won't pause your music. The audio session is marked
+// "ambient" so it mixes in as incidental noise.
 import turnSound from "../era-art/page-turn.mp3";
-let _audio: HTMLAudioElement | null = null;
+let _audioCtx: AudioContext | null = null;
+let _turnBuffer: AudioBuffer | null = null;
+let _bufferLoading = false;
+function ensureTurnAudio() {
+  if (typeof window === "undefined") return;
+  if (!_audioCtx) {
+    const Ctx = window.AudioContext || (window as any).webkitAudioContext;
+    if (!Ctx) return;
+    _audioCtx = new Ctx();
+    try {
+      // tell iOS this is ambient noise, not media — keeps it off the lock screen
+      const session = (navigator as any).audioSession;
+      if (session) session.type = "ambient";
+    } catch {
+      /* audioSession unsupported — Web Audio alone still avoids Now Playing */
+    }
+  }
+  if (!_turnBuffer && !_bufferLoading) {
+    _bufferLoading = true;
+    fetch(turnSound)
+      .then((r) => r.arrayBuffer())
+      .then((buf) => _audioCtx!.decodeAudioData(buf))
+      .then((decoded) => {
+        _turnBuffer = decoded;
+      })
+      .catch(() => {})
+      .finally(() => {
+        _bufferLoading = false;
+      });
+  }
+}
 function playPageTurn() {
   try {
-    if (!_audio) {
-      _audio = new Audio(turnSound);
-      _audio.preload = "auto";
-    }
-    const a = _audio.cloneNode(true) as HTMLAudioElement;
-    a.volume = 0.7;
-    void a.play().catch(() => {});
+    ensureTurnAudio();
+    if (!_audioCtx) return;
+    if (_audioCtx.state === "suspended") void _audioCtx.resume();
+    if (!_turnBuffer) return; // not decoded yet (rare: only the very first turn)
+    const src = _audioCtx.createBufferSource();
+    src.buffer = _turnBuffer;
+    const gain = _audioCtx.createGain();
+    gain.gain.value = 0.7;
+    src.connect(gain).connect(_audioCtx.destination);
+    src.start();
   } catch {
     /* audio not available — silently skip */
   }
@@ -372,8 +408,9 @@ export default function Era() {
     return () => cancelAnimationFrame(id);
   }, []);
 
-  // prime the haptics engine (mounts the hidden iOS switch) before the first turn
-  useEffect(() => { getHaptics(); }, []);
+  // prime the haptics engine (mounts the hidden iOS switch) and decode the
+  // page-turn sound before the first turn
+  useEffect(() => { getHaptics(); ensureTurnAudio(); }, []);
 
   // clamp when the layout mode (and thus page count) changes
   useEffect(() => { setPage((p) => Math.min(p, max)); }, [max]);
