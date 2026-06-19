@@ -250,84 +250,60 @@
   box-shadow: inset 14px 0 30px -14px rgba(0, 0, 0, 0.4);
 }
 
-/* --- back cover (plain kraft + cloth spine + barcode + colophon) ------------ */
-.era-backcover {
-  position: absolute;
-  inset: 0;
-  color: #3a2a17;
-}
-/* cloth binding strip down the spine edge */
-.era-backcover-spine {
+/* crisp cloth binding strip at the spine edge (front cover: left, back: right) */
+.era-spine {
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 0;
-  width: 7%;
-  background: linear-gradient(to right, #1f1810, #2c241a 55%, rgba(33, 26, 18, 0));
+  width: 6%;
+  background: #1a130b;
+  z-index: 3;
 }
-/* bottom-left: brand sitting above the barcode */
+.era-spine--left {
+  left: 0;
+  border-right: 2px solid rgba(0, 0, 0, 0.55);
+}
+.era-spine--right {
+  right: 0;
+  border-left: 2px solid rgba(0, 0, 0, 0.55);
+}
+
+/* --- back cover (plain kraft + cloth spine + dark barcode) ------------------ */
+.era-backcover {
+  position: absolute;
+  inset: 0;
+  color: #2a1d0e;
+}
+/* bottom-left: barcode with the origin line beneath it */
 .era-backcover-tag {
   position: absolute;
-  left: 13%;
+  left: 12%;
   bottom: 9%;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.5em;
-}
-.era-backcover-brand {
-  font-family: var(--font-serif);
-  font-size: clamp(1rem, 3vw, 1.6rem);
-  letter-spacing: 0.06em;
-  color: #2a1d0e;
-}
-/* bottom-right: colophon paragraph + made-in line */
-.era-backcover-colophon {
-  position: absolute;
-  right: 10%;
-  bottom: 9%;
-  max-width: 44%;
-  text-align: right;
-}
-.era-backcover-colophon p {
-  margin: 0 0 0.7em;
-  font-family: var(--font-serif);
-  font-size: clamp(0.5rem, 1.5vw, 0.72rem);
-  line-height: 1.5;
-  opacity: 0.55;
 }
 .era-backcover-made {
   font-family: var(--font-serif);
-  font-size: clamp(0.6rem, 1.7vw, 0.85rem);
+  font-size: clamp(0.62rem, 1.8vw, 0.9rem);
   letter-spacing: 0.1em;
-  opacity: 0.85;
+  opacity: 0.8;
 }
 
-/* fake barcode */
+/* fake barcode — dark bars printed straight onto the kraft (no white label) */
 .era-barcode {
   display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  background: #f1ebdd;
-  padding: 7px 8px 5px;
-  border-radius: 2px;
 }
 .era-barcode-bars {
   display: flex;
   align-items: flex-end;
-  height: 38px;
+  height: 40px;
 }
 .era-barcode-bars span {
   display: block;
   height: 100%;
-  background: #16110a;
-}
-.era-barcode-num {
-  font-family: var(--font-serif);
-  font-size: 0.52rem;
-  letter-spacing: 0.16em;
-  color: #16110a;
+  background: rgba(26, 16, 6, 0.6);
 }
 
 /* --- paper pages ----------------------------------------------------------- */
