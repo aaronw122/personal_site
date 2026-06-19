@@ -145,17 +145,36 @@ const FIT_MAX = 120;
 const FIT_MIN = 9;
 const fitStore = {
   sizes: new Map<number, number>(),
+  heights: new Map<number, number>(), // content height at the shared size, per page
+  box: 0, // inner height of the writing box (same for all shared pages)
   listeners: new Set<() => void>(),
+  notify() {
+    this.listeners.forEach((l) => l());
+  },
   set(id: number, size: number) {
     if (this.sizes.get(id) === size) return;
     this.sizes.set(id, size);
-    this.listeners.forEach((l) => l());
+    this.notify();
+  },
+  setHeight(id: number, h: number, box: number) {
+    if (this.heights.get(id) === h && this.box === box) return;
+    this.heights.set(id, h);
+    this.box = box;
+    this.notify();
   },
   remove(id: number) {
-    if (this.sizes.delete(id)) this.listeners.forEach((l) => l());
+    const changed = this.sizes.delete(id);
+    if (this.heights.delete(id) || changed) this.notify();
   },
   min() {
     return this.sizes.size ? Math.min(...this.sizes.values()) : FIT_MAX;
+  },
+  // top padding that vertically centers the TALLEST shared page (tiger); the
+  // shorter pages (quill) reuse it so their top lines up with tiger's
+  topOffset() {
+    if (!this.heights.size || !this.box) return 0;
+    const maxH = Math.max(...this.heights.values());
+    return Math.max(0, (this.box - maxH) / 2);
   },
   subscribe(l: () => void) {
     this.listeners.add(l);
@@ -172,6 +191,10 @@ function Writing({ items, independent = false }: { items: Block[]; independent?:
   const sharedMin = useSyncExternalStore(
     (cb) => fitStore.subscribe(cb),
     () => fitStore.min(),
+  );
+  const topOffset = useSyncExternalStore(
+    (cb) => fitStore.subscribe(cb),
+    () => fitStore.topOffset(),
   );
   // independent pages (the shorter intro) fit their own page; shared pages
   // (quill/tiger) all render at the store min so they stay consistent
@@ -221,13 +244,26 @@ function Writing({ items, independent = false }: { items: Block[]; independent?:
       if (!independent) fitStore.remove(id);
     };
   }, [items, independent]);
+  // report content height at the applied size so the store can compute a top
+  // offset that centers the tallest shared page (tiger) and aligns quill to it
+  useLayoutEffect(() => {
+    if (independent) return;
+    const el = ref.current;
+    const content = contentRef.current;
+    if (!el || !content) return;
+    fitStore.setHeight(idRef.current, content.scrollHeight, el.clientHeight);
+  }, [applied, items, independent]);
   return (
     <div
       className={`era-writing${independent ? " era-writing--center" : ""}`}
       ref={ref}
       style={{ fontSize: applied + "px" }}
     >
-      <div className="era-writing-inner" ref={contentRef}>
+      <div
+        className="era-writing-inner"
+        ref={contentRef}
+        style={independent ? undefined : { marginTop: topOffset + "px" }}
+      >
         {items.map((b, i) => (
           <p key={i}>{b.text}</p>
         ))}
