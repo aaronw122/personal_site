@@ -397,7 +397,7 @@
   position: absolute;
   /* tight margins give the auto-fit the most room, so the consistent
      quill/tiger pair (and the intro) fill as much of the page as possible */
-  inset: 3% 5% 4% 6%;
+  inset: 2% 4% 2.5% 5%;
   overflow: hidden;
   font-family: "Reenie Beanie", var(--font-serif);
   color: #2a2622;
