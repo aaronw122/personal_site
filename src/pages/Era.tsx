@@ -74,6 +74,44 @@ const COVER: ReactNode = (
     </div>
   </>
 );
+
+// fake barcode — a fixed bar-width pattern so it renders identically every time
+const BARCODE_BARS = [
+  2, 1, 1, 3, 1, 2, 1, 1, 2, 3, 1, 2, 1, 1, 3, 1, 1, 2, 2, 1, 3, 1, 1, 2, 1, 2,
+  1, 3, 1, 1, 2, 1, 1, 3, 1, 2, 2, 1, 1, 2,
+];
+function Barcode() {
+  return (
+    <div className="era-barcode" aria-hidden="true">
+      <div className="era-barcode-bars">
+        {BARCODE_BARS.map((w, i) => (
+          <span key={i} style={{ width: w + "px", marginRight: ((i % 2) + 1) + "px" }} />
+        ))}
+      </div>
+      <div className="era-barcode-num">2 026000 001837</div>
+    </div>
+  );
+}
+
+// outside back cover — plain kraft like a LIFE Noble Note back: a cloth binding
+// strip down the spine edge, a barcode + brand in one corner, and a small
+// colophon with the origin line in the other.
+const BACK_COVER: ReactNode = (
+  <div className="era-backcover">
+    <div className="era-backcover-spine" aria-hidden="true" />
+    <div className="era-backcover-tag">
+      <div className="era-backcover-brand">era</div>
+      <Barcode />
+    </div>
+    <div className="era-backcover-colophon">
+      <p>
+        era builds devices for intentional living — intelligence without the pull
+        of distraction. two to start; many more to come.
+      </p>
+      <div className="era-backcover-made">era inc. · made in brooklyn</div>
+    </div>
+  </div>
+);
 // split the .md into intro / quill / tiger writing. Markdown blockquotes (the
 // "elevator pitch" lines) become emphasized callouts in the notebook.
 type Block = { quote: boolean; text: string };
@@ -110,7 +148,7 @@ const TIGER_BODY = bodyOf(TIGER_BLOCKS);
 // still fits, and EVERY page renders at the global minimum of those — so quill,
 // tiger and intro read at one consistent size (the longest page sets the size,
 // the shorter ones shrink to match) instead of each fitting independently.
-const FIT_MAX = 42;
+const FIT_MAX = 120;
 const FIT_MIN = 9;
 const fitStore = {
   sizes: new Map<number, number>(),
@@ -151,7 +189,7 @@ function Writing({ items }: { items: Block[] }) {
       let size = FIT_MAX;
       el.style.fontSize = size + "px";
       while (size > FIT_MIN && el.scrollHeight > el.clientHeight) {
-        size -= 1;
+        size -= 0.7;
         el.style.fontSize = size + "px";
       }
       fitStore.set(id, size);
@@ -200,7 +238,7 @@ const LEAVES: Leaf[] = [
   { front: COVER, back: null, frontClass: "era-cover", backClass: "era-inside-cover" },
   { front: INTRO, back: QUILL_DEVICE, frontClass: "era-page", backClass: "era-page" },
   { front: QUILL_WRITING, back: TIGER_DEVICE, frontClass: "era-page", backClass: "era-page" },
-  { front: TIGER_WRITING, back: null, frontClass: "era-page", backClass: "era-page" },
+  { front: TIGER_WRITING, back: BACK_COVER, frontClass: "era-page", backClass: "era-cover" },
 ];
 
 // mobile: one page at a time, in reading order
@@ -211,6 +249,7 @@ const MOBILE: { content: ReactNode; cover?: boolean }[] = [
   { content: QUILL_WRITING },
   { content: TIGER_DEVICE },
   { content: TIGER_WRITING },
+  { content: BACK_COVER, cover: true },
 ];
 
 function useIsMobile() {
@@ -236,10 +275,11 @@ function initialPage(maxPage: number): number {
 export default function Era() {
   usePageTitle("era");
   const isMobile = useIsMobile();
-  const total = isMobile ? MOBILE.length : LEAVES.length;
+  // desktop has one extra state past the last spread: the closed back cover
+  const total = isMobile ? MOBILE.length : LEAVES.length + 1;
   const max = total - 1;
 
-  const [page, setPage] = useState(() => initialPage(LEAVES.length - 1));
+  const [page, setPage] = useState(() => initialPage(LEAVES.length));
   // index of the leaf/page currently mid-flip — kept on top until its transition
   // ends so the turning sheet never slips behind the destination page.
   const [turning, setTurning] = useState<number | null>(null);
@@ -390,6 +430,8 @@ export default function Era() {
       ) : (
         <div
           className={`era-book${page === 0 ? " is-closed" : ""}${
+            page === LEAVES.length ? " is-closed-back" : ""
+          }${
             page > 0 && LEAVES[page - 1]?.backClass === "era-inside-cover" ? " is-cover-left" : ""
           }`}
         >
