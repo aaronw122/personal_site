@@ -108,13 +108,6 @@ const BACK_COVER: ReactNode = (
 // split the .md into intro / quill / tiger writing. Markdown blockquotes (the
 // "elevator pitch" lines) become emphasized callouts in the notebook.
 type Block = { quote: boolean; text: string };
-// the source .md is all-lowercase (site style), but the handwritten notebook
-// reads better in sentence case — capitalize each sentence opener + pronoun "i"
-function sentenceCase(s: string): string {
-  return s
-    .replace(/(^|[.!?]["')\]]?\s+)([a-z])/g, (_m, p, c) => p + c.toUpperCase())
-    .replace(/\bi\b/g, "I");
-}
 function blocks(section: string): Block[] {
   return section
     .replace(/!\[\[[^\]]+\]\]/g, "") // drop image embeds
@@ -123,9 +116,9 @@ function blocks(section: string): Block[] {
     .filter(Boolean)
     .map((raw) => {
       const quote = raw.startsWith(">");
-      const text = sentenceCase(
-        (quote ? raw.replace(/^>\s?/gm, "") : raw).replace(/\s*\n\s*/g, " ").trim(),
-      );
+      const text = (quote ? raw.replace(/^>\s?/gm, "") : raw)
+        .replace(/\s*\n\s*/g, " ")
+        .trim();
       return { quote, text };
     });
 }
