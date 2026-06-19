@@ -66,6 +66,7 @@ function CoverFrame() {
 // shared page content, authored once
 const COVER: ReactNode = (
   <>
+    <div className="era-spine era-spine--left" aria-hidden="true" />
     <CoverFrame />
     <div className="era-cover-text">
       <div className="era-cover-brand">era</div>
@@ -88,27 +89,19 @@ function Barcode() {
           <span key={i} style={{ width: w + "px", marginRight: ((i % 2) + 1) + "px" }} />
         ))}
       </div>
-      <div className="era-barcode-num">2 026000 001837</div>
     </div>
   );
 }
 
-// outside back cover — plain kraft like a LIFE Noble Note back: a cloth binding
-// strip down the spine edge, a barcode + brand in one corner, and a small
-// colophon with the origin line in the other.
+// outside back cover — plain kraft like a LIFE Noble Note back: a crisp cloth
+// binding strip at the spine edge and a dark barcode (printed straight onto the
+// kraft) with the origin line beneath it.
 const BACK_COVER: ReactNode = (
   <div className="era-backcover">
-    <div className="era-backcover-spine" aria-hidden="true" />
+    <div className="era-spine era-spine--right" aria-hidden="true" />
     <div className="era-backcover-tag">
-      <div className="era-backcover-brand">era</div>
       <Barcode />
-    </div>
-    <div className="era-backcover-colophon">
-      <p>
-        era builds devices for intentional living — intelligence without the pull
-        of distraction. two to start; many more to come.
-      </p>
-      <div className="era-backcover-made">era inc. · made in brooklyn</div>
+      <div className="era-backcover-made">made in brooklyn</div>
     </div>
   </div>
 );
