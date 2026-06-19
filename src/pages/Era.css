@@ -403,15 +403,19 @@
    font-size is set by JS (Writing component) to auto-fit each page; no scroll */
 .era-writing {
   position: absolute;
-  /* tight margins give the auto-fit the most room, so the consistent
-     quill/tiger pair (and the intro) fill as much of the page as possible */
-  inset: 2% 4% 2.5% 5%;
+  /* even top/bottom margins; the text is vertically centered so shorter pages
+     (quill) balance their whitespace and read consistently with the intro */
+  inset: 3% 5% 3% 5%;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   font-family: "Reenie Beanie", var(--font-serif);
   color: #2a2622;
   font-size: 24px; /* fallback before JS fits */
   line-height: 1.12;
 }
+.era-writing-inner { width: 100%; }
 .era-writing p { margin: 0 0 0.5em; }
 .era-writing p:last-child { margin-bottom: 0; }
 
