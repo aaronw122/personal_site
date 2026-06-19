@@ -440,18 +440,16 @@ export default function Era() {
             // once a page has finished turning, hide it so no "left page" /
             // spine line shows — mobile is strictly one page at a time
             const hidden = flipped && turning !== i;
-            // mobile turns one page at a time: the turning page fades out as it
-            // rotates (faster than the rotation) so it just "disappears" instead
-            // of revealing its blank back / a desktop-style two-page spread.
+            // mobile turns one page at a time: fade the faces, not the 3D wrapper,
+            // so the rotating page keeps preserve-3d compositing during the flip.
             return (
               <div
                 key={i}
-                className="era-mpage"
+                className={`era-mpage${flipped ? " is-flipped" : ""}`}
                 onTransitionEnd={endTurn(i)}
                 style={{
                   zIndex: z,
                   transform: flipped ? "rotateY(-180deg)" : "rotateY(0deg)",
-                  opacity: flipped ? 0 : 1,
                   visibility: hidden ? "hidden" : "visible",
                 }}
               >
