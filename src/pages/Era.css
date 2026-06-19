@@ -77,13 +77,14 @@
   transition: transform 900ms cubic-bezier(0.2, 0.7, 0.2, 1);
   filter: drop-shadow(0 30px 50px rgba(0, 0, 0, 0.55));
 }
-/* closed: slide right half to center so the cover reads as a shut book */
+/* closed: slide right half to center, then tilt (rotateY) so the page-edge
+   thickness on the fore-edge is visible — a real 3D book, à la scastiel.dev */
 .era-book.is-closed {
-  transform: translateX(calc(var(--page-w) * -0.5));
+  transform: translateX(calc(var(--page-w) * -0.5)) rotateY(-26deg);
 }
-/* closed from the back: slide the left half (the back cover) to center */
+/* closed from the back: slide left half to center, tilt the other way */
 .era-book.is-closed-back {
-  transform: translateX(calc(var(--page-w) * 0.5));
+  transform: translateX(calc(var(--page-w) * 0.5)) rotateY(26deg);
 }
 .era-book.is-closed-back .era-page-base--right { opacity: 0; }
 .era-book.is-closed-back::after,
@@ -165,41 +166,46 @@
 .era-page-base--right { left: 50%; box-shadow: inset 14px 0 24px -14px rgba(0, 0, 0, 0.28); }
 .era-book.is-closed .era-page-base--left { opacity: 0; }
 
-/* page-block thickness — sits behind the cover and peeks out as a stack of page
-   edges so a closed book reads as a real 3D notebook. Shown only when closed
-   (front: stack to the right/bottom; back: to the left/bottom). */
-.era-book-thickness {
+/* real 3D page-block thickness on the fore-edge (scastiel.dev technique): a face
+   hinged at the cover's outer edge and rotated 90° so, with the closed book
+   tilted, you see the stack of page edges. Front: right edge; back: left edge. */
+.era-cover3d {
   position: absolute;
   top: 0;
   width: 50%;
   height: 100%;
-  z-index: 0;
+  transform-style: preserve-3d;
   opacity: 0;
-  transition: opacity 300ms ease;
-  background: var(--era-edge, #ded2ba);
+  transition: opacity 250ms ease;
+  pointer-events: none;
+  z-index: 2;
 }
-.era-book-thickness--front {
-  left: 50%;
-  border-radius: 0 4px 4px 0;
-  box-shadow:
-    1px 1px 0 #cdbf9f, 2px 1px 0 var(--era-edge, #ded2ba),
-    3px 2px 0 #cdbf9f, 4px 2px 0 var(--era-edge, #ded2ba),
-    5px 3px 0 #cdbf9f, 6px 3px 0 var(--era-edge, #ded2ba),
-    7px 4px 0 #cdbf9f, 8px 4px 0 var(--era-edge, #ded2ba),
-    9px 5px 0 #cdbf9f, 11px 7px 16px rgba(0, 0, 0, 0.34);
+.era-cover3d--front { left: 50%; }
+.era-cover3d--back { left: 0; }
+.era-cover3d-edge {
+  position: absolute;
+  top: 1.5%;
+  height: 97%;
+  width: var(--era-thick, 30px);
+  background-color: #e7ddc6;
+  /* fine page-edge striations + a soft shade toward the cover */
+  background-image:
+    repeating-linear-gradient(to bottom, #efe9db 0 2px, #d4c9ad 2px 3px);
 }
-.era-book-thickness--back {
+.era-cover3d--front .era-cover3d-edge {
+  right: 0;
+  transform-origin: right center;
+  transform: rotateY(90deg);
+  box-shadow: inset 6px 0 10px -6px rgba(0, 0, 0, 0.4);
+}
+.era-cover3d--back .era-cover3d-edge {
   left: 0;
-  border-radius: 4px 0 0 4px;
-  box-shadow:
-    -1px 1px 0 #cdbf9f, -2px 1px 0 var(--era-edge, #ded2ba),
-    -3px 2px 0 #cdbf9f, -4px 2px 0 var(--era-edge, #ded2ba),
-    -5px 3px 0 #cdbf9f, -6px 3px 0 var(--era-edge, #ded2ba),
-    -7px 4px 0 #cdbf9f, -8px 4px 0 var(--era-edge, #ded2ba),
-    -9px 5px 0 #cdbf9f, -11px 7px 16px rgba(0, 0, 0, 0.34);
+  transform-origin: left center;
+  transform: rotateY(-90deg);
+  box-shadow: inset -6px 0 10px -6px rgba(0, 0, 0, 0.4);
 }
-.era-book.is-closed .era-book-thickness--front { opacity: 1; }
-.era-book.is-closed-back .era-book-thickness--back { opacity: 1; }
+.era-book.is-closed .era-cover3d--front { opacity: 1; }
+.era-book.is-closed-back .era-cover3d--back { opacity: 1; }
 
 /* --- flipping leaves ------------------------------------------------------- */
 .era-leaf {
@@ -293,16 +299,16 @@
   top: 0;
   bottom: 0;
   width: 6%;
-  background: var(--era-edge, #ded2ba);
+  background: #6f4a28;
   z-index: 3;
 }
 .era-spine--left {
   left: 0;
-  border-right: 2px solid rgba(0, 0, 0, 0.18);
+  border-right: 2px solid rgba(40, 24, 8, 0.5);
 }
 .era-spine--right {
   right: 0;
-  border-left: 2px solid rgba(0, 0, 0, 0.18);
+  border-left: 2px solid rgba(40, 24, 8, 0.5);
 }
 
 /* --- back cover (plain kraft + cloth spine + dark barcode) ------------------ */
