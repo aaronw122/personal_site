@@ -242,16 +242,30 @@
 .era-writing p { margin: 0 0 0.5em; }
 .era-writing p:last-child { margin-bottom: 0; }
 
-/* the "elevator pitch" (a markdown blockquote) — emphasized callout */
-.era-pitch {
-  font-size: 1.22em;
-  line-height: 1.08;
-  color: #3a2a17;
-  background: rgba(58, 42, 23, 0.06);
-  border-left: 3px solid rgba(58, 42, 23, 0.45);
-  border-radius: 0 8px 8px 0;
-  padding: 0.4em 0.7em;
-  margin: 0 0 0.7em;
+/* --- device page: sketch with its elevator pitch (plain text) beneath -------- */
+.era-devpage {
+  position: absolute;
+  inset: 7% 9% 8% 10%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+}
+.era-devpage-img {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  object-fit: contain;
+}
+.era-devpage-pitch {
+  flex: 0 0 auto;
+  margin: 0;
+  font-family: "Reenie Beanie", var(--font-serif);
+  color: #2a2622;
+  font-size: clamp(1.3rem, 3.2vw, 2rem);
+  line-height: 1.05;
+  text-align: center;
 }
 
 /* --- transparent page artwork (one PNG per page, on the solid paper) --------
