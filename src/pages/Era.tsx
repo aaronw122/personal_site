@@ -252,6 +252,41 @@ export default function Era() {
     return () => cancelAnimationFrame(id);
   }, []);
 
+  // fullscreen toggle — maximizes the immersive view (great on mobile). Hidden
+  // where the Fullscreen API isn't available (e.g. iPhone Safari); supports the
+  // webkit-prefixed form for desktop/iPad Safari.
+  const stageRef = useRef<HTMLDivElement>(null);
+  const [fsSupported] = useState(() => {
+    if (typeof document === "undefined") return false;
+    const el = document.documentElement as any;
+    return !!(el.requestFullscreen || el.webkitRequestFullscreen);
+  });
+  const [isFs, setIsFs] = useState(false);
+  useEffect(() => {
+    const doc = document as any;
+    const onChange = () => setIsFs(!!(document.fullscreenElement || doc.webkitFullscreenElement));
+    document.addEventListener("fullscreenchange", onChange);
+    document.addEventListener("webkitfullscreenchange", onChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", onChange);
+      document.removeEventListener("webkitfullscreenchange", onChange);
+    };
+  }, []);
+  const toggleFs = () => {
+    const doc = document as any;
+    const el = stageRef.current as any;
+    try {
+      if (document.fullscreenElement || doc.webkitFullscreenElement) {
+        (document.exitFullscreen || doc.webkitExitFullscreen).call(document);
+      } else if (el) {
+        const p = (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+        if (p && p.catch) p.catch(() => {});
+      }
+    } catch {
+      /* fullscreen denied — ignore */
+    }
+  };
+
   // clamp when the layout mode (and thus page count) changes
   useEffect(() => { setPage((p) => Math.min(p, max)); }, [max]);
 
@@ -303,8 +338,23 @@ export default function Era() {
   };
 
   return (
-    <div className={`era-stage${ready ? " is-ready" : ""}`}>
+    <div ref={stageRef} className={`era-stage${ready ? " is-ready" : ""}`}>
       <Link to="/" className="era-back">← awill.co</Link>
+      {fsSupported && (
+        <button
+          className="era-fs"
+          onClick={toggleFs}
+          aria-label={isFs ? "exit fullscreen" : "enter fullscreen"}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            {isFs ? (
+              <path d="M8 4v4H4 M16 4v4h4 M8 20v-4H4 M16 20v-4h4" />
+            ) : (
+              <path d="M4 8V4h4 M20 8V4h-4 M4 16v4h4 M20 16v4h-4" />
+            )}
+          </svg>
+        </button>
+      )}
 
       {isMobile ? (
         <div className="era-mobile" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
