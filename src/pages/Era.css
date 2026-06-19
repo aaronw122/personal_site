@@ -8,6 +8,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 100dvh; /* fill the true visible viewport (mobile URL bar aware) */
   background:
     radial-gradient(120% 90% at 50% 18%, #34302a 0%, #211e1a 55%, #141210 100%);
   overflow: hidden;
@@ -16,6 +17,28 @@
   perspective: 2400px;
   -webkit-tap-highlight-color: transparent;
 }
+
+/* fullscreen toggle (top-right). Hidden where the Fullscreen API is absent
+   (e.g. iPhone Safari) — the dvh sizing already maximizes the viewport there. */
+.era-fs {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 50;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+}
+.era-fs:hover { background: rgba(255, 255, 255, 0.16); color: rgba(255, 255, 255, 0.95); }
+.era-fs svg { width: 18px; height: 18px; display: block; }
 
 .era-back {
   position: absolute;
@@ -58,29 +81,64 @@
   transform: translateX(calc(var(--page-w) * -0.5));
 }
 
-/* soft gutter shadow at the spine — one subtle cue of depth for the open spread.
-   Sits above resting pages (z 100–104) but below a turning leaf (z 200). */
+/* spine gutter — the soft valley where the two pages dive into the binding.
+   Modeled on how 3D book viewers (turn.js / StPageFlip) render the center
+   shadow: darkest exactly at the spine with a smooth falloff to each side, plus
+   a faint sheen where each page crests back up away from the gutter. Sits above
+   resting pages (z 100–106) but below a turning leaf (z 200). */
 .era-book::after {
+  /* the valley shadow */
   content: "";
   position: absolute;
   top: 0;
   bottom: 0;
   left: 50%;
-  width: 56px;
+  width: 13%;
+  max-width: 150px;
   transform: translateX(-50%);
   background: linear-gradient(
     to right,
-    transparent,
-    rgba(76, 54, 24, 0.16) 48%,
-    rgba(76, 54, 24, 0.16) 52%,
-    transparent
+    rgba(28, 20, 10, 0) 0%,
+    rgba(28, 20, 10, 0.04) 30%,
+    rgba(28, 20, 10, 0.13) 44%,
+    rgba(22, 15, 6, 0.3) 49%,
+    rgba(16, 10, 3, 0.42) 50%,
+    rgba(22, 15, 6, 0.3) 51%,
+    rgba(28, 20, 10, 0.13) 56%,
+    rgba(28, 20, 10, 0.04) 70%,
+    rgba(28, 20, 10, 0) 100%
   );
   pointer-events: none;
   z-index: 150;
   opacity: 1;
   transition: opacity 400ms ease;
 }
-.era-book.is-closed::after { opacity: 0; }
+.era-book::before {
+  /* the page-crest sheen flanking the spine */
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 13%;
+  max-width: 150px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    to right,
+    transparent 30%,
+    rgba(255, 252, 244, 0.36) 41%,
+    transparent 47%,
+    transparent 53%,
+    rgba(255, 252, 244, 0.36) 59%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 151;
+  opacity: 1;
+  transition: opacity 400ms ease;
+}
+.era-book.is-closed::after,
+.era-book.is-closed::before { opacity: 0; }
 
 /* static pages sitting behind the flipping leaves */
 .era-page-base {
@@ -349,8 +407,10 @@
 .era-mobile {
   --era-paper: #f7f5f2;
   position: relative;
-  width: min(90vw, 64vh);
-  height: calc(min(90vw, 64vh) * 1.4);
+  /* maximize within the viewport: as wide as possible (96vw) but never so tall
+     (×1.4) that it overflows the visible height, leaving room for the nav */
+  width: min(96vw, 63dvh);
+  height: calc(min(96vw, 63dvh) * 1.4);
   transform-style: preserve-3d;
   filter: drop-shadow(0 22px 40px rgba(0, 0, 0, 0.5));
 }
