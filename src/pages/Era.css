@@ -3,6 +3,7 @@
    =========================================================================== */
 
 .era-stage {
+  --era-edge: #ded2ba; /* page-block edge + spine color */
   position: fixed;
   inset: 0;
   display: flex;
@@ -164,6 +165,42 @@
 .era-page-base--right { left: 50%; box-shadow: inset 14px 0 24px -14px rgba(0, 0, 0, 0.28); }
 .era-book.is-closed .era-page-base--left { opacity: 0; }
 
+/* page-block thickness — sits behind the cover and peeks out as a stack of page
+   edges so a closed book reads as a real 3D notebook. Shown only when closed
+   (front: stack to the right/bottom; back: to the left/bottom). */
+.era-book-thickness {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  background: var(--era-edge, #ded2ba);
+}
+.era-book-thickness--front {
+  left: 50%;
+  border-radius: 0 4px 4px 0;
+  box-shadow:
+    1px 1px 0 #cdbf9f, 2px 1px 0 var(--era-edge, #ded2ba),
+    3px 2px 0 #cdbf9f, 4px 2px 0 var(--era-edge, #ded2ba),
+    5px 3px 0 #cdbf9f, 6px 3px 0 var(--era-edge, #ded2ba),
+    7px 4px 0 #cdbf9f, 8px 4px 0 var(--era-edge, #ded2ba),
+    9px 5px 0 #cdbf9f, 11px 7px 16px rgba(0, 0, 0, 0.34);
+}
+.era-book-thickness--back {
+  left: 0;
+  border-radius: 4px 0 0 4px;
+  box-shadow:
+    -1px 1px 0 #cdbf9f, -2px 1px 0 var(--era-edge, #ded2ba),
+    -3px 2px 0 #cdbf9f, -4px 2px 0 var(--era-edge, #ded2ba),
+    -5px 3px 0 #cdbf9f, -6px 3px 0 var(--era-edge, #ded2ba),
+    -7px 4px 0 #cdbf9f, -8px 4px 0 var(--era-edge, #ded2ba),
+    -9px 5px 0 #cdbf9f, -11px 7px 16px rgba(0, 0, 0, 0.34);
+}
+.era-book.is-closed .era-book-thickness--front { opacity: 1; }
+.era-book.is-closed-back .era-book-thickness--back { opacity: 1; }
+
 /* --- flipping leaves ------------------------------------------------------- */
 .era-leaf {
   position: absolute;
@@ -256,16 +293,16 @@
   top: 0;
   bottom: 0;
   width: 6%;
-  background: #6f4a28;
+  background: var(--era-edge, #ded2ba);
   z-index: 3;
 }
 .era-spine--left {
   left: 0;
-  border-right: 2px solid rgba(40, 24, 8, 0.5);
+  border-right: 2px solid rgba(0, 0, 0, 0.18);
 }
 .era-spine--right {
   right: 0;
-  border-left: 2px solid rgba(40, 24, 8, 0.5);
+  border-left: 2px solid rgba(0, 0, 0, 0.18);
 }
 
 /* --- back cover (plain kraft + cloth spine + dark barcode) ------------------ */

@@ -440,6 +440,10 @@ export default function Era() {
         >
           <div className="era-page-base era-page-base--left" />
           <div className="era-page-base era-page-base--right" />
+          {/* page-block thickness so a closed cover reads as a real 3D notebook
+              with pages (front: stack on the right/bottom, back: on the left) */}
+          <div className="era-book-thickness era-book-thickness--front" aria-hidden="true" />
+          <div className="era-book-thickness era-book-thickness--back" aria-hidden="true" />
           {LEAVES.map((leaf, i) => {
             const flipped = page > i;
             const z = turning === i ? 200 : flipped ? 100 + i : 100 + LEAVES.length - i;
