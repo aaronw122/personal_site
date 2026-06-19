@@ -139,6 +139,10 @@
 }
 .era-book.is-closed::after,
 .era-book.is-closed::before { opacity: 0; }
+/* on the opening spread the left page is the brown inside cover (which carries
+   its own binding shadow) — the cream crest sheen reads as a white streak there,
+   so drop it for that spread; the dark valley shadow still works on brown. */
+.era-book.is-cover-left::before { opacity: 0; }
 
 /* static pages sitting behind the flipping leaves */
 .era-page-base {

@@ -388,7 +388,11 @@ export default function Era() {
           })}
         </div>
       ) : (
-        <div className={`era-book${page === 0 ? " is-closed" : ""}`}>
+        <div
+          className={`era-book${page === 0 ? " is-closed" : ""}${
+            page > 0 && LEAVES[page - 1]?.backClass === "era-inside-cover" ? " is-cover-left" : ""
+          }`}
+        >
           <div className="era-page-base era-page-base--left" />
           <div className="era-page-base era-page-base--right" />
           {LEAVES.map((leaf, i) => {
