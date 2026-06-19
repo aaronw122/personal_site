@@ -63,10 +63,6 @@ function CoverFrame() {
   );
 }
 
-const Art = ({ src, alt }: { src: string; alt: string }) => (
-  <img className="era-media-img" src={src} alt={alt} />
-);
-
 // shared page content, authored once
 const COVER: ReactNode = (
   <>
@@ -100,6 +96,15 @@ const _tigerSplit = (_quillSplit[1] || "").split(/^###\s+Tiger\s*$/im);
 const INTRO_BLOCKS = blocks(_quillSplit[0] || "");
 const QUILL_BLOCKS = blocks(_tigerSplit[0] || "");
 const TIGER_BLOCKS = blocks(_tigerSplit[1] || "");
+
+// the "elevator pitch" (the markdown blockquote) sits under the device sketch on
+// the left page as plain text; the body paragraphs fill the right page.
+const pitchOf = (bs: Block[]) => bs.find((b) => b.quote)?.text ?? "";
+const bodyOf = (bs: Block[]) => bs.filter((b) => !b.quote);
+const QUILL_PITCH = pitchOf(QUILL_BLOCKS);
+const TIGER_PITCH = pitchOf(TIGER_BLOCKS);
+const QUILL_BODY = bodyOf(QUILL_BLOCKS);
+const TIGER_BODY = bodyOf(TIGER_BLOCKS);
 
 // shared auto-fit: each writing page measures the largest font size at which it
 // still fits, and EVERY page renders at the global minimum of those — so quill,
@@ -142,7 +147,7 @@ function Writing({ items }: { items: Block[] }) {
     const id = idRef.current;
     const measure = () => {
       // probe this page's own max-fit (largest size where content fits), then
-      // report it; the rendered size comes from the shared store (the min)
+      // report it; the rendered size is the shared store min
       let size = FIT_MAX;
       el.style.fontSize = size + "px";
       while (size > FIT_MIN && el.scrollHeight > el.clientHeight) {
@@ -150,6 +155,9 @@ function Writing({ items }: { items: Block[] }) {
         el.style.fontSize = size + "px";
       }
       fitStore.set(id, size);
+      // always land on the shared min — even if our own value was unchanged and
+      // store.set skipped a re-render, this keeps every page at one size
+      el.style.fontSize = fitStore.min() + "px";
     };
     measure();
     window.addEventListener("resize", measure);
@@ -162,22 +170,28 @@ function Writing({ items }: { items: Block[] }) {
   }, [items]);
   return (
     <div className="era-writing" ref={ref} style={{ fontSize: shared + "px" }}>
-      {items.map((b, i) =>
-        b.quote ? (
-          <p key={i} className="era-pitch">{b.text}</p>
-        ) : (
-          <p key={i}>{b.text}</p>
-        ),
-      )}
+      {items.map((b, i) => (
+        <p key={i}>{b.text}</p>
+      ))}
+    </div>
+  );
+}
+
+// a device sketch with its elevator pitch as plain text underneath
+function DevicePage({ src, alt, pitch }: { src: string; alt: string; pitch: string }) {
+  return (
+    <div className="era-devpage">
+      <img className="era-devpage-img" src={src} alt={alt} />
+      {pitch && <p className="era-devpage-pitch">{pitch}</p>}
     </div>
   );
 }
 
 const INTRO = <Writing items={INTRO_BLOCKS} />;
-const QUILL_DEVICE = <Art src={quillDeviceImg} alt="quill device sketch" />;
-const QUILL_WRITING = <Writing items={QUILL_BLOCKS} />;
-const TIGER_DEVICE = <Art src={tigerDeviceImg} alt="tiger device sketch" />;
-const TIGER_WRITING = <Writing items={TIGER_BLOCKS} />;
+const QUILL_DEVICE = <DevicePage src={quillDeviceImg} alt="quill device sketch" pitch={QUILL_PITCH} />;
+const QUILL_WRITING = <Writing items={QUILL_BODY} />;
+const TIGER_DEVICE = <DevicePage src={tigerDeviceImg} alt="tiger device sketch" pitch={TIGER_PITCH} />;
+const TIGER_WRITING = <Writing items={TIGER_BODY} />;
 
 type Leaf = { front: ReactNode; back: ReactNode; frontClass: string; backClass: string };
 
