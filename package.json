@@ -18,16 +18,19 @@
   },
   "dependencies": {
     "highlight.js": "^11.11.1",
+    "katex": "^0.17.0",
     "p5": "^2.2.3",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.14.1",
     "rehype-highlight": "^7.0.2",
+    "rehype-katex": "^7.0.1",
     "rehype-raw": "^7.0.0",
     "remark-breaks": "^4.0.0",
     "remark-frontmatter": "^5.0.0",
     "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0",
     "simplex-noise": "^4.0.3",
     "web-haptics": "^0.0.6"
   }

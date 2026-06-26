@@ -54,6 +54,16 @@ export default function App() {
             <ContentArticle section="lists" entries={listsEntries} />
           }
         />
+        <Route
+          path="/haystack-errw-proof"
+          element={
+            <ContentArticle
+              section="writing"
+              entries={writingEntries}
+              fixedSlug="haystack-errw-proof"
+            />
+          }
+        />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
