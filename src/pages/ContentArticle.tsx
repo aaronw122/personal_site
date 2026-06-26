@@ -4,9 +4,12 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
 import remarkFrontmatter from "remark-frontmatter";
+import remarkMath from "remark-math";
 import rehypeRaw from "rehype-raw";
+import rehypeKatex from "rehype-katex";
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github.css";
+import "katex/dist/katex.min.css";
 import usePageTitle from "../hooks/usePageTitle";
 import {
   type ContentEntry,
@@ -48,10 +51,14 @@ function LightboxImage(props: React.ImgHTMLAttributes<HTMLImageElement>) {
 interface Props {
   section: "writing" | "lists";
   entries: ContentEntry[];
+  // When set, serve this fixed slug instead of reading it from the URL param.
+  // Used for standalone top-level routes (e.g. /haystack-errw-proof).
+  fixedSlug?: string;
 }
 
-export default function ContentArticle({ section, entries }: Props) {
-  const { slug } = useParams<{ slug: string }>();
+export default function ContentArticle({ section, entries, fixedSlug }: Props) {
+  const params = useParams<{ slug: string }>();
+  const slug = fixedSlug ?? params.slug;
   const [article, setArticle] = useState<{
     title: string;
     date: string | null;
@@ -109,8 +116,8 @@ export default function ContentArticle({ section, entries }: Props) {
       )}
       <div className="prose prose-content">
         <ReactMarkdown
-          remarkPlugins={[remarkGfm, remarkBreaks, remarkFrontmatter]}
-          rehypePlugins={[rehypeRaw, rehypeHighlight]}
+          remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkFrontmatter]}
+          rehypePlugins={[rehypeRaw, rehypeKatex, rehypeHighlight]}
           components={{ img: LightboxImage, a: MarkdownLink }}
         >
           {processMarkdown(article.content, section)}
