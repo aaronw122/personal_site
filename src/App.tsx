@@ -64,6 +64,16 @@ export default function App() {
             />
           }
         />
+        <Route
+          path="/oboe"
+          element={
+            <ContentArticle
+              section="writing"
+              entries={writingEntries}
+              fixedSlug="oboe"
+            />
+          }
+        />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
