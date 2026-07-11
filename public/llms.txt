@@ -18,25 +18,29 @@ Contact: youfoundaaron@gmail.com
 
 ## Writing
 
+- [Future of Personal Computing Pt 1](https://awill.co/writing/future%20of%20personal%20computing%20pt%201)
+- [Most Inneficient Way to Find Needle in a Haystack](https://awill.co/writing/most%20inneficient%20way%20to%20find%20needle%20in%20a%20haystack)
+- [Thera Copilot](https://awill.co/writing/thera%20copilot)
+- [Building diaHistory with the macOS AX Tree](https://awill.co/writing/building%20diaHistory%20with%20the%20macOS%20ax%20tree)
+- [Fine Tuning SDXL to Create Particle Art](https://awill.co/writing/fine%20tuning%20sdxl%20to%20create%20particle%20art)
+- [Friends](https://awill.co/writing/friends)
 - [Product Thinking](https://awill.co/writing/product%20thinking)
 - [Curation](https://awill.co/writing/curation)
 - [Ask Questions](https://awill.co/writing/ask%20questions)
 - [Lessons from Nonpolar](https://awill.co/writing/lessons%20from%20nonpolar)
-- [Fractal Blogs](https://awill.co/writing/fractal%20blogs)
 
 ## Lists
 
-- [Albums](https://awill.co/lists/albums)
+- [Questions](https://awill.co/lists/questions)
+- [Idea Backlog](https://awill.co/lists/idea%20backlog)
 - [Books](https://awill.co/lists/books)
-- [Cool People](https://awill.co/lists/cool%20people)
-- [Life Advice](https://awill.co/lists/life%20advice)
 - [Media Recs](https://awill.co/lists/media%20recs)
 - [Meditation Corner](https://awill.co/lists/meditation%20corner)
-- [Movies](https://awill.co/lists/movies)
-- [Questions](https://awill.co/lists/questions)
-- [Quotes](https://awill.co/lists/quotes)
+- [Cool People](https://awill.co/lists/cool%20people)
 - [Shows](https://awill.co/lists/shows)
-- [Misc](https://awill.co/lists/misc)
+- [Life Advice](https://awill.co/lists/life%20advice)
+- [Albums](https://awill.co/lists/albums)
+- [Movies](https://awill.co/lists/movies)
 
 ## Projects
 
