@@ -70,7 +70,7 @@ export default function App() {
             <ContentArticle
               section="writing"
               entries={writingEntries}
-              fixedSlug="oboe"
+              fixedSlug="most inneficient way to find needle in a haystack"
             />
           }
         />
