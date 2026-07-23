@@ -25,9 +25,12 @@ export function processMarkdown(
   raw: string,
   section: "writing" | "lists",
 ): string {
-  // Convert ![[image.png]] embeds to standard markdown images
-  let result = raw.replace(/!\[\[([^\]]+)\]\]/g, (_match, filename: string) => {
-    return `![${filename}](/writing-images/${encodeURIComponent(filename)})`;
+  // Convert ![[image.png]] embeds to standard markdown images. Obsidian allows a
+  // trailing size hint (![[image.png|300]]); split it off so only the real
+  // filename is encoded into the URL (encoding the whole string yields %7C 404s).
+  let result = raw.replace(/!\[\[([^\]]+)\]\]/g, (_match, inner: string) => {
+    const file = inner.split("|")[0].trim();
+    return `![${file}](/writing-images/${encodeURIComponent(file)})`;
   });
 
   // Convert [[wikilinks]] to standard markdown links
