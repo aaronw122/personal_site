@@ -12,6 +12,9 @@ lerna-debug.log*
 .zed
 node_modules
 dist
+# Generated at build by vite-plugin-writing-images from the Obsidian vault
+# (single source of truth: Code/Images 1). Not tracked to keep the repo lean.
+public/writing-images/
 writing
 lists
 dist-ssr
