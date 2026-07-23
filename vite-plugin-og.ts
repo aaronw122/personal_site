@@ -153,6 +153,15 @@ export function ogPrerender(opts: Options): Plugin {
 
       for (const section of opts.sections) {
         if (!fs.existsSync(section.dir)) continue;
+        // Section landing page (e.g. /writing) from the curated index.md, so
+        // link-preview bots get section-specific OG meta and a self-canonical
+        // URL instead of the generic homepage tags. nginx serves this inline
+        // via try_files $uri/index.html.
+        const sectionIndex = path.join(section.dir, "index.md");
+        if (fs.existsSync(sectionIndex)) {
+          emit(section.urlPrefix, sectionIndex, `${opts.siteUrl}/${section.urlPrefix}`);
+          count++;
+        }
         for (const file of fs.readdirSync(section.dir)) {
           if (!file.endsWith(".md") || file === "index.md") continue;
           const slug = file.replace(/\.md$/, "");
