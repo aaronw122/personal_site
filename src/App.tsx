@@ -9,6 +9,7 @@ import Era from "./pages/Era";
 import EraDevices from "./pages/EraDevices";
 import NotFound from "./pages/NotFound";
 import { getWritingEntries, getListsEntries } from "./lib/content";
+import useNavHaptics from "./hooks/useNavHaptics";
 
 const writingEntries = getWritingEntries();
 const listsEntries = getListsEntries();
@@ -20,6 +21,7 @@ const loadListsIndex = () =>
   import("@lists/index.md?raw").then((m) => m.default);
 
 export default function App() {
+  useNavHaptics();
   return (
     <Routes>
       {/* standalone immersive notebook — no site chrome */}
