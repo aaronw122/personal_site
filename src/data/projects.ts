@@ -26,6 +26,14 @@ export const FEATURED_PROJECTS: Project[] = [
     stack: "react, python, bsroformer",
   },
   {
+    name: "voicemixy",
+    description:
+      "send your friends audio in the voice of trump or elon.",
+    url: "https://x.com/aaaronwill/status/2076804018714673460",
+    linkText: "twitter",
+    stack: "f5-tts",
+  },
+  {
     name: "particleArt",
     description:
       "type text, generates particle art via a fine-tuned stable diffusion model.",
