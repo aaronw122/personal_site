@@ -29,8 +29,8 @@ export const FEATURED_PROJECTS: Project[] = [
     name: "voicemixy",
     description:
       "send your friends audio in the voice of trump or elon.",
-    url: "https://x.com/aaaronwill/status/2076804018714673460",
-    linkText: "twitter",
+    url: "https://testflight.apple.com/join/9aAt3nUw",
+    linkText: "testflight",
     stack: "f5-tts",
   },
   {
