@@ -8,7 +8,7 @@ export default function HeroBio() {
     <section>
       <div className="hero-header">
         <h2 className="hero-name">aaron williams</h2>
-        <h5 className="hero-location">new york, ny</h5>
+        <h5 className="hero-location">brooklyn, ny</h5>
       </div>
 
       <div className="hero-content">
