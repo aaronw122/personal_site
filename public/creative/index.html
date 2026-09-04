@@ -1,0 +1,43 @@
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>just type and see what happens</title>
+        <script src="/creative/index.js" defer></script>
+    </head>
+
+    <body>
+        <canvas id="canvas"></canvas>
+        <div class="main">
+            <h1>just type and see what happens</h1>
+            <div class="input">
+                <input>
+            </div>
+            <button id="erase">erase</button>
+        </div>
+    </body>
+</html>
+
+<style>
+    .main{
+        display:flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height:100vh
+    }
+    .input{
+        padding-top: 40px;
+        padding-bottom: 10px;
+    }
+
+    #canvas{
+        width:100%;
+        display: block;
+        position: fixed;
+        z-index: -1;
+    }
+    body{
+        margin: 0;
+    }
+</style>
