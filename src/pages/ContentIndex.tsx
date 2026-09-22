@@ -38,6 +38,11 @@ export default function ContentIndex({ section, loadIndex }: Props) {
           {content}
         </ReactMarkdown>
       </div>
+      {section === "writing" && (
+        <p className="rss-link">
+          <a href="/rss.xml">subscribe via rss</a>
+        </p>
+      )}
     </div>
   );
 }

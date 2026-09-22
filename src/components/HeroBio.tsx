@@ -26,7 +26,7 @@ export default function HeroBio() {
 
         <div className="hero-photo-wrapper">
           <img
-            src="/images/Platform_9_34_cropped.png"
+            src="/images/Platform_9_34_cropped.webp"
             alt="photo of aaron"
             className="hero-photo"
             tabIndex={0}
@@ -46,7 +46,7 @@ export default function HeroBio() {
       <Lightbox
         open={lightbox}
         onClose={() => setLightbox(false)}
-        src="/images/Platform_9_34_cropped.png"
+        src="/images/Platform_9_34_cropped.webp"
         alt="photo of aaron"
       />
     </section>
