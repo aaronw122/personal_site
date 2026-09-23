@@ -702,13 +702,15 @@ a:visited {
   margin-top: -0.5rem;
   margin-bottom: 1rem;
 }
-/* small "rss" aside next to the writing heading */
+/* muted "subscribe via rss" line at the bottom of /writing, just above the
+   footer rule */
 .rss-link {
   font-size: 0.875rem;
   font-weight: 400;
   opacity: 0.5;
   text-decoration: underline;
-  margin-left: 0.5rem;
+  margin-top: 4rem;
+  margin-bottom: 0;
 }
 .rss-link:hover {
   opacity: 1;
