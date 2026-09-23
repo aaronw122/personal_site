@@ -492,6 +492,9 @@ a:visited {
 .hero-photo {
   width: 100%;
   max-width: 200px;
+  /* width/height attrs give the aspect ratio for CLS; don't let the
+     height attr win over the CSS width. */
+  height: auto;
   margin-left: auto;
   margin-right: auto;
   cursor: pointer;
