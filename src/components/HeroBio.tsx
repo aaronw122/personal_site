@@ -27,6 +27,8 @@ export default function HeroBio() {
         <div className="hero-photo-wrapper">
           <img
             src="/images/Platform_9_34_cropped.webp"
+            width={400}
+            height={470}
             alt="photo of aaron"
             className="hero-photo"
             tabIndex={0}

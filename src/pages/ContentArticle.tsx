@@ -26,6 +26,8 @@ function LightboxImage(props: React.ImgHTMLAttributes<HTMLImageElement>) {
     <>
       <img
         {...props}
+        loading="lazy"
+        decoding="async"
         className="lightbox-trigger"
         tabIndex={0}
         role="button"

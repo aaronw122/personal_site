@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Outlet } from "react-router-dom";
 import BackgroundImage from "./BackgroundImage";
 import GenerativeSwirls from "./GenerativeSwirls";
@@ -12,7 +13,9 @@ export default function Layout() {
       <div className="layout-shell">
         <Navbar />
         <main className="layout-main">
-          <Outlet />
+          <Suspense fallback={<div>loading...</div>}>
+            <Outlet />
+          </Suspense>
         </main>
         <Footer />
       </div>
