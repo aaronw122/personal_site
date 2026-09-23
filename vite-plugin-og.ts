@@ -1,6 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { Plugin } from "vite";
+import {
+  deriveDescription,
+  extractFrontmatter,
+  htmlEscape,
+} from "./vault-markdown";
 
 // Build-time prerendering of per-post OG / social-preview metadata.
 //
@@ -29,56 +34,6 @@ interface Options {
   sections: Section[];
   fixed?: FixedRoute[];
   siteUrl: string; // e.g. "https://awill.co" (no trailing slash)
-}
-
-function htmlEscape(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-function extractFrontmatter(raw: string): Record<string, string> {
-  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
-  if (!match) return {};
-  const result: Record<string, string> = {};
-  for (const line of match[1].split("\n")) {
-    const idx = line.indexOf(":");
-    if (idx === -1) continue;
-    const key = line.slice(0, idx).trim();
-    const val = line.slice(idx + 1).trim().replace(/^["']|["']$/g, "");
-    if (key && val) result[key] = val;
-  }
-  return result;
-}
-
-function stripFrontmatter(raw: string): string {
-  return raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n*/, "");
-}
-
-// Pull a plain-text summary from the first real paragraph of the body.
-function deriveDescription(body: string, fallback: string): string {
-  const lines = stripFrontmatter(body).split(/\r?\n/);
-  for (let line of lines) {
-    line = line.trim();
-    if (!line) continue;
-    if (line.startsWith("#")) continue; // heading
-    if (/^!?\[\[.*\]\]$/.test(line)) continue; // wikilink embed on its own
-    if (/^!\[.*\]\(.*\)$/.test(line)) continue; // image on its own
-    if (/^(---|\*\*\*|___)$/.test(line)) continue; // horizontal rule
-    // Strip common markdown markup down to readable prose.
-    let text = line
-      .replace(/!?\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_m, t, a) => a || t) // wikilinks
-      .replace(/!\[[^\]]*\]\([^)]*\)/g, "") // images
-      .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1") // links → text
-      .replace(/[*_`>#]/g, "") // emphasis / code / quote / heading marks
-      .trim();
-    if (!text) continue;
-    if (text.length > 200) text = text.slice(0, 197).trimEnd() + "…";
-    return text;
-  }
-  return fallback;
 }
 
 function buildHtml(

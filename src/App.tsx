@@ -1,15 +1,20 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Experience from "./pages/Experience";
-import ContentIndex from "./pages/ContentIndex";
-import ContentArticle from "./pages/ContentArticle";
-import Era from "./pages/Era";
-import EraDevices from "./pages/EraDevices";
 import NotFound from "./pages/NotFound";
 import { getWritingEntries, getListsEntries } from "./lib/content";
 import useNavHaptics from "./hooks/useNavHaptics";
+
+// Split off the routes that drag in heavy deps (react-markdown + remark/rehype,
+// KaTeX, highlight.js, the Era notebook) so the home page's initial bundle
+// doesn't pay for them.
+const ContentIndex = lazy(() => import("./pages/ContentIndex"));
+const ContentArticle = lazy(() => import("./pages/ContentArticle"));
+const Era = lazy(() => import("./pages/Era"));
+const EraDevices = lazy(() => import("./pages/EraDevices"));
 
 const writingEntries = getWritingEntries();
 const listsEntries = getListsEntries();
@@ -24,8 +29,15 @@ export default function App() {
   useNavHaptics();
   return (
     <Routes>
-      {/* standalone immersive notebook — no site chrome */}
-      <Route path="/era-notebook" element={<Era />} />
+      {/* standalone immersive notebook — no site chrome, so its own Suspense */}
+      <Route
+        path="/era-notebook"
+        element={
+          <Suspense fallback={<div>loading...</div>}>
+            <Era />
+          </Suspense>
+        }
+      />
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         {/* simple md-driven page */}

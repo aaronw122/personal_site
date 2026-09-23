@@ -28,7 +28,7 @@ export default function Navbar() {
 function SiteLogo() {
   return (
     <img
-      src="/images/upside_down_transparent.png"
+      src="/images/upside_down_transparent.webp"
       alt="site logo"
       width="36"
       height="36"

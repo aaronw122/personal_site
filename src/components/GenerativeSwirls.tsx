@@ -46,7 +46,13 @@ export default function GenerativeSwirls() {
     let spawnTimer: ReturnType<typeof setTimeout> | null = null;
     let visibilityHandler: (() => void) | null = null;
 
-    import("p5").then((mod) => {
+    // Decorative: wait for idle so the ~1 MB p5 chunk doesn't compete with
+    // the hero image and fonts for bandwidth right after mount.
+    const idle =
+      window.requestIdleCallback ??
+      ((cb: () => void) => window.setTimeout(cb, 200));
+    const whenIdle = new Promise<void>((resolve) => idle(() => resolve()));
+    whenIdle.then(() => import("p5")).then((mod) => {
       if (cancelled || !containerRef.current) return;
 
       const p5Constructor = mod.default as unknown as new (

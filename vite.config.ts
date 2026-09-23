@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { ogPrerender } from "./vite-plugin-og";
 import { syncWritingImages } from "./vite-plugin-writing-images";
+import { rssFeed } from "./vite-plugin-rss";
 
 const VAULT = "/Users/aaron/Documents/Obsidian_AW";
 const WRITING = `${VAULT}/published/writing`;
@@ -28,6 +29,7 @@ export default defineConfig({
         { route: "oboe", dir: WRITING, slug: "most inneficient way to find needle in a haystack" },
       ],
     }),
+    rssFeed({ siteUrl: "https://awill.co", urlPrefix: "writing", dir: WRITING }),
   ],
   resolve: {
     alias: {

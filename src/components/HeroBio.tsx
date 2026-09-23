@@ -14,7 +14,10 @@ export default function HeroBio() {
       <div className="hero-content">
         <div className="prose hero-bio">
           <p className="hero-bio-text">
-            hey! i'm aaron. aspiring renaissance man. engineer currently building at fractal nyc.
+            hey! i'm aaron. aspiring renaissance man. engineer currently hacking at{" "}
+            <a href="https://www.recurse.com" target="_blank" rel="noreferrer">
+              recurse center
+            </a>.
           </p>
           <p className="hero-bio-text">
             i spent two years as a PM at expedia building products that drove $7M in annual profit. switched to engineering because i wanted to build things instead. check out my projects below.
@@ -23,7 +26,9 @@ export default function HeroBio() {
 
         <div className="hero-photo-wrapper">
           <img
-            src="/images/Platform_9_34_cropped.png"
+            src="/images/Platform_9_34_cropped.webp"
+            width={400}
+            height={470}
             alt="photo of aaron"
             className="hero-photo"
             tabIndex={0}
@@ -43,7 +48,7 @@ export default function HeroBio() {
       <Lightbox
         open={lightbox}
         onClose={() => setLightbox(false)}
-        src="/images/Platform_9_34_cropped.png"
+        src="/images/Platform_9_34_cropped.webp"
         alt="photo of aaron"
       />
     </section>
