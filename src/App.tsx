@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Experience from "./pages/Experience";
 import NotFound from "./pages/NotFound";
+import Rick from "./pages/Rick";
 import { getWritingEntries, getListsEntries } from "./lib/content";
 import useNavHaptics from "./hooks/useNavHaptics";
 
@@ -15,6 +16,12 @@ const ContentIndex = lazy(() => import("./pages/ContentIndex"));
 const ContentArticle = lazy(() => import("./pages/ContentArticle"));
 const Era = lazy(() => import("./pages/Era"));
 const EraDevices = lazy(() => import("./pages/EraDevices"));
+// TEMPORARY: dev-only line-spacing tuner. `import.meta.env.DEV` is statically
+// false in production builds, so the chunk is never emitted. Remove together
+// with components/SpacingPanel.tsx.
+const SpacingPanel = import.meta.env.DEV
+  ? lazy(() => import("./components/SpacingPanel"))
+  : null;
 
 const writingEntries = getWritingEntries();
 const listsEntries = getListsEntries();
@@ -28,68 +35,77 @@ const loadListsIndex = () =>
 export default function App() {
   useNavHaptics();
   return (
-    <Routes>
-      {/* standalone immersive notebook — no site chrome, so its own Suspense */}
-      <Route
-        path="/era-notebook"
-        element={
-          <Suspense fallback={<div>loading...</div>}>
-            <Era />
-          </Suspense>
-        }
-      />
-      <Route element={<Layout />}>
-        <Route path="/" element={<Home />} />
-        {/* simple md-driven page */}
-        <Route path="/era" element={<EraDevices />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/experience" element={<Experience />} />
+    <>
+      {SpacingPanel && (
+        <Suspense fallback={null}>
+          <SpacingPanel />
+        </Suspense>
+      )}
+      <Routes>
+        {/* standalone immersive notebook — no site chrome, so its own Suspense */}
         <Route
-          path="/writing"
+          path="/era-notebook"
           element={
-            <ContentIndex section="writing" loadIndex={loadWritingIndex} />
+            <Suspense fallback={<div>loading...</div>}>
+              <Era />
+            </Suspense>
           }
         />
-        <Route
-          path="/writing/:slug"
-          element={
-            <ContentArticle section="writing" entries={writingEntries} />
-          }
-        />
-        <Route
-          path="/lists"
-          element={
-            <ContentIndex section="lists" loadIndex={loadListsIndex} />
-          }
-        />
-        <Route
-          path="/lists/:slug"
-          element={
-            <ContentArticle section="lists" entries={listsEntries} />
-          }
-        />
-        <Route
-          path="/haystack-errw-proof"
-          element={
-            <ContentArticle
-              section="writing"
-              entries={writingEntries}
-              fixedSlug="haystack-errw-proof"
-            />
-          }
-        />
-        <Route
-          path="/oboe"
-          element={
-            <ContentArticle
-              section="writing"
-              entries={writingEntries}
-              fixedSlug="most inneficient way to find needle in a haystack"
-            />
-          }
-        />
-        <Route path="*" element={<NotFound />} />
-      </Route>
-    </Routes>
+        {/* standalone full-screen rickroll — no site chrome */}
+        <Route path="/rick" element={<Rick />} />
+        <Route element={<Layout />}>
+          <Route path="/" element={<Home />} />
+          {/* simple md-driven page */}
+          <Route path="/era" element={<EraDevices />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/experience" element={<Experience />} />
+          <Route
+            path="/writing"
+            element={
+              <ContentIndex section="writing" loadIndex={loadWritingIndex} />
+            }
+          />
+          <Route
+            path="/writing/:slug"
+            element={
+              <ContentArticle section="writing" entries={writingEntries} />
+            }
+          />
+          <Route
+            path="/lists"
+            element={
+              <ContentIndex section="lists" loadIndex={loadListsIndex} />
+            }
+          />
+          <Route
+            path="/lists/:slug"
+            element={
+              <ContentArticle section="lists" entries={listsEntries} />
+            }
+          />
+          <Route
+            path="/haystack-errw-proof"
+            element={
+              <ContentArticle
+                section="writing"
+                entries={writingEntries}
+                fixedSlug="haystack-errw-proof"
+              />
+            }
+          />
+          <Route
+            path="/oboe"
+            element={
+              <ContentArticle
+                section="writing"
+                entries={writingEntries}
+                fixedSlug="most inneficient way to find needle in a haystack"
+              />
+            }
+          />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
+    </>
   );
 }
