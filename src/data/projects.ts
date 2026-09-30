@@ -3,8 +3,6 @@ export interface Project {
   description: string
   url: string
   linkText: string
-  // The whole-card ("story") destination when it differs from the label link —
-  // a writeup for most cards, but any narrative link (e.g. a launch tweet).
   blogUrl?: string
   stack: string
 }
@@ -31,8 +29,6 @@ export const FEATURED_PROJECTS: Project[] = [
     name: "voicemixy",
     description:
       "send your friends audio in the voice of trump or elon.",
-    // Label → the live testflight; whole-card → the tweet (its "story" link,
-    // filling the same role blogUrl does for the writeup-backed cards).
     url: "https://testflight.apple.com/join/9aAt3nUw",
     linkText: "testflight",
     blogUrl: "https://x.com/aaaronwill/status/2076804018714673460",
