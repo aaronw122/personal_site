@@ -49,7 +49,10 @@ export default function SpacingPanel() {
       if (values[i] === DEFAULTS[i]) root.style.removeProperty(t.name);
       else root.style.setProperty(t.name, fmt(values[i]));
     });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
+    // Persist only real overrides, so untouched defaults never mask a later
+    // hand edit to :root.
+    if (values.every((v, i) => v === DEFAULTS[i])) localStorage.removeItem(STORAGE_KEY);
+    else localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
   }, [values]);
 
   function copyCss() {

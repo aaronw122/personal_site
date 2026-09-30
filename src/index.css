@@ -40,7 +40,8 @@ hr { border: none; border-top: 1px solid rgba(0, 0, 0, 0.15); }
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
-  /* line spacing — every multi-line text rule reads one of these */
+  /* line spacing — body, prose and headings; fixed-grid components (notebook
+     cards, Era pages) and single-line labels keep literal values */
   --leading-body: 1.6;     /* general UI text */
   --leading-prose: 1.5;    /* long-form reading (.prose) */
   --leading-heading: 1.25; /* h1–h6 */
@@ -521,6 +522,21 @@ a:visited {
   line-height: 23px;
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+/* Split-target cards (ProjectCard with blogUrl): the overlay link covers the
+   card (-> story); the label link sits above it (-> live site). Margin instead
+   of padding so only the label text is clickable, not the gap above it. */
+.project-card-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.project-card-link-inline {
+  position: relative;
+  z-index: 3;
+  align-self: flex-start;
+  padding-top: 0;
+  margin-top: 23px;
 }
 .project-card-stack {
   font-size: 0.75rem;
