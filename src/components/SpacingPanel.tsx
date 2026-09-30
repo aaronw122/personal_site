@@ -1,6 +1,3 @@
-// TEMPORARY dev-only tuner for the --leading-* tokens in index.css :root.
-// Drag a slider to preview live, "copy css" the result into :root, then delete
-// this file and its mount in App.tsx.
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 
@@ -14,8 +11,6 @@ const STEP = 0.025;
 const STORAGE_KEY = "spacing-panel";
 const root = document.documentElement;
 
-// Stylesheet values, read with inline overrides cleared so an HMR re-run of
-// this module doesn't mistake a previous override for the default.
 for (const t of TOKENS) root.style.removeProperty(t.name);
 const DEFAULTS = TOKENS.map((t) =>
   parseFloat(getComputedStyle(root).getPropertyValue(t.name)),
@@ -32,7 +27,7 @@ function loadSaved(): number[] {
       return saved.map(Number);
     }
   } catch {
-    // corrupt entry — fall through to defaults
+    return DEFAULTS;
   }
   return DEFAULTS;
 }
@@ -49,8 +44,6 @@ export default function SpacingPanel() {
       if (values[i] === DEFAULTS[i]) root.style.removeProperty(t.name);
       else root.style.setProperty(t.name, fmt(values[i]));
     });
-    // Persist only real overrides, so untouched defaults never mask a later
-    // hand edit to :root.
     if (values.every((v, i) => v === DEFAULTS[i])) localStorage.removeItem(STORAGE_KEY);
     else localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
   }, [values]);
@@ -114,7 +107,6 @@ export default function SpacingPanel() {
   );
 }
 
-// Fixed type metrics so the panel itself doesn't reflow while you tune.
 const panel: CSSProperties = {
   position: "fixed",
   right: 16,
