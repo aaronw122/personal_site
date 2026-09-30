@@ -27,8 +27,8 @@ export default function About() {
           started teaching myself to program in the spring of 2025 because i wanted to build things!
         </p>
         <p>
-          currently, i spend my time at fractal nyc working on a project that helps people polish their web design
-          directly where its rendered - in the browser! i also like to meditate, meet new people, and catch live music when i can.
+          currently, i spend my time at fractal nyc working on an augmented reality project that lets people create/view digital art in 3d space!
+          i also like to meditate, meet new people, and catch live music when i can.
         </p>
         <p>
           i'd describe most of my friends as misfits. i'm drawn to people who

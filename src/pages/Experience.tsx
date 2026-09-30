@@ -88,12 +88,6 @@ export default function Experience() {
             so here it is.
           </a>
         </Entry>
-
-        <Entry title="twitter offline poster" date="2025">
-          wanted to post on twitter without logging in and seeing brainrot.
-          vibecoded this tool in a day with codex(jun '25). damn near one shot it.{" "}
-          <a href="https://easytweet.xyz" className="link-underline">easytweet.xyz</a>
-        </Entry>
       </div>
     </div>
   );
