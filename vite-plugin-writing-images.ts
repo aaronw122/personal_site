@@ -2,7 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 import type { Plugin } from "vite";
 
-// Build-time sync of images embedded in published writing/lists docs.
+// Build-time sync of images embedded in published writing/lists docs (plus any
+// standalone vault docs a page renders, e.g. the era page).
 //
 // Markdown is loaded straight from the Obsidian vault (via the @writing/@lists
 // aliases), but the images those docs embed are served from public/writing-images/.
@@ -25,6 +26,8 @@ import type { Plugin } from "vite";
 interface Options {
   // Vault directories holding the published markdown, e.g. …/published/writing.
   sourceDirs: string[];
+  // Individual vault docs outside sourceDirs whose embeds are served the same way.
+  sourceFiles: string[];
   // Vault attachment directories to pull referenced images from, searched in order.
   attachmentsDirs: string[];
   // Destination served at /writing-images/, e.g. <repo>/public/writing-images.
@@ -49,15 +52,19 @@ export function syncWritingImages(opts: Options): Plugin {
     name: "sync-writing-images",
     buildStart() {
       const referenced = new Set<string>();
+      const scan = (file: string) => {
+        for (const ref of extractImageRefs(fs.readFileSync(file, "utf8"))) referenced.add(ref);
+      };
       for (const dir of opts.sourceDirs) {
         if (!fs.existsSync(dir)) continue;
         // Recursive to match the runtime import.meta.glob("**/*.md") in content.ts.
         for (const file of fs.readdirSync(dir, { recursive: true })) {
           if (typeof file !== "string" || !file.endsWith(".md")) continue;
-          const raw = fs.readFileSync(path.join(dir, file), "utf8");
-          for (const ref of extractImageRefs(raw)) referenced.add(ref);
+          scan(path.join(dir, file));
         }
       }
+      // Pages import these directly, so a missing file fails the build anyway.
+      for (const file of opts.sourceFiles) scan(file);
 
       fs.mkdirSync(opts.destDir, { recursive: true });
 
