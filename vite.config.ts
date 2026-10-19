@@ -7,6 +7,7 @@ import { rssFeed } from "./vite-plugin-rss";
 const VAULT = "/Users/aaron/Documents/Obsidian_AW";
 const WRITING = `${VAULT}/published/writing`;
 const LISTS = `${VAULT}/published/lists`;
+const ERA = `${VAULT}/networking/companies`;
 
 export default defineConfig({
   base: "/",
@@ -14,6 +15,7 @@ export default defineConfig({
     react(),
     syncWritingImages({
       sourceDirs: [WRITING, LISTS],
+      sourceFiles: [`${ERA}/era/era devices 2.md`],
       attachmentsDirs: [`${VAULT}/Code/Images 1`],
       destDir: "public/writing-images",
     }),
@@ -35,8 +37,7 @@ export default defineConfig({
     alias: {
       "@writing": WRITING,
       "@lists": LISTS,
-      "@era-content": `${VAULT}/networking/companies`,
-      "@era-images": `${VAULT}/Code/Images 1`,
+      "@era-content": ERA,
     },
   },
   build: {
