@@ -40,11 +40,9 @@ hr { border: none; border-top: 1px solid rgba(0, 0, 0, 0.15); }
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
-  /* line spacing — body, prose and headings; fixed-grid components (notebook
-     cards, Era pages) and single-line labels keep literal values */
-  --leading-body: 1.6;     /* general UI text */
-  --leading-prose: 1.5;    /* long-form reading (.prose) */
-  --leading-heading: 1.25; /* h1–h6 */
+  --leading-body: 1.6;
+  --leading-prose: 1.5;
+  --leading-heading: 1.25;
 }
 
 html {
@@ -162,7 +160,7 @@ a:visited {
   font-weight: 400;
 }
 
-/* notebook paper — cards; 23px ruled-line grid, independent of --leading-* */
+/* notebook paper — shared base for cards */
 .notebook-card {
   --nb-header: 0px;
   position: relative;
@@ -503,6 +501,7 @@ a:visited {
   min-width: 320px;
   scroll-snap-align: start;
   padding: 20px 20px 20px 44px;
+  color: var(--color-fg-1);
 }
 .project-card-title {
   font-size: 1rem;
@@ -523,9 +522,6 @@ a:visited {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
-/* Split-target cards (ProjectCard with blogUrl): the overlay link covers the
-   card (-> story); the label link sits above it (-> live site). Margin instead
-   of padding so only the label text is clickable, not the gap above it. */
 .project-card-overlay {
   position: absolute;
   inset: 0;

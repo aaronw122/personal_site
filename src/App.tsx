@@ -16,9 +16,6 @@ const ContentIndex = lazy(() => import("./pages/ContentIndex"));
 const ContentArticle = lazy(() => import("./pages/ContentArticle"));
 const Era = lazy(() => import("./pages/Era"));
 const EraDevices = lazy(() => import("./pages/EraDevices"));
-// TEMPORARY: dev-only line-spacing tuner. `import.meta.env.DEV` is statically
-// false in production builds, so the chunk is never emitted. Remove together
-// with components/SpacingPanel.tsx.
 const SpacingPanel = import.meta.env.DEV
   ? lazy(() => import("./components/SpacingPanel"))
   : null;
@@ -51,7 +48,6 @@ export default function App() {
             </Suspense>
           }
         />
-        {/* standalone full-screen rickroll — no site chrome */}
         <Route path="/rick" element={<Rick />} />
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
