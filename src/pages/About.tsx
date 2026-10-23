@@ -9,12 +9,12 @@ export default function About() {
       <div className="prose about-prose">
         <p>hey! i'm aaron.</p>
         <p>
-          i grew up in chicago in a family of 5, and spent a ton of time with my nose in a book.
-          so much so that i got a detention in the second grade for reading too much.
+          i grew up addicted to reading. my nose was always in a fiction book to the point where i thought magic
+          was real. then, reality hit. i turned 11, and didnt get my hogwarts letter.
         </p>
         <p>
-          at age 14, i started caddying at evanston golf club. through caddying, i got exposed to people
-          from all different backgrounds, and learned that charisma beats smarts.
+          fast forward a few years - at 14 i started caddying at evanston golf club. through caddying, i got
+          exposed to people from all different backgrounds, and learned that charisma beats smarts.
           i also received a full ride to the university of michigan as an evans scholar.
         </p>
         <p>
@@ -27,7 +27,7 @@ export default function About() {
           started teaching myself to program in the spring of 2025 because i wanted to build things!
         </p>
         <p>
-          currently, i spend my time at fractal nyc working on an augmented reality project that lets people create/view digital art in 3d space!
+          currently, i spend my time at recurse center working on an augmented reality project that lets people create/view digital art in 3d space!
           i also like to meditate, meet new people, and catch live music when i can.
         </p>
         <p>
