@@ -43,8 +43,10 @@ hr { border: none; border-top: 1px solid rgba(0, 0, 0, 0.15); }
   /* line spacing — body, prose and headings; fixed-grid components (notebook
      cards, Era pages) and single-line labels keep literal values */
   --leading-body: 1.6;     /* general UI text */
-  --leading-prose: 1.5;    /* long-form reading (.prose) */
+  --leading-prose: 1.55;   /* long-form reading (.prose) */
   --leading-heading: 1.25; /* h1–h6 */
+  --text-body: 1.075rem;   /* base text size; explicitly sized elements opt out */
+  --space-p: 0.5em;        /* gap between .prose paragraphs */
 }
 
 html {
@@ -59,6 +61,7 @@ html {
 
 body {
   box-sizing: inherit;
+  font-size: var(--text-body);
   line-height: var(--leading-body);
   margin: 0;
   background: transparent;
@@ -74,7 +77,7 @@ h6 { font-size: 0.875rem; font-weight: 400; margin: 0.6em 0 0.5em; }
 h1, h2, h3, h4, h5, h6 { line-height: var(--leading-heading); }
 
 .prose { line-height: var(--leading-prose); }
-.prose p { margin: 0.5em 0; }
+.prose p { margin: var(--space-p) 0; }
 .prose ul, .prose ol { margin: 0.5em 0; }
 .prose li { margin: 0.15em 0; }
 .prose ul ul, .prose ul ol, .prose ol ul, .prose ol ol { margin: 0.25em 0; }
@@ -444,7 +447,6 @@ a:visited {
 }
 
 .hero-location {
-  font-size: 1rem;
   line-height: 1.5rem;
   font-weight: 300;
   margin-top: 0px;
@@ -459,11 +461,6 @@ a:visited {
 
 .hero-bio {
   flex: 1;
-}
-
-.hero-bio-text {
-  font-size: 1rem;
-  line-height: var(--leading-body);
 }
 
 .hero-photo-wrapper {

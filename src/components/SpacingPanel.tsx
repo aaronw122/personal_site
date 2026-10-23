@@ -1,13 +1,15 @@
-// TEMPORARY dev-only tuner for the --leading-* tokens in index.css :root.
-// Drag a slider to preview live, "copy css" the result into :root, then delete
-// this file and its mount in App.tsx.
+// TEMPORARY dev-only tuner for the --leading-*, --text-body and --space-p tokens in index.css
+// :root. Drag a slider to preview live, "copy css" the result into :root, then
+// delete this file and its mount in App.tsx.
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 
 const TOKENS = [
-  { name: "--leading-body", label: "body / ui", min: 1, max: 2.2 },
-  { name: "--leading-prose", label: "prose", min: 1, max: 2.2 },
-  { name: "--leading-heading", label: "headings", min: 0.8, max: 1.8 },
+  { name: "--leading-body", label: "body / ui line height", min: 1, max: 2.2, unit: "" },
+  { name: "--leading-prose", label: "prose line height", min: 1, max: 2.2, unit: "" },
+  { name: "--leading-heading", label: "heading line height", min: 0.8, max: 1.8, unit: "" },
+  { name: "--text-body", label: "text size", min: 0.75, max: 1.5, unit: "rem" },
+  { name: "--space-p", label: "paragraph gap", min: 0, max: 2, unit: "em" },
 ] as const;
 
 const STEP = 0.025;
@@ -47,7 +49,7 @@ export default function SpacingPanel() {
   useEffect(() => {
     TOKENS.forEach((t, i) => {
       if (values[i] === DEFAULTS[i]) root.style.removeProperty(t.name);
-      else root.style.setProperty(t.name, fmt(values[i]));
+      else root.style.setProperty(t.name, fmt(values[i]) + t.unit);
     });
     // Persist only real overrides, so untouched defaults never mask a later
     // hand edit to :root.
@@ -56,7 +58,7 @@ export default function SpacingPanel() {
   }, [values]);
 
   function copyCss() {
-    const css = TOKENS.map((t, i) => `  ${t.name}: ${fmt(values[i])};`).join("\n");
+    const css = TOKENS.map((t, i) => `  ${t.name}: ${fmt(values[i])}${t.unit};`).join("\n");
     navigator.clipboard.writeText(css).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
@@ -66,7 +68,7 @@ export default function SpacingPanel() {
   if (!open) {
     return (
       <button style={{ ...panel, padding: "6px 10px" }} onClick={() => setOpen(true)}>
-        spacing
+        type
       </button>
     );
   }
@@ -74,7 +76,7 @@ export default function SpacingPanel() {
   return (
     <div style={panel}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-        <strong>line spacing</strong>
+        <strong>type</strong>
         <button style={link} onClick={() => setOpen(false)} aria-label="Collapse">
           ×
         </button>
@@ -84,7 +86,7 @@ export default function SpacingPanel() {
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <span>{t.label}</span>
             <span style={{ opacity: values[i] === DEFAULTS[i] ? 0.5 : 1 }}>
-              {fmt(values[i])}
+              {fmt(values[i]) + t.unit}
             </span>
           </div>
           <input
