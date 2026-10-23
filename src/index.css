@@ -107,9 +107,14 @@ blockquote, blockquote p {
 /* tighten hr in prose */
 .prose hr { margin: 1.5em 0; border-top: 1px solid rgba(0, 0, 0, 0.15); }
 
-/* prose table borders */
+/* prose table borders; wide tables scroll inside the column instead of
+   widening the page */
 .prose table {
   border-collapse: collapse;
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-wrap: normal; /* cells keep words whole; the table scrolls instead */
 }
 
 .prose th,
@@ -122,6 +127,8 @@ blockquote, blockquote p {
 .prose {
   color: var(--color-fg-1);
   max-width: 65ch;
+  /* bare URLs and long inline code would otherwise widen the page on mobile */
+  overflow-wrap: anywhere;
 }
 .prose a {
   text-decoration: underline;
