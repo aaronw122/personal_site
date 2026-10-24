@@ -28,6 +28,7 @@ export type HeadAttachment = {
   rotation: Vec3;
   neckPivot: Vec3;
 };
+/** Contact x is an offset from edgeX; y/z are root-local. This is not the wrist. */
 export type GripTarget = { position: Vec3; elbowDirection: Vec3 };
 export type PeekPose = {
   torsoPosition: Vec3;

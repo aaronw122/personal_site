@@ -105,6 +105,7 @@ export default function RigPreview({ config, mode, debug, native = false, onStat
       targets.forEach((target, index) => {
         target.visible = current.debug;
         target.position.fromArray(index ? pose.right.position : pose.left.position);
+        target.position.x += pose.edgeX;
       });
       camera.right = pose.edgeX;
       camera.left = pose.edgeX - width / pixelsPerUnit;
