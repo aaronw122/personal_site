@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import RigPreview from "../components/CharacterRig/RigPreview";
 import type { TurnMode } from "../components/CharacterRig/RigPreview";
 import { CHARACTER_PRESETS } from "../components/CharacterRig/presets";
-import { validateBodyShape } from "../components/CharacterRig/body";
-import type { BodyShape, CharacterConfig, PoseStatus, Vec3 } from "../components/CharacterRig/types";
+import { validateBodyProportions } from "../components/CharacterRig/body";
+import type { BodyProportions, CharacterConfig, PoseStatus, Vec3 } from "../components/CharacterRig/types";
 
-const shapeControls: { key: keyof BodyShape; min: number; max: number }[] = [
+const proportionControls: { key: keyof BodyProportions; min: number; max: number }[] = [
   { key: "chestWidth", min: 0.5, max: 2 }, { key: "chestDepth", min: 0.3, max: 1.5 },
   { key: "bellyWidth", min: 0.5, max: 2.4 }, { key: "bellyDepth", min: 0.3, max: 1.8 },
   { key: "torsoLength", min: 0.7, max: 2 }, { key: "shoulderWidth", min: 0.5, max: 1.8 },
@@ -16,6 +16,9 @@ const shapeControls: { key: keyof BodyShape; min: number; max: number }[] = [
   { key: "shirtClearance", min: 0.01, max: 0.15 },
 ];
 const labelText = (value: string) => value.replace(/([A-Z])/g, " $1").toLowerCase();
+function isTurnMode(value: string): value is TurnMode {
+  return value === "auto" || value === "left" || value === "centre" || value === "right";
+}
 function Slider({ label, value, min, max, onChange }: { label: string; value: number; min: number; max: number; onChange(value: number): void }) {
   return <label style={{ display: "grid", gridTemplateColumns: "1fr 52px", gap: 4 }}>
     <span>{label}</span><output>{value.toFixed(2)}</output>
@@ -39,15 +42,15 @@ export default function CharacterRigDemo() {
   const [referenceY, setReferenceY] = useState(0);
   const [opacity, setOpacity] = useState(0.35);
   const [exported, setExported] = useState("");
-  const [shapeError, setShapeError] = useState("");
-  const changeShape = (key: keyof BodyShape, value: number) => {
-    const shape = { ...config.shape, [key]: value };
+  const [proportionError, setProportionError] = useState("");
+  const changeProportions = (key: keyof BodyProportions, value: number) => {
+    const proportions = { ...config.proportions, [key]: value };
     try {
-      validateBodyShape(shape);
-      setShapeError("");
-      setConfig({ ...config, shape });
+      validateBodyProportions(proportions);
+      setProportionError("");
+      setConfig({ ...config, proportions });
     } catch (error) {
-      setShapeError(error instanceof Error ? error.message : String(error));
+      setProportionError(error instanceof Error ? error.message : String(error));
     }
   };
   useEffect(() => () => { if (reference) URL.revokeObjectURL(reference); }, [reference]);
@@ -62,19 +65,19 @@ export default function CharacterRigDemo() {
   };
   return <main style={{ padding: 24, color: "#26313b", background: "#f4f1eb", minHeight: "100vh", font: "14px/1.4 system-ui" }}>
     <h1>Character rig workshop</h1>
-    <p>Neutral body approval: lean and fuller shapes share one rig. Red boundary is the browser edge. One world unit equals the neutral head height.</p>
+    <p>Neutral body approval: lean and fuller proportions share one rig. Red boundary is the browser edge. One world unit equals the neutral head height.</p>
     <div style={{ display: "flex", flexWrap: "wrap", alignItems: "start", gap: 24 }}>
       <aside style={{ width: 270, display: "grid", gap: 12 }}>
         <label>Body preset <select aria-label="Body preset" value={config.id} onChange={(event) => {
           const preset = CHARACTER_PRESETS.find((entry) => entry.id === event.target.value);
-          if (preset) { setConfig(structuredClone(preset)); setStatus(null); setShapeError(""); }
+          if (preset) { setConfig(structuredClone(preset)); setStatus(null); setProportionError(""); }
         }}>{CHARACTER_PRESETS.map((preset) => <option key={preset.id} value={preset.id}>{preset.label}</option>)}</select></label>
-        <label>Head turn <select aria-label="Head turn" value={mode} onChange={(event) => setMode(event.target.value as TurnMode)}>{["auto", "left", "centre", "right"].map((value) => <option key={value}>{value}</option>)}</select></label>
+        <label>Head turn <select aria-label="Head turn" value={mode} onChange={(event) => { if (isTurnMode(event.target.value)) setMode(event.target.value); }}>{["auto", "left", "centre", "right"].map((value) => <option key={value}>{value}</option>)}</select></label>
         <label><input type="checkbox" checked={debug} onChange={(event) => setDebug(event.target.checked)} /> Bones and grip targets</label>
         <p role="status">{status ? `Left arm: ${status.left.reachable ? "reachable" : "UNREACHABLE"}; right arm: ${status.right.reachable ? "reachable" : "UNREACHABLE"}` : "Preparing rig…"}</p>
         <button onClick={exportConfig}>Export configuration</button>
-        {shapeError && <p role="alert">{shapeError}</p>}
-        <details open><summary>Body proportions</summary>{shapeControls.map(({ key, min, max }) => <Slider key={key} label={labelText(key)} value={config.shape[key]} min={min} max={max} onChange={(value) => changeShape(key, value)} />)}</details>
+        {proportionError && <p role="alert">{proportionError}</p>}
+        <details open><summary>Body proportions</summary>{proportionControls.map(({ key, min, max }) => <Slider key={key} label={labelText(key)} value={config.proportions[key]} min={min} max={max} onChange={(value) => changeProportions(key, value)} />)}</details>
         <details><summary>Pose and movement</summary>
           <VectorControls label="Torso" value={config.pose.torsoPosition} onChange={(torsoPosition) => changePose({ torsoPosition })} />
           {(["left", "right"] as const).map((side) => <div key={side}>

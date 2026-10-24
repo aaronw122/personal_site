@@ -3,7 +3,7 @@ import type { Bone, Group, Object3D, Quaternion, Vector3 } from "three";
 /** Right-handed frame: +X right, +Y up, +Z toward viewer. One unit is head height. */
 export type Vec3 = [number, number, number];
 export type Side = "left" | "right";
-export type BodyShape = {
+export type BodyProportions = {
   chestWidth: number;
   chestDepth: number;
   bellyWidth: number;
@@ -44,7 +44,7 @@ export type PeekPose = {
 export type CharacterConfig = {
   id: string;
   label: string;
-  shape: BodyShape;
+  proportions: BodyProportions;
   appearance: Appearance;
   head: HeadAttachment | null;
   pose: PeekPose;
@@ -63,7 +63,7 @@ export type CharacterRig = {
   neck: Bone;
   headMount: Group;
   arms: Record<Side, ArmRig>;
-  shape: BodyShape;
+  proportions: BodyProportions;
   dispose(): void;
 };
 export type ReachStatus = { reachable: boolean; distance: number; minimum: number; maximum: number };

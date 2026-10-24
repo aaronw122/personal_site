@@ -3,16 +3,14 @@ import { Bone, Group, Quaternion, Vector3 } from "three";
 import { applyPeekPose, createPoseScratch } from "../../src/components/CharacterRig/pose.ts";
 import { HAND_KNUCKLE_OFFSET_RATIO } from "../../src/components/CharacterRig/body.ts";
 import type {
-  Appearance,
   ArmRig,
-  BodyShape,
+  BodyProportions,
   CharacterRig,
   PeekPose,
   Side,
 } from "../../src/components/CharacterRig/types.ts";
 
-const appearance: Appearance = { skin: "#d6a17d", shirt: "#234567" };
-const shape: BodyShape = {
+const proportions: BodyProportions = {
   chestWidth: 1,
   chestDepth: 0.45,
   bellyWidth: 1,
@@ -29,15 +27,14 @@ const shape: BodyShape = {
   handSize: 0.3,
   shirtClearance: 0.02,
 };
-void appearance;
 
-function makeArm(side: Side, torso: Bone, rigShape: BodyShape): ArmRig {
+function makeArm(side: Side, torso: Bone, rigProportions: BodyProportions): ArmRig {
   const upper = new Bone();
   const forearm = new Bone();
   const hand = new Bone();
-  upper.position.set(side === "left" ? -rigShape.shoulderWidth / 2 : rigShape.shoulderWidth / 2, 0, 0);
-  forearm.position.set(0, -rigShape.upperArmLength, 0);
-  hand.position.set(0, -rigShape.forearmLength, 0);
+  upper.position.set(side === "left" ? -rigProportions.shoulderWidth / 2 : rigProportions.shoulderWidth / 2, 0, 0);
+  forearm.position.set(0, -rigProportions.upperArmLength, 0);
+  hand.position.set(0, -rigProportions.forearmLength, 0);
   torso.add(upper);
   upper.add(forearm);
   forearm.add(hand);
@@ -46,12 +43,12 @@ function makeArm(side: Side, torso: Bone, rigShape: BodyShape): ArmRig {
   const fingers = Array.from({ length: 5 }, (_, fingerIndex) => {
     const chain: Bone[] = [];
     let parent = hand;
-    const segmentLength = fingerLengthRatios[fingerIndex] * rigShape.handSize / 3;
+    const segmentLength = fingerLengthRatios[fingerIndex] * rigProportions.handSize / 3;
     for (let jointIndex = 0; jointIndex < 3; jointIndex += 1) {
       const joint = new Bone();
       joint.position.set(
         fingerIndex * 0.01,
-        jointIndex === 0 ? -HAND_KNUCKLE_OFFSET_RATIO * rigShape.handSize : -segmentLength,
+        jointIndex === 0 ? -HAND_KNUCKLE_OFFSET_RATIO * rigProportions.handSize : -segmentLength,
         0,
       );
       parent.add(joint);
@@ -63,8 +60,8 @@ function makeArm(side: Side, torso: Bone, rigShape: BodyShape): ArmRig {
   return { upper, forearm, hand, fingers };
 }
 
-function makeRig(handSize = shape.handSize): CharacterRig {
-  const rigShape = { ...shape, handSize };
+function makeRig(handSize = proportions.handSize): CharacterRig {
+  const rigProportions = { ...proportions, handSize };
   const root = new Group();
   const torso = new Bone();
   const neck = new Bone();
@@ -72,18 +69,18 @@ function makeRig(handSize = shape.handSize): CharacterRig {
   root.add(torso);
   torso.add(neck);
   neck.add(headMount);
-  headMount.position.set(0, shape.neckLength, 0);
+  headMount.position.set(0, proportions.neckLength, 0);
   return {
     root,
     torso,
     neck,
     headMount,
     arms: {
-      left: makeArm("left", torso, rigShape),
-      right: makeArm("right", torso, rigShape),
+      left: makeArm("left", torso, rigProportions),
+      right: makeArm("right", torso, rigProportions),
     },
-    shape: rigShape,
-    dispose() {},
+    proportions: rigProportions,
+    dispose() { root.clear(); },
   };
 }
 
@@ -114,7 +111,7 @@ function handWorldPosition(rig: CharacterRig, side: Side): Vector3 {
 function wristTarget(pose: PeekPose, side: Side): Vector3 {
   const grip = pose[side].position;
   return new Vector3(
-    pose.edgeX + grip[0] - HAND_KNUCKLE_OFFSET_RATIO * shape.handSize,
+    pose.edgeX + grip[0] - HAND_KNUCKLE_OFFSET_RATIO * proportions.handSize,
     grip[1],
     grip[2],
   );
@@ -145,12 +142,20 @@ describe("applyPeekPose", () => {
     expectVectorClose(dorsal, rootDorsal);
     const knuckle = rig.root.worldToLocal(rightHand.children[1].getWorldPosition(new Vector3()));
     expect(knuckle.x).toBeCloseTo(pose.edgeX + pose.right.position[0], 8);
+    const expectedCurl = [0.35, 0.45, 0.35];
+    for (const finger of rig.arms.right.fingers.slice(1)) {
+      for (let jointIndex = 0; jointIndex < finger.length; jointIndex += 1) {
+        const halfAngle = expectedCurl[jointIndex] / 2;
+        expect(finger[jointIndex].quaternion.x).toBeCloseTo(Math.sin(halfAngle), 8);
+        expect(finger[jointIndex].quaternion.w).toBeCloseTo(Math.cos(halfAngle), 8);
+      }
+    }
   });
 
   test("reports and clamps targets outside both reach boundaries without stretching", () => {
     const rig = makeRig();
-    const shoulderX = -shape.shoulderWidth / 2;
-    const knuckleOffset = HAND_KNUCKLE_OFFSET_RATIO * shape.handSize;
+    const shoulderX = -proportions.shoulderWidth / 2;
+    const knuckleOffset = HAND_KNUCKLE_OFFSET_RATIO * proportions.handSize;
     const pose = makePose([shoulderX + knuckleOffset, -2, 0], [-shoulderX + knuckleOffset, -0.1, 0]);
 
     const status = applyPeekPose(rig, pose, 0, createPoseScratch());
@@ -170,7 +175,7 @@ describe("applyPeekPose", () => {
 
   test("uses a deterministic fallback for zero and parallel elbow poles", () => {
     const rig = makeRig();
-    const knuckleOffset = HAND_KNUCKLE_OFFSET_RATIO * shape.handSize;
+    const knuckleOffset = HAND_KNUCKLE_OFFSET_RATIO * proportions.handSize;
     const pose = makePose([-0.6 + knuckleOffset, -0.7, 0], [0.6 + knuckleOffset, -0.7, 0]);
     pose.left.elbowDirection = [0, 0, 0];
     pose.right.elbowDirection = [0, -1, 0];

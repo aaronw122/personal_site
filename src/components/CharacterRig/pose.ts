@@ -50,7 +50,7 @@ export function applyPeekPose(
     solveArm(
       rig,
       rig.arms[side],
-      pose.edgeX + grip.position[0] - HAND_KNUCKLE_OFFSET_RATIO * rig.shape.handSize,
+      pose.edgeX + grip.position[0] - HAND_KNUCKLE_OFFSET_RATIO * rig.proportions.handSize,
       grip.position[1],
       grip.position[2],
       grip.elbowDirection,
@@ -77,8 +77,8 @@ function solveArm(
 
   scratch.direction.subVectors(scratch.target, scratch.shoulder);
   const distance = scratch.direction.length();
-  const minimum = Math.abs(rig.shape.upperArmLength - rig.shape.forearmLength);
-  const maximum = rig.shape.upperArmLength + rig.shape.forearmLength;
+  const minimum = Math.abs(rig.proportions.upperArmLength - rig.proportions.forearmLength);
+  const maximum = rig.proportions.upperArmLength + rig.proportions.forearmLength;
   const clampedDistance = clamp(distance, minimum, maximum);
   status.distance = distance;
   status.minimum = minimum;
@@ -104,8 +104,8 @@ function solveArm(
     scratch.perpendicular.normalize();
   }
 
-  const upperLength = rig.shape.upperArmLength;
-  const forearmLength = rig.shape.forearmLength;
+  const upperLength = rig.proportions.upperArmLength;
+  const forearmLength = rig.proportions.forearmLength;
   const safeDistance = Math.max(clampedDistance, EPSILON);
   const along = (safeDistance * safeDistance + upperLength * upperLength - forearmLength * forearmLength)
     / (2 * safeDistance);

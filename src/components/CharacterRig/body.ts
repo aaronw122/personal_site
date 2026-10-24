@@ -11,14 +11,14 @@ import {
   Vector3,
 } from "three";
 import type { Material } from "three";
-import type { Appearance, BodyShape, CharacterRig } from "./types";
+import type { Appearance, BodyProportions, CharacterRig } from "./types";
 
 const SIDES = ["left", "right"] as const;
 const RADIAL_SEGMENTS = 12;
 export const HAND_KNUCKLE_OFFSET_RATIO = 0.42;
 const FINGER_LENGTHS = [0.32, 0.44, 0.48, 0.44, 0.36] as const;
 const FINGER_X = [-0.42, -0.27, -0.08, 0.11, 0.29] as const;
-const SHAPE_FIELDS: ReadonlyArray<keyof BodyShape> = [
+const PROPORTION_FIELDS: ReadonlyArray<keyof BodyProportions> = [
   "chestWidth",
   "chestDepth",
   "bellyWidth",
@@ -36,28 +36,28 @@ const SHAPE_FIELDS: ReadonlyArray<keyof BodyShape> = [
   "shirtClearance",
 ];
 
-function assertFinitePositive(name: keyof BodyShape, value: number): void {
+function assertFinitePositive(name: keyof BodyProportions, value: number): void {
   const permitsZero = name === "shoulderSlope";
   if (!Number.isFinite(value) || (permitsZero ? value < 0 : value <= 0)) {
     const range = permitsZero ? "zero or greater" : "greater than zero";
-    throw new RangeError(`shape.${name} must be a finite number ${range}`);
+    throw new RangeError(`proportions.${name} must be a finite number ${range}`);
   }
 }
 
-export function validateBodyShape(shape: BodyShape): void {
-  for (const name of SHAPE_FIELDS) {
-    assertFinitePositive(name, shape[name]);
+export function validateBodyProportions(proportions: BodyProportions): void {
+  for (const name of PROPORTION_FIELDS) {
+    assertFinitePositive(name, proportions[name]);
   }
-  if (shape.neckWidth >= shape.shoulderWidth) {
-    throw new RangeError("shape.neckWidth must be less than shape.shoulderWidth");
+  if (proportions.neckWidth >= proportions.shoulderWidth) {
+    throw new RangeError("proportions.neckWidth must be less than proportions.shoulderWidth");
   }
 }
 
 function validateAppearance(appearance: Appearance): void {
-  if (typeof appearance.skin !== "string" || appearance.skin.trim().length === 0) {
+  if (appearance.skin.trim().length === 0) {
     throw new TypeError("appearance.skin must be a non-empty color string");
   }
-  if (typeof appearance.shirt !== "string" || appearance.shirt.trim().length === 0) {
+  if (appearance.shirt.trim().length === 0) {
     throw new TypeError("appearance.shirt must be a non-empty color string");
   }
 }
@@ -203,8 +203,8 @@ function globalBindPosition(bone: Bone, target = new Vector3()): Vector3 {
   return bone.getWorldPosition(target);
 }
 
-export function createCharacterRig(shape: BodyShape, appearance: Appearance): CharacterRig {
-  validateBodyShape(shape);
+export function createCharacterRig(proportions: BodyProportions, appearance: Appearance): CharacterRig {
+  validateBodyProportions(proportions);
   validateAppearance(appearance);
   const root = new Group();
   root.name = "characterRig";
@@ -215,16 +215,17 @@ export function createCharacterRig(shape: BodyShape, appearance: Appearance): Ch
   torso.add(neck);
   const headMount = new Group();
   headMount.name = "headMount";
-  headMount.position.y = shape.neckLength;
+  headMount.position.y = proportions.neckLength;
   neck.add(headMount);
 
+  // SAFETY: Both entries are assigned in the exhaustive SIDES loop before arms is read.
   const arms = {} as CharacterRig["arms"];
-  const fingerLengths = FINGER_LENGTHS.map((ratio) => ratio * shape.handSize);
+  const fingerLengths = FINGER_LENGTHS.map((ratio) => ratio * proportions.handSize);
   for (const side of SIDES) {
     const sign = side === "left" ? -1 : 1;
-    const upper = makeBone(`${side}UpperArm`, sign * shape.shoulderWidth * 0.5, 0, 0);
-    const forearm = makeBone(`${side}Forearm`, 0, -shape.upperArmLength, 0);
-    const hand = makeBone(`${side}Hand`, 0, -shape.forearmLength, 0);
+    const upper = makeBone(`${side}UpperArm`, sign * proportions.shoulderWidth * 0.5, 0, 0);
+    const forearm = makeBone(`${side}Forearm`, 0, -proportions.upperArmLength, 0);
+    const hand = makeBone(`${side}Hand`, 0, -proportions.forearmLength, 0);
     torso.add(upper);
     upper.add(forearm);
     forearm.add(hand);
@@ -233,9 +234,9 @@ export function createCharacterRig(shape: BodyShape, appearance: Appearance): Ch
       const totalLength = fingerLengths[fingerIndex];
       const chain: Bone[] = [];
       for (let joint = 0; joint < 3; joint += 1) {
-        const x = joint === 0 ? FINGER_X[fingerIndex] * shape.handSize : 0;
-        const y = joint === 0 ? -shape.handSize * (fingerIndex === 0 ? 0.18 : HAND_KNUCKLE_OFFSET_RATIO) : -totalLength / 3;
-        const z = joint === 0 && fingerIndex === 0 ? -shape.handSize * 0.08 : 0;
+        const x = joint === 0 ? FINGER_X[fingerIndex] * proportions.handSize : 0;
+        const y = joint === 0 ? -proportions.handSize * (fingerIndex === 0 ? 0.18 : HAND_KNUCKLE_OFFSET_RATIO) : -totalLength / 3;
+        const z = joint === 0 && fingerIndex === 0 ? -proportions.handSize * 0.08 : 0;
         const bone = makeBone(`${side}Finger${fingerIndex}.${joint}`, sign * x, y, z);
         (joint === 0 ? hand : chain[joint - 1]).add(bone);
         chain.push(bone);
@@ -258,19 +259,19 @@ export function createCharacterRig(shape: BodyShape, appearance: Appearance): Ch
 
   const torsoGeometry = createProfileGeometry(
     [
-      [shape.shoulderSlope, shape.neckWidth * 0.62, shape.chestDepth * 0.38],
-      [0, shape.shoulderWidth * 0.5, shape.chestDepth * 0.48],
-      [-shape.torsoLength * 0.12, Math.max(shape.shoulderWidth * 0.48, shape.chestWidth * 0.5), shape.chestDepth * 0.5],
-      [-shape.torsoLength * 0.24, shape.chestWidth * 0.5, shape.chestDepth * 0.5],
-      [-shape.torsoLength * 0.58, shape.bellyWidth * 0.5, shape.bellyDepth * 0.5],
-      [-shape.torsoLength, shape.bellyWidth * 0.45, shape.bellyDepth * 0.46],
+      [proportions.shoulderSlope, proportions.neckWidth * 0.62, proportions.chestDepth * 0.38],
+      [0, proportions.shoulderWidth * 0.5, proportions.chestDepth * 0.48],
+      [-proportions.torsoLength * 0.12, Math.max(proportions.shoulderWidth * 0.48, proportions.chestWidth * 0.5), proportions.chestDepth * 0.5],
+      [-proportions.torsoLength * 0.24, proportions.chestWidth * 0.5, proportions.chestDepth * 0.5],
+      [-proportions.torsoLength * 0.58, proportions.bellyWidth * 0.5, proportions.bellyDepth * 0.5],
+      [-proportions.torsoLength, proportions.bellyWidth * 0.45, proportions.bellyDepth * 0.46],
     ],
     boneIndex.get(torso)!,
   );
   root.add(createSkinnedMesh(torsoGeometry, shirtMaterial, skeleton, "shirtTorso"));
 
   const neckGeometry = createProfileGeometry(
-    [[0, shape.neckWidth * 0.5, shape.neckWidth * 0.47], [shape.neckLength, shape.neckWidth * 0.46, shape.neckWidth * 0.44]],
+    [[0, proportions.neckWidth * 0.5, proportions.neckWidth * 0.47], [proportions.neckLength, proportions.neckWidth * 0.46, proportions.neckWidth * 0.44]],
     boneIndex.get(neck)!,
   );
   root.add(createSkinnedMesh(neckGeometry, skinMaterial, skeleton, "neck"));
@@ -281,22 +282,22 @@ export function createCharacterRig(shape: BodyShape, appearance: Appearance): Ch
     const upperIndex = boneIndex.get(arm.upper)!;
     const forearmIndex = boneIndex.get(arm.forearm)!;
     const handIndex = boneIndex.get(arm.hand)!;
-    const elbowY = -shape.upperArmLength;
-    const wristY = elbowY - shape.forearmLength;
+    const elbowY = -proportions.upperArmLength;
+    const wristY = elbowY - proportions.forearmLength;
     const armGeometry = createWeightedProfileGeometry([
-      { y: 0, radiusX: shape.upperArmRadius, radiusZ: shape.upperArmRadius * 0.9, bones: [upperIndex, forearmIndex], primaryWeight: 1 },
-      { y: elbowY * 0.82, radiusX: shape.upperArmRadius * 0.84, radiusZ: shape.upperArmRadius * 0.76, bones: [upperIndex, forearmIndex], primaryWeight: 1 },
-      { y: elbowY * 0.94, radiusX: shape.forearmRadius * 1.08, radiusZ: shape.forearmRadius, bones: [upperIndex, forearmIndex], primaryWeight: 0.72 },
-      { y: elbowY, radiusX: shape.forearmRadius * 1.06, radiusZ: shape.forearmRadius, bones: [upperIndex, forearmIndex], primaryWeight: 0.5 },
-      { y: elbowY - shape.forearmLength * 0.08, radiusX: shape.forearmRadius * 1.04, radiusZ: shape.forearmRadius * 0.96, bones: [upperIndex, forearmIndex], primaryWeight: 0.28 },
-      { y: elbowY - shape.forearmLength * 0.55, radiusX: shape.forearmRadius * 0.88, radiusZ: shape.forearmRadius * 0.82, bones: [forearmIndex, handIndex], primaryWeight: 1 },
-      { y: wristY, radiusX: shape.forearmRadius * 0.72, radiusZ: shape.forearmRadius * 0.66, bones: [forearmIndex, handIndex], primaryWeight: 0 },
+      { y: 0, radiusX: proportions.upperArmRadius, radiusZ: proportions.upperArmRadius * 0.9, bones: [upperIndex, forearmIndex], primaryWeight: 1 },
+      { y: elbowY * 0.82, radiusX: proportions.upperArmRadius * 0.84, radiusZ: proportions.upperArmRadius * 0.76, bones: [upperIndex, forearmIndex], primaryWeight: 1 },
+      { y: elbowY * 0.94, radiusX: proportions.forearmRadius * 1.08, radiusZ: proportions.forearmRadius, bones: [upperIndex, forearmIndex], primaryWeight: 0.72 },
+      { y: elbowY, radiusX: proportions.forearmRadius * 1.06, radiusZ: proportions.forearmRadius, bones: [upperIndex, forearmIndex], primaryWeight: 0.5 },
+      { y: elbowY - proportions.forearmLength * 0.08, radiusX: proportions.forearmRadius * 1.04, radiusZ: proportions.forearmRadius * 0.96, bones: [upperIndex, forearmIndex], primaryWeight: 0.28 },
+      { y: elbowY - proportions.forearmLength * 0.55, radiusX: proportions.forearmRadius * 0.88, radiusZ: proportions.forearmRadius * 0.82, bones: [forearmIndex, handIndex], primaryWeight: 1 },
+      { y: wristY, radiusX: proportions.forearmRadius * 0.72, radiusZ: proportions.forearmRadius * 0.66, bones: [forearmIndex, handIndex], primaryWeight: 0 },
     ]);
     armGeometry.translate(shoulder.x, shoulder.y, shoulder.z);
     root.add(createSkinnedMesh(armGeometry, skinMaterial, skeleton, `${side}ArmSkin`));
 
-    const sleeveLength = Math.min(shape.upperArmLength * 0.42, shape.upperArmLength - shape.shirtClearance);
-    const sleeveRadius = shape.upperArmRadius + shape.shirtClearance;
+    const sleeveLength = Math.min(proportions.upperArmLength * 0.42, proportions.upperArmLength - proportions.shirtClearance);
+    const sleeveRadius = proportions.upperArmRadius + proportions.shirtClearance;
     const sleeveGeometry = createProfileGeometry(
       [[0.03, sleeveRadius * 1.12, sleeveRadius], [-sleeveLength, sleeveRadius, sleeveRadius * 0.92]],
       upperIndex,
@@ -306,14 +307,14 @@ export function createCharacterRig(shape: BodyShape, appearance: Appearance): Ch
     root.add(createSkinnedMesh(sleeveGeometry, shirtMaterial, skeleton, `${side}OpenSleeve`));
 
     const wrist = globalBindPosition(arm.hand);
-    const palmGeometry = new BoxGeometry(shape.handSize * 0.72, shape.handSize * 0.52, shape.handSize * 0.3, 2, 3, 1);
-    palmGeometry.translate(wrist.x, wrist.y - shape.handSize * 0.25, wrist.z);
+    const palmGeometry = new BoxGeometry(proportions.handSize * 0.72, proportions.handSize * 0.52, proportions.handSize * 0.3, 2, 3, 1);
+    palmGeometry.translate(wrist.x, wrist.y - proportions.handSize * 0.25, wrist.z);
     setRigidSkin(palmGeometry, handIndex);
     root.add(createSkinnedMesh(palmGeometry, skinMaterial, skeleton, `${side}Palm`));
 
     for (let fingerIndex = 0; fingerIndex < arm.fingers.length; fingerIndex += 1) {
       const chain = arm.fingers[fingerIndex];
-      const radius = shape.handSize * (fingerIndex === 0 ? 0.095 : 0.075);
+      const radius = proportions.handSize * (fingerIndex === 0 ? 0.095 : 0.075);
       const segmentLength = fingerLengths[fingerIndex] / 3;
       const rootPosition = globalBindPosition(chain[0]);
       const firstIndex = boneIndex.get(chain[0])!;
@@ -342,7 +343,7 @@ export function createCharacterRig(shape: BodyShape, appearance: Appearance): Ch
     neck,
     headMount,
     arms,
-    shape,
+    proportions,
     dispose(): void {
       if (disposed) return;
       disposed = true;

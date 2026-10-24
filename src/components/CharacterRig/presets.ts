@@ -4,7 +4,7 @@ export const CHARACTER_PRESETS: CharacterConfig[] = [
   {
     id: "lean",
     label: "Lean",
-    shape: {
+    proportions: {
       chestWidth: 0.9,
       chestDepth: 0.42,
       bellyWidth: 0.78,
@@ -24,21 +24,21 @@ export const CHARACTER_PRESETS: CharacterConfig[] = [
     appearance: { skin: "#b97a57", shirt: "#426789" },
     head: null,
     pose: {
-      torsoPosition: [-0.55, -0.15, 0],
-      torsoRoll: -0.06,
-      headRoll: -0.08,
+      torsoPosition: [-0.04, -0.15, 0],
+      torsoRoll: 0.18,
+      headRoll: 0.48,
       headYaw: 0,
       yawRange: 0.38,
       cycleSeconds: 5.5,
       edgeX: 0,
-      left: { position: [-0.03, -0.78, 0.16], elbowDirection: [-0.62, 0.08, 0.78] },
-      right: { position: [-0.03, 0.3, 0.18], elbowDirection: [-0.85, 0.45, -0.3] },
+      left: { position: [-0.03, 0.03, 0.16], elbowDirection: [-0.8, -1.5, 0.4] },
+      right: { position: [-0.03, 0.9, 0.18], elbowDirection: [-0.4, -0.5, -1.5] },
     },
   },
   {
     id: "full",
     label: "Full",
-    shape: {
+    proportions: {
       chestWidth: 1.14,
       chestDepth: 0.58,
       bellyWidth: 1.28,
@@ -58,15 +58,15 @@ export const CHARACTER_PRESETS: CharacterConfig[] = [
     appearance: { skin: "#a96848", shirt: "#784b3d" },
     head: null,
     pose: {
-      torsoPosition: [-0.58, -0.16, 0],
-      torsoRoll: -0.045,
-      headRoll: -0.07,
+      torsoPosition: [-0.04, -0.16, 0],
+      torsoRoll: 0.18,
+      headRoll: 0.48,
       headYaw: 0,
       yawRange: 0.34,
       cycleSeconds: 5.8,
       edgeX: 0,
-      left: { position: [-0.03, -0.76, 0.18], elbowDirection: [-0.58, 0.06, 0.81] },
-      right: { position: [-0.03, 0.3, 0.2], elbowDirection: [-0.85, 0.45, -0.3] },
+      left: { position: [-0.03, 0.03, 0.18], elbowDirection: [-0.8, -1.5, 0.4] },
+      right: { position: [-0.03, 0.9, 0.2], elbowDirection: [-0.4, -0.5, -1.5] },
     },
   },
 ];

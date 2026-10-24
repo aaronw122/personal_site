@@ -46,7 +46,7 @@ export default function RigPreview({ config, mode, debug, native = false, onStat
   live.current = { config, mode, debug, onStatus };
   const [error, setError] = useState("");
   // Only geometry/material edits recreate the assembly; pose edits update existing bones.
-  const assemblyKey = JSON.stringify([config.shape, config.appearance]);
+  const assemblyKey = JSON.stringify([config.proportions, config.appearance]);
 
   useEffect(() => {
     if (!host.current) return;
@@ -73,7 +73,7 @@ export default function RigPreview({ config, mode, debug, native = false, onStat
     const camera = new THREE.OrthographicCamera(0, 1, 1, 0, 0.01, 100);
     camera.position.set(0, 0, 10);
     const initial = live.current.config;
-    const rig = createCharacterRig(initial.shape, initial.appearance);
+    const rig = createCharacterRig(initial.proportions, initial.appearance);
     const releaseHead = addNeutralHead(rig.headMount);
     scene.add(rig.root);
     const helper = new THREE.SkeletonHelper(rig.root);
