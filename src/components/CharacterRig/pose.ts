@@ -34,14 +34,15 @@ export function applyPeekPose(
   turn: number,
   scratch: PoseScratch,
 ): PoseStatus {
-  rig.torso.position.set(...pose.torsoPosition);
+  rig.torso.position.set(pose.torsoPosition[0], pose.torsoPosition[1], pose.torsoPosition[2]);
   rig.torso.quaternion.setFromAxisAngle(scratch.direction.set(0, 0, 1), pose.torsoRoll);
 
   const yaw = pose.headYaw + pose.yawRange * clamp(turn, -1, 1);
   setYawRoll(rig.neck.quaternion, yaw, pose.headRoll);
 
   rig.root.updateWorldMatrix(true, true);
-  for (const side of SIDES) {
+  for (let sideIndex = 0; sideIndex < SIDES.length; sideIndex += 1) {
+    const side = SIDES[sideIndex];
     const grip = pose[side];
     solveArm(
       rig,
@@ -65,7 +66,7 @@ function solveArm(
 ): void {
   arm.upper.getWorldPosition(scratch.shoulder);
   rig.root.worldToLocal(scratch.shoulder);
-  scratch.target.set(...target);
+  scratch.target.set(target[0], target[1], target[2]);
 
   scratch.direction.subVectors(scratch.target, scratch.shoulder);
   const distance = scratch.direction.length();
@@ -85,7 +86,7 @@ function solveArm(
   }
 
   // elbowDirection is a root-local direction, not a position.
-  scratch.pole.set(...pole);
+  scratch.pole.set(pole[0], pole[1], pole[2]);
   scratch.perpendicular.copy(scratch.pole).addScaledVector(
     scratch.direction,
     -scratch.pole.dot(scratch.direction),
