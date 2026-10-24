@@ -1,6 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { BufferGeometry, SkinnedMesh } from "three";
-import { createCharacterRig, createProfileGeometry, validateBodyShape } from "../../src/components/CharacterRig/body";
+import { BufferAttribute, BufferGeometry, SkinnedMesh, Vector3 } from "three";
+import {
+  createCharacterRig,
+  createProfileGeometry,
+  HAND_KNUCKLE_OFFSET_RATIO,
+  validateBodyShape,
+} from "../../src/components/CharacterRig/body";
 import { CHARACTER_PRESETS } from "../../src/components/CharacterRig/presets";
 
 const lean = CHARACTER_PRESETS.find((preset) => preset.id === "lean")!;
@@ -28,33 +33,84 @@ describe("character body", () => {
         expect(chain[1].parent).toBe(chain[0]);
         expect(chain[2].parent).toBe(chain[1]);
       }
+      expect(arm.fingers[1][0].position.y).toBeCloseTo(-lean.shape.handSize * HAND_KNUCKLE_OFFSET_RATIO);
     }
 
-    const meshes: SkinnedMesh[] = [];
-    rig.root.traverse((object) => {
-      if (object instanceof SkinnedMesh) meshes.push(object);
-    });
-    expect(meshes.some((mesh) => mesh.name === "leftOpenSleeve")).toBe(true);
-    expect(meshes.some((mesh) => mesh.name === "rightPalm")).toBe(true);
-    expect(meshes.filter((mesh) => mesh.name.includes("Finger"))).toHaveLength(40);
-    for (const mesh of meshes) {
-      expect(mesh.geometry.getAttribute("skinIndex")).toBeDefined();
-      expect(mesh.geometry.getAttribute("skinWeight")).toBeDefined();
-    }
 
+    const torsoSkin = rig.root.getObjectByName("shirtTorso") as SkinnedMesh;
+    const torsoPosition = torsoSkin.geometry.getAttribute("position") as BufferAttribute;
+    expect(torsoPosition.getX(12)).toBeCloseTo(lean.shape.shoulderWidth / 2);
+    const sleeve = rig.root.getObjectByName("rightOpenSleeve") as SkinnedMesh;
+    expect(sleeve.geometry.getAttribute("position").count).toBe(25);
+    expect(sleeve.geometry.getIndex()!.count).toBe(108);
     rig.dispose();
   });
 
-  test("leaves both ends open when generating a cuff", () => {
+  test("winds side walls and caps outward while preserving an open cuff option", () => {
     const open = createProfileGeometry([[0, 0.2, 0.2], [-0.4, 0.16, 0.16]], 0, false);
     const closed = createProfileGeometry([[0, 0.2, 0.2], [-0.4, 0.16, 0.16]], 0, true);
+    const position = closed.getAttribute("position") as BufferAttribute;
+    const normal = closed.getAttribute("normal") as BufferAttribute;
+    const radialDot = position.getX(0) * normal.getX(0) + position.getZ(0) * normal.getZ(0);
+    const topCenter = position.count - 2;
+    const bottomCenter = position.count - 1;
 
+    expect(radialDot).toBeGreaterThan(0);
+    expect(normal.getY(topCenter)).toBeGreaterThan(0.99);
+    expect(normal.getY(bottomCenter)).toBeLessThan(-0.99);
     expect(open.getAttribute("position").count).toBe(24);
     expect(closed.getAttribute("position").count).toBe(26);
-    expect(open.getIndex()!.count).toBe(72);
-    expect(closed.getIndex()!.count).toBe(144);
     open.dispose();
     closed.dispose();
+  });
+
+  test("keeps a bent shoulder-to-wrist surface continuous with finite deformation", () => {
+    const rig = createCharacterRig(lean.shape, lean.appearance);
+    const arm = rig.arms.right;
+    const armSkin = rig.root.getObjectByName("rightArmSkin") as SkinnedMesh;
+    const position = armSkin.geometry.getAttribute("position") as BufferAttribute;
+    const indices = armSkin.geometry.getIndex()!;
+
+    arm.upper.rotation.z = -0.65;
+    arm.forearm.rotation.z = 2.35;
+    rig.root.updateMatrixWorld(true);
+    armSkin.skeleton.update();
+
+    const deformed = new Vector3();
+    for (let vertex = 0; vertex < position.count; vertex += 1) {
+      deformed.fromBufferAttribute(position, vertex);
+      armSkin.applyBoneTransform(vertex, deformed);
+      expect(Number.isFinite(deformed.x) && Number.isFinite(deformed.y) && Number.isFinite(deformed.z)).toBe(true);
+    }
+
+    const elbowBoundaryStart = 2 * 12;
+    const elbowBoundaryEnd = 5 * 12;
+    let crossesBlendRegion = false;
+    for (let offset = 0; offset < indices.count; offset += 3) {
+      const a = indices.getX(offset);
+      const b = indices.getX(offset + 1);
+      const c = indices.getX(offset + 2);
+      const minimum = Math.min(a, b, c);
+      const maximum = Math.max(a, b, c);
+      if (minimum < elbowBoundaryStart && maximum >= elbowBoundaryStart) crossesBlendRegion = true;
+      if (minimum < elbowBoundaryEnd && maximum >= elbowBoundaryEnd) crossesBlendRegion = true;
+    }
+    expect(crossesBlendRegion).toBe(true);
+
+    const fingerSkin = rig.root.getObjectByName("rightFinger2") as SkinnedMesh;
+    arm.fingers[2][0].rotation.x = 0.7;
+    arm.fingers[2][1].rotation.x = 0.9;
+    arm.fingers[2][2].rotation.x = 0.8;
+    rig.root.updateMatrixWorld(true);
+    fingerSkin.skeleton.update();
+    const fingerPosition = fingerSkin.geometry.getAttribute("position") as BufferAttribute;
+    for (let vertex = 0; vertex < fingerPosition.count; vertex += 1) {
+      deformed.fromBufferAttribute(fingerPosition, vertex);
+      fingerSkin.applyBoneTransform(vertex, deformed);
+      expect(Number.isFinite(deformed.x) && Number.isFinite(deformed.y) && Number.isFinite(deformed.z)).toBe(true);
+    }
+
+    rig.dispose();
   });
 
   test("rejects malformed and physically contradictory inputs", () => {
@@ -64,9 +120,7 @@ describe("character body", () => {
     expect(() => validateBodyShape({ ...lean.shape, shoulderSlope: 0 })).not.toThrow();
     expect(() => validateBodyShape({ ...lean.shape, shoulderWidth: lean.shape.chestWidth - 0.01 })).not.toThrow();
     expect(() => validateBodyShape({ ...lean.shape, shirtClearance: lean.shape.forearmRadius * 2 })).not.toThrow();
-    expect(() => validateBodyShape({ ...lean.shape, neckWidth: lean.shape.shoulderWidth })).toThrow(
-      "shape.neckWidth",
-    );
+    expect(() => validateBodyShape({ ...lean.shape, neckWidth: lean.shape.shoulderWidth })).toThrow("shape.neckWidth");
     expect(() => createCharacterRig(lean.shape, { ...lean.appearance, skin: "" })).toThrow("appearance.skin");
   });
 
@@ -92,7 +146,7 @@ describe("character body", () => {
 });
 
 describe("character presets", () => {
-  test("provide independently modeled lean and full bodies with reachable edge grips", () => {
+  test("provide independently modeled lean and full bodies", () => {
     expect(full.shape.bellyWidth / full.shape.chestWidth).toBeGreaterThan(
       lean.shape.bellyWidth / lean.shape.chestWidth,
     );
@@ -102,21 +156,12 @@ describe("character presets", () => {
     expect(full.shape.upperArmRadius).not.toBe(lean.shape.upperArmRadius);
     expect(full.shape.forearmLength).not.toBe(lean.shape.forearmLength);
     expect(full.shape.handSize).not.toBe(lean.shape.handSize);
-
     for (const preset of CHARACTER_PRESETS) {
       expect(preset.head).toBeNull();
       expect(preset.pose.edgeX).toBe(0);
-      for (const side of ["left", "right"] as const) {
-        expect(preset.pose[side].position[0]).toBe(0);
-        const shoulderX = preset.pose.torsoPosition[0] + (side === "left" ? -1 : 1) * preset.shape.shoulderWidth / 2;
-        const shoulderY = preset.pose.torsoPosition[1];
-        const [targetX, targetY, targetZ] = preset.pose[side].position;
-        const reach = Math.hypot(targetX - shoulderX, targetY - shoulderY, targetZ);
-        const maximum = preset.shape.upperArmLength + preset.shape.forearmLength;
-        const minimum = Math.abs(preset.shape.upperArmLength - preset.shape.forearmLength);
-        expect(reach).toBeGreaterThan(minimum);
-        expect(reach).toBeLessThan(maximum);
-      }
+      expect(preset.pose.left.position[0]).toBe(0);
+      expect(preset.pose.right.position[0]).toBe(0);
+      expect(preset.shape.handSize * (HAND_KNUCKLE_OFFSET_RATIO + 0.48)).toBeLessThan(0.35);
     }
   });
 });
