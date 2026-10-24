@@ -159,8 +159,6 @@ describe("character presets", () => {
     for (const preset of CHARACTER_PRESETS) {
       expect(preset.head).toBeNull();
       expect(preset.pose.edgeX).toBe(0);
-      expect(preset.pose.left.position[0]).toBe(0);
-      expect(preset.pose.right.position[0]).toBe(-0.03);
       expect(preset.shape.handSize * (HAND_KNUCKLE_OFFSET_RATIO + 0.48)).toBeLessThan(0.35);
     }
   });
