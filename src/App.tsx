@@ -22,6 +22,15 @@ const EraDevices = lazy(() => import("./pages/EraDevices"));
 const SpacingPanel = import.meta.env.DEV
   ? lazy(() => import("./components/SpacingPanel"))
   : null;
+// Dev-only Bob Weir playgrounds (raymarched at /bob, GLB at /bob2); never
+// emitted in production.
+const BobDemo = import.meta.env.DEV ? lazy(() => import("./pages/BobDemo")) : null;
+const Bob2Demo = import.meta.env.DEV ? lazy(() => import("./pages/Bob2Demo")) : null;
+// Dev-only playground for the raymarched shader in components/bob3.
+const Bob3Demo = import.meta.env.DEV ? lazy(() => import("./pages/Bob3Demo")) : null;
+// Dev-only page for the animated gif in public/images/bob.
+const Bob4Demo = import.meta.env.DEV ? lazy(() => import("./pages/Bob4Demo")) : null;
+const PeekDemo = import.meta.env.DEV ? lazy(() => import("./pages/PeekDemo")) : null;
 
 const writingEntries = getWritingEntries();
 const listsEntries = getListsEntries();
@@ -57,6 +66,11 @@ export default function App() {
           <Route path="/" element={<Home />} />
           {/* simple md-driven page */}
           <Route path="/era" element={<EraDevices />} />
+          {BobDemo && <Route path="/bob" element={<BobDemo />} />}
+          {Bob2Demo && <Route path="/bob2" element={<Bob2Demo />} />}
+          {Bob3Demo && <Route path="/bob3" element={<Bob3Demo />} />}
+          {Bob4Demo && <Route path="/bob4" element={<Bob4Demo />} />}
+          {PeekDemo && <Route path="/peek" element={<PeekDemo />} />}
           <Route path="/about" element={<About />} />
           <Route path="/experience" element={<Experience />} />
           <Route
