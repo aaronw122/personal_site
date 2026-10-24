@@ -1,5 +1,18 @@
 # Reusable procedural character rig — implementation plan
 
+## Execution status
+- [x] Phase 1: baseline checkpoint and shared typed contracts.
+- [ ] Phase 2: body generator — PR #67 under corrective review.
+- [ ] Phase 3: grip solver — PR #66 under corrective review.
+- [ ] Phase 4: development tuner — implemented; integrated runtime verification pending.
+- [ ] Neutral lean/full visual approval — required before head fitting.
+- [ ] Phase 5: head preparation — awaits visual approval and confirmed replacement assets.
+- [ ] Phase 6: Bob/Jerry reuse proof.
+- [ ] Phase 7: production-behavior cutover.
+- [ ] Phase 8: integrated verification, test cleanup, readability report.
+
+Integration branch: `feat/reusable-character-rig-integration`. Isolated preview: port 4540; original checkout/server unchanged. User approved fixing initial blocking geometry and hand-pose review findings before merge.
+
 ## Approved direction
 Build in Three.js/TypeScript without Blender or regenerating characters in Meshy. Preserve character identity through interchangeable head geometry and textures. Generate proportioned bodies from shared code; share skeleton topology, grip behavior, and animation logic, not a single fixed body mesh.
 

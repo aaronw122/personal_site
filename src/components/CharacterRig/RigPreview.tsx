@@ -132,6 +132,6 @@ export default function RigPreview({ config, mode, debug, native = false, onStat
 
   return <div>
     {error && <p role="alert">Preview unavailable: {error}</p>}
-    <div ref={host} data-rig-preview={native ? "native" : "detail"} style={{ width: native ? 320 : 440, height: native ? 410 : 560, borderRight: "2px solid #ce4949", background: "#e8e5df" }} />
+    <div ref={host} data-rig-preview={native ? "native" : "detail"} style={{ boxSizing: "content-box", width: native ? 320 : 440, height: native ? 410 : 560, borderRight: "2px solid #ce4949", background: "#e8e5df" }} />
   </div>;
 }
