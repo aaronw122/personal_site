@@ -31,25 +31,27 @@ const shape: BodyShape = {
 };
 void appearance;
 
-function makeArm(side: Side, torso: Bone): ArmRig {
+function makeArm(side: Side, torso: Bone, rigShape: BodyShape): ArmRig {
   const upper = new Bone();
   const forearm = new Bone();
   const hand = new Bone();
-  upper.position.set(side === "left" ? -shape.shoulderWidth / 2 : shape.shoulderWidth / 2, 0, 0);
-  forearm.position.set(0, -shape.upperArmLength, 0);
-  hand.position.set(0, -shape.forearmLength, 0);
+  upper.position.set(side === "left" ? -rigShape.shoulderWidth / 2 : rigShape.shoulderWidth / 2, 0, 0);
+  forearm.position.set(0, -rigShape.upperArmLength, 0);
+  hand.position.set(0, -rigShape.forearmLength, 0);
   torso.add(upper);
   upper.add(forearm);
   forearm.add(hand);
 
+  const fingerLengthRatios = [0.32, 0.44, 0.48, 0.44, 0.36];
   const fingers = Array.from({ length: 5 }, (_, fingerIndex) => {
     const chain: Bone[] = [];
     let parent = hand;
+    const segmentLength = fingerLengthRatios[fingerIndex] * rigShape.handSize / 3;
     for (let jointIndex = 0; jointIndex < 3; jointIndex += 1) {
       const joint = new Bone();
       joint.position.set(
         fingerIndex * 0.01,
-        jointIndex === 0 ? -HAND_KNUCKLE_OFFSET_RATIO * shape.handSize : -0.07,
+        jointIndex === 0 ? -HAND_KNUCKLE_OFFSET_RATIO * rigShape.handSize : -segmentLength,
         0,
       );
       parent.add(joint);
@@ -61,7 +63,8 @@ function makeArm(side: Side, torso: Bone): ArmRig {
   return { upper, forearm, hand, fingers };
 }
 
-function makeRig(): CharacterRig {
+function makeRig(handSize = shape.handSize): CharacterRig {
+  const rigShape = { ...shape, handSize };
   const root = new Group();
   const torso = new Bone();
   const neck = new Bone();
@@ -76,10 +79,10 @@ function makeRig(): CharacterRig {
     neck,
     headMount,
     arms: {
-      left: makeArm("left", torso),
-      right: makeArm("right", torso),
+      left: makeArm("left", torso, rigShape),
+      right: makeArm("right", torso, rigShape),
     },
-    shape,
+    shape: rigShape,
     dispose() {},
   };
 }
@@ -214,16 +217,25 @@ describe("applyPeekPose", () => {
     expect(rig.neck.quaternion.equals(expectedNeck)).toBe(false);
   });
 
-  test("curls finger joints behind the edge around local X", () => {
-    const rig = makeRig();
-    const pose = makePose([-0.2, -0.8, 0.2], [0.2, -0.8, 0.2]);
-    applyPeekPose(rig, pose, 0, createPoseScratch());
+  test("places preset-scale knuckles before the edge and fingertips across it", () => {
+    for (const handSize of [0.36, 0.37]) {
+      const rig = makeRig(handSize);
+      const contactOffset = -0.03;
+      const pose = makePose(
+        [contactOffset, -0.8, 0.2],
+        [contactOffset, -0.8, 0.2],
+      );
+      applyPeekPose(rig, pose, 0, createPoseScratch());
+      rig.root.updateWorldMatrix(true, true);
 
-    const finger = rig.arms.right.fingers[1][0];
-    const bindAxis = new Vector3(0, -1, 0).applyQuaternion(finger.quaternion);
-    const hingeAxis = new Vector3(1, 0, 0).applyQuaternion(finger.quaternion);
-    expect(bindAxis.y).toBeLessThan(0);
-    expect(bindAxis.z).toBeLessThan(0);
-    expectVectorClose(hingeAxis, new Vector3(1, 0, 0));
+      const finger = rig.arms.right.fingers[1];
+      const knuckle = rig.root.worldToLocal(finger[0].getWorldPosition(new Vector3()));
+      const segmentLength = 0.44 * handSize / 3;
+      const fingertipWorld = finger[2].localToWorld(new Vector3(0, -segmentLength, 0));
+      const fingertip = rig.root.worldToLocal(fingertipWorld);
+      expect(knuckle.x).toBeLessThan(pose.edgeX);
+      expect(fingertip.x).toBeGreaterThan(pose.edgeX);
+      expect(fingertip.z).toBeLessThan(pose.right.position[2]);
+    }
   });
 });

@@ -8,6 +8,7 @@ const DOWN_Z = 0;
 const EPSILON = 1e-8;
 const REACH_EPSILON = 1e-7;
 const SIDES: Side[] = ["left", "right"];
+const NON_THUMB_CURL = [0.35, 0.45, 0.35] as const;
 
 export function createPoseScratch(): PoseScratch {
   return {
@@ -170,7 +171,7 @@ function curlFingers(arm: ArmRig): void {
     const chain = arm.fingers[fingerIndex];
     const isThumb = fingerIndex === 0;
     for (let jointIndex = 0; jointIndex < chain.length; jointIndex += 1) {
-      const angle = isThumb ? 0.48 + jointIndex * 0.16 : 0.62 + jointIndex * 0.24;
+      const angle = isThumb ? 0.48 + jointIndex * 0.16 : NON_THUMB_CURL[jointIndex];
       chain[jointIndex].quaternion.set(Math.sin(angle / 2), 0, 0, Math.cos(angle / 2));
     }
   }
