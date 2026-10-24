@@ -7,6 +7,7 @@ import {
   validateBodyProportions,
 } from "../../src/components/CharacterRig/body";
 import { CHARACTER_PRESETS } from "../../src/components/CharacterRig/presets";
+import { applyPeekPose, createPoseScratch } from "../../src/components/CharacterRig/pose";
 
 const lean = CHARACTER_PRESETS.find((preset) => preset.id === "lean");
 if (!lean) throw new Error("Lean character preset is required for body tests");
@@ -63,8 +64,8 @@ describe("character body", () => {
     expect(radialDot).toBeGreaterThan(0);
     expect(normal.getY(topCenter)).toBeGreaterThan(0.99);
     expect(normal.getY(bottomCenter)).toBeLessThan(-0.99);
-    expect(open.getAttribute("position").count).toBe(24);
-    expect(closed.getAttribute("position").count).toBe(26);
+    expect(open.getAttribute("position").count).toBe(32);
+    expect(closed.getAttribute("position").count).toBe(34);
     open.dispose();
     closed.dispose();
   });
@@ -89,10 +90,10 @@ describe("character body", () => {
       deformedVertices.push(deformed.clone());
     }
     for (let ring = 0; ring < 7; ring += 1) {
-      const ringStart = ring * 12;
-      const seamLength = deformedVertices[ringStart].distanceTo(deformedVertices[ringStart + 11]);
+      const ringStart = ring * 16;
+      const seamLength = deformedVertices[ringStart].distanceTo(deformedVertices[ringStart + 15]);
       let longestInteriorEdge = 0;
-      for (let segment = 0; segment < 11; segment += 1) {
+      for (let segment = 0; segment < 15; segment += 1) {
         longestInteriorEdge = Math.max(
           longestInteriorEdge,
           deformedVertices[ringStart + segment].distanceTo(deformedVertices[ringStart + segment + 1]),
@@ -116,6 +117,57 @@ describe("character body", () => {
     }
 
     rig.dispose();
+  });
+
+  test("builds shaped palms, rounded shoulder profiles, and a naturally hidden default hem", () => {
+    for (const preset of CHARACTER_PRESETS) {
+      const rig = createCharacterRig(preset.proportions, preset.appearance);
+      const palm = requireSkinnedMesh(rig.root, "rightPalm").geometry;
+      const palmPosition = requireBufferAttribute(palm, "position");
+      palm.computeBoundingBox();
+      const palmBounds = palm.boundingBox!;
+      expect(palmBounds.max.x - palmBounds.min.x).toBeCloseTo(preset.proportions.handSize * 0.86);
+      expect(palmBounds.max.y - palmBounds.min.y).toBeCloseTo(preset.proportions.handSize * 0.64);
+
+      const wristWidth = Math.abs(palmPosition.getX(0) - palmPosition.getX(8));
+      const palmWidth = Math.abs(palmPosition.getX(32) - palmPosition.getX(40));
+      const fingerEdgeWidth = Math.abs(palmPosition.getX(64) - palmPosition.getX(72));
+      expect(palmWidth).toBeGreaterThan(wristWidth * 1.4);
+      expect(fingerEdgeWidth).toBeGreaterThan(wristWidth);
+      expect(fingerEdgeWidth).toBeLessThan(palmWidth);
+
+      const torso = requireSkinnedMesh(rig.root, "shirtTorso");
+      const torsoPosition = requireBufferAttribute(torso.geometry, "position");
+      torso.geometry.computeBoundingBox();
+      const torsoBounds = torso.geometry.boundingBox!;
+      expect(torsoBounds.min.y).toBeCloseTo(-preset.proportions.torsoLength * 1.08);
+      const neckRingWidth = Math.abs(torsoPosition.getX(0) - torsoPosition.getX(8));
+      const roundedShoulderWidth = Math.abs(torsoPosition.getX(48) - torsoPosition.getX(56));
+      expect(roundedShoulderWidth).toBeGreaterThan(neckRingWidth * 2);
+
+      const terminalVertices: number[] = [];
+      let terminalMinX = Infinity;
+      let terminalMaxX = -Infinity;
+      for (let vertex = 0; vertex < torsoPosition.count; vertex += 1) {
+        if (Math.abs(torsoPosition.getY(vertex) - torsoBounds.min.y) < 1e-6) {
+          terminalVertices.push(vertex);
+          terminalMinX = Math.min(terminalMinX, torsoPosition.getX(vertex));
+          terminalMaxX = Math.max(terminalMaxX, torsoPosition.getX(vertex));
+        }
+      }
+      expect(terminalMinX).toBeCloseTo(-terminalMaxX);
+
+      applyPeekPose(rig, preset.pose, 0, createPoseScratch());
+      rig.root.updateMatrixWorld(true);
+      torso.skeleton.update();
+      const deformed = new Vector3();
+      for (const vertex of terminalVertices) {
+        deformed.fromBufferAttribute(torsoPosition, vertex);
+        torso.applyBoneTransform(vertex, deformed);
+        expect(deformed.x).toBeGreaterThan(preset.pose.edgeX);
+      }
+      rig.dispose();
+    }
   });
 
   test("rejects malformed and physically contradictory inputs", () => {

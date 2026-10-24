@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { createCharacterRig } from "./body";
 import { applyPeekPose, createPoseScratch } from "./pose";
-import type { CharacterConfig, PoseStatus } from "./types";
+import type { CharacterConfig, CharacterRig, PoseStatus } from "./types";
 
 export type TurnMode = "auto" | "left" | "centre" | "right";
 type Props = {
@@ -39,14 +39,47 @@ function addNeutralHead(mount: THREE.Group) {
     marker.dispose();
   };
 }
+type Assembly = {
+  rig: CharacterRig;
+  helper: THREE.SkeletonHelper;
+  releaseHead(): void;
+  proportions: CharacterConfig["proportions"];
+};
+
+function disposeAssembly(scene: THREE.Scene, assembly: Assembly) {
+  scene.remove(assembly.rig.root, assembly.helper);
+  assembly.releaseHead();
+  assembly.rig.dispose();
+  assembly.helper.geometry.dispose();
+  const materials = Array.isArray(assembly.helper.material) ? assembly.helper.material : [assembly.helper.material];
+  materials.forEach((material) => material.dispose());
+}
+
+function setAssemblyColors(assembly: Assembly, appearance: CharacterConfig["appearance"]) {
+  assembly.rig.root.traverse((object) => {
+    if (!(object instanceof THREE.SkinnedMesh)) return;
+    const materials = Array.isArray(object.material) ? object.material : [object.material];
+    const color = object.name === "shirtTorso" || object.name.endsWith("OpenSleeve") ? appearance.shirt : appearance.skin;
+    materials.forEach((material) => {
+      if (material instanceof THREE.MeshStandardMaterial) material.color.set(color);
+    });
+  });
+}
+function sameStatus(left: PoseStatus | null, right: PoseStatus) {
+  return left !== null && (["left", "right"] as const).every((side) =>
+    left[side].reachable === right[side].reachable &&
+    left[side].distance === right[side].distance &&
+    left[side].minimum === right[side].minimum &&
+    left[side].maximum === right[side].maximum);
+}
 
 export default function RigPreview({ config, mode, debug, native = false, onStatus }: Props) {
   const host = useRef<HTMLDivElement>(null);
   const live = useRef({ config, mode, debug, onStatus });
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const assemblyRef = useRef<Assembly | null>(null);
   live.current = { config, mode, debug, onStatus };
   const [error, setError] = useState("");
-  // Only geometry/material edits recreate the assembly; pose edits update existing bones.
-  const assemblyKey = JSON.stringify([config.proportions, config.appearance]);
 
   useEffect(() => {
     if (!host.current) return;
@@ -66,18 +99,25 @@ export default function RigPreview({ config, mode, debug, native = false, onStat
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     container.appendChild(renderer.domElement);
     const scene = new THREE.Scene();
+    sceneRef.current = scene;
     scene.add(new THREE.HemisphereLight(0xffffff, 0x66717b, 2));
     const light = new THREE.DirectionalLight(0xffffff, 2.2);
     light.position.set(-3, 5, 6);
     scene.add(light);
     const camera = new THREE.OrthographicCamera(0, 1, 1, 0, 0.01, 100);
     camera.position.set(0, 0, 10);
+
     const initial = live.current.config;
     const rig = createCharacterRig(initial.proportions, initial.appearance);
-    const releaseHead = addNeutralHead(rig.headMount);
-    scene.add(rig.root);
-    const helper = new THREE.SkeletonHelper(rig.root);
-    scene.add(helper);
+    const assembly: Assembly = {
+      rig,
+      helper: new THREE.SkeletonHelper(rig.root),
+      releaseHead: addNeutralHead(rig.headMount),
+      proportions: initial.proportions,
+    };
+    assemblyRef.current = assembly;
+    scene.add(rig.root, assembly.helper);
+
     const targetGeometry = new THREE.SphereGeometry(0.035, 10, 8);
     const targetMaterial = new THREE.MeshBasicMaterial({ color: "#d94949", depthTest: false });
     const targets = [new THREE.Mesh(targetGeometry, targetMaterial), new THREE.Mesh(targetGeometry, targetMaterial)];
@@ -85,23 +125,24 @@ export default function RigPreview({ config, mode, debug, native = false, onStat
     const scratch = createPoseScratch();
     const motion = matchMedia("(prefers-reduced-motion: reduce)");
     let frame = 0;
-    let lastStatus = "";
+    let lastStatus: PoseStatus | null = null;
     let previous = -Infinity;
     const draw = (time: number) => {
       frame = requestAnimationFrame(draw);
       if (document.hidden || time - previous < 33) return;
       previous = time;
       const current = live.current;
+      const currentAssembly = assemblyRef.current;
+      if (!currentAssembly) return;
       const pose = current.config.pose;
       const turn = current.mode === "left" ? -1 : current.mode === "right" ? 1 :
         current.mode === "centre" || motion.matches ? 0 : Math.sin(time / 1000 * Math.PI * 2 / pose.cycleSeconds);
-      const status = applyPeekPose(rig, pose, turn, scratch);
-      const statusKey = `${status.left.reachable}:${status.right.reachable}`;
-      if (statusKey !== lastStatus) {
-        lastStatus = statusKey;
-        current.onStatus?.({ left: { ...status.left }, right: { ...status.right } });
+      const status = applyPeekPose(currentAssembly.rig, pose, turn, scratch);
+      if (!sameStatus(lastStatus, status)) {
+        lastStatus = { left: { ...status.left }, right: { ...status.right } };
+        current.onStatus?.(lastStatus);
       }
-      helper.visible = current.debug;
+      currentAssembly.helper.visible = current.debug;
       targets.forEach((target, index) => {
         target.visible = current.debug;
         target.position.fromArray(index ? pose.right.position : pose.left.position);
@@ -118,18 +159,39 @@ export default function RigPreview({ config, mode, debug, native = false, onStat
     frame = requestAnimationFrame(draw);
     return () => {
       cancelAnimationFrame(frame);
-      releaseHead();
-      rig.dispose();
-      helper.geometry.dispose();
-      const materials = Array.isArray(helper.material) ? helper.material : [helper.material];
-      materials.forEach((material) => material.dispose());
+      const currentAssembly = assemblyRef.current;
+      if (currentAssembly) disposeAssembly(scene, currentAssembly);
+      assemblyRef.current = null;
+      sceneRef.current = null;
       targetGeometry.dispose();
       targetMaterial.dispose();
       renderer.dispose();
       renderer.forceContextLoss();
       renderer.domElement.remove();
     };
-  }, [assemblyKey, native]);
+  }, [native]);
+
+  useEffect(() => {
+    const scene = sceneRef.current;
+    const previous = assemblyRef.current;
+    if (!scene || !previous || previous.proportions === config.proportions) return;
+    const current = live.current.config;
+    const rig = createCharacterRig(current.proportions, current.appearance);
+    const next: Assembly = {
+      rig,
+      helper: new THREE.SkeletonHelper(rig.root),
+      releaseHead: addNeutralHead(rig.headMount),
+      proportions: current.proportions,
+    };
+    scene.add(rig.root, next.helper);
+    assemblyRef.current = next;
+    disposeAssembly(scene, previous);
+  }, [config.proportions]);
+
+  useEffect(() => {
+    const assembly = assemblyRef.current;
+    if (assembly) setAssemblyColors(assembly, config.appearance);
+  }, [config.appearance]);
 
   return <div>
     {error && <p role="alert">Preview unavailable: {error}</p>}

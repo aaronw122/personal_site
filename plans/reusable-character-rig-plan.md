@@ -14,14 +14,16 @@
 Integration branch: `feat/reusable-character-rig-integration`. Isolated preview: http://127.0.0.1:4540/character-rig. Original checkout/server unchanged.
 
 ### Neutral checkpoint evidence
-- 10 Bun tests pass (449 assertions), including real generated rigs under both preset poses/yaw extremes and finger/edge contact checks.
+- Latest verification loop: 11 Bun tests pass (565 assertions), including real generated rigs under both preset poses/yaw extremes and finger/edge contact checks.
 - New CharacterRig, demo and test files pass scoped lint. Repository-wide lint still reports unrelated existing diagnostics in checkpointed Bob experiments and other site code; not suppressed or changed.
 - Production build passed; no e2e framework configured. Browser smoke captures: `/tmp/rig-review/shots/`, `/tmp/rig-final-workshop.png`, `/tmp/rig-final-full-native.png`.
 - Continuous limbs and sleeves, distinct proportions, visible yaw, unreachable-target warnings and configuration export verified. Same-preset status reset fixed; native canvas moved to lower-third framing.
 - Test cleanup removed one incidental preset test and four structural assertions/blocks; retained seam/normal/reach coverage and replaced fake wrap proof with real assemblies.
 - Readability report: `notes/readability-2026-10-24-reusable-character-rig.md`, 10 advisory findings (2 high, 5 medium, 3 low). No readability refactors applied without approval.
-- Known visual limits for approval: neutral head, box-like palm silhouette, torso termination visible in native frame. Do not claim reference likeness or final character completion.
+- Latest independent visual matrix: all 12 lean/full × left/centre/right × detail/native states inspected and passed neutral pose relationships. Evidence: `/tmp/rig-interaction-loop1/final2/`, including `matrix.png` and `log.txt`. No head/hand overlap or buried lower grip; both arms reachable in every default state. Remaining cosmetic limits: faceted neck, cuffs and fuller lower-torso silhouette. Neutral head is deliberate; no character likeness or human approval implied.
 - Existing `/peek` mouse close is obscured by its dev spacing panel; keyboard close works. This predates reusable-rig integration; do not treat it as a passed mouse round trip. Original feature remains unchanged.
+- Renderer lifecycle corrected: repeated proportion/color edits retain the same renderer/context; only changed assemblies are replaced. Independent 20-edit/switch runs held context creation count at 4 (development StrictMode initial mounts), with two live canvases. Reset restores default pixels; 390px viewport no longer has document overflow. Evidence: `/tmp/rig-interaction-loop1/churn/`.
+- Rounded profiled palms, continuous blunt wrists, smoothed collar/sleeves and forward lower-grip depth replace rectangular/occluded grips. Torso remains symmetric and anatomically proportioned; discarded the edge-specific asymmetric and overlong taper attempts.
 
 ## Approved direction
 Build in Three.js/TypeScript without Blender or regenerating characters in Meshy. Preserve character identity through interchangeable head geometry and textures. Generate proportioned bodies from shared code; share skeleton topology, grip behavior, and animation logic, not a single fixed body mesh.

@@ -53,6 +53,12 @@ export default function CharacterRigDemo() {
       setProportionError(error instanceof Error ? error.message : String(error));
     }
   };
+  const resetSelectedPreset = () => {
+    const preset = CHARACTER_PRESETS.find((entry) => entry.id === config.id);
+    if (!preset) return;
+    setConfig(structuredClone(preset));
+    setProportionError("");
+  };
   useEffect(() => () => { if (reference) URL.revokeObjectURL(reference); }, [reference]);
   const changePose = (patch: Partial<CharacterConfig["pose"]>) => setConfig((current) => ({ ...current, pose: { ...current.pose, ...patch } }));
   const exportConfig = () => {
@@ -68,10 +74,13 @@ export default function CharacterRigDemo() {
     <p>Neutral body approval: lean and fuller proportions share one rig. Red boundary is the browser edge. One world unit equals the neutral head height.</p>
     <div style={{ display: "flex", flexWrap: "wrap", alignItems: "start", gap: 24 }}>
       <aside style={{ width: 270, display: "grid", gap: 12 }}>
-        <label>Body preset <select aria-label="Body preset" value={config.id} onChange={(event) => {
-          const preset = CHARACTER_PRESETS.find((entry) => entry.id === event.target.value);
-          if (preset) { setConfig(structuredClone(preset)); setProportionError(""); }
-        }}>{CHARACTER_PRESETS.map((preset) => <option key={preset.id} value={preset.id}>{preset.label}</option>)}</select></label>
+        <div style={{ display: "flex", alignItems: "end", gap: 8 }}>
+          <label style={{ flex: 1 }}>Body preset <select aria-label="Body preset" value={config.id} onChange={(event) => {
+            const preset = CHARACTER_PRESETS.find((entry) => entry.id === event.target.value);
+            if (preset) { setConfig(structuredClone(preset)); setProportionError(""); }
+          }}>{CHARACTER_PRESETS.map((preset) => <option key={preset.id} value={preset.id}>{preset.label}</option>)}</select></label>
+          <button type="button" onClick={resetSelectedPreset}>Reset preset</button>
+        </div>
         <label>Head turn <select aria-label="Head turn" value={mode} onChange={(event) => { if (isTurnMode(event.target.value)) setMode(event.target.value); }}>{["auto", "left", "centre", "right"].map((value) => <option key={value}>{value}</option>)}</select></label>
         <label><input type="checkbox" checked={debug} onChange={(event) => setDebug(event.target.checked)} /> Bones and grip targets</label>
         <p role="status">{status ? `Left arm: ${status.left.reachable ? "reachable" : "UNREACHABLE"}; right arm: ${status.right.reachable ? "reachable" : "UNREACHABLE"}` : "Preparing rig…"}</p>
@@ -97,10 +106,14 @@ export default function CharacterRigDemo() {
           <Slider label="Reference opacity" value={opacity} min={0} max={1} onChange={setOpacity} />
         </details>
       </aside>
-      <section><h2>Detail</h2><div style={{ position: "relative", overflow: "hidden", width: 442, height: 560 }}>
-        <RigPreview config={config} mode={mode} debug={debug} onStatus={setStatus} />
-        {reference && <img alt="Pose reference overlay" src={reference} style={{ position: "absolute", width: referenceWidth, maxWidth: "none", left: referenceX, top: referenceY, opacity, pointerEvents: "none" }} />}
-      </div></section>
+      <section style={{ minWidth: 0, maxWidth: "100%" }}><h2>Detail</h2>
+        <div style={{ maxWidth: "100%", overflowX: "auto" }}>
+          <div style={{ position: "relative", overflow: "hidden", width: 442, height: 560 }}>
+            <RigPreview config={config} mode={mode} debug={debug} onStatus={setStatus} />
+            {reference && <img alt="Pose reference overlay" src={reference} style={{ position: "absolute", width: referenceWidth, maxWidth: "none", left: referenceX, top: referenceY, opacity, pointerEvents: "none" }} />}
+          </div>
+        </div>
+      </section>
       <section><h2>Delivery size · 48px head</h2><RigPreview config={config} mode={mode} debug={debug} native /><p>Neutral head only. Character likeness approval comes after body approval.</p></section>
     </div>
     {exported && <details open><summary>Exported configuration</summary><textarea aria-label="Exported configuration" readOnly value={exported} style={{ width: "100%", height: 200 }} /></details>}
