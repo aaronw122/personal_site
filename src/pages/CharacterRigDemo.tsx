@@ -70,7 +70,7 @@ export default function CharacterRigDemo() {
       <aside style={{ width: 270, display: "grid", gap: 12 }}>
         <label>Body preset <select aria-label="Body preset" value={config.id} onChange={(event) => {
           const preset = CHARACTER_PRESETS.find((entry) => entry.id === event.target.value);
-          if (preset) { setConfig(structuredClone(preset)); setStatus(null); setProportionError(""); }
+          if (preset) { setConfig(structuredClone(preset)); setProportionError(""); }
         }}>{CHARACTER_PRESETS.map((preset) => <option key={preset.id} value={preset.id}>{preset.label}</option>)}</select></label>
         <label>Head turn <select aria-label="Head turn" value={mode} onChange={(event) => { if (isTurnMode(event.target.value)) setMode(event.target.value); }}>{["auto", "left", "centre", "right"].map((value) => <option key={value}>{value}</option>)}</select></label>
         <label><input type="checkbox" checked={debug} onChange={(event) => setDebug(event.target.checked)} /> Bones and grip targets</label>

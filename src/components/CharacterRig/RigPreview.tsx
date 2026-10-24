@@ -109,7 +109,7 @@ export default function RigPreview({ config, mode, debug, native = false, onStat
       });
       camera.right = pose.edgeX;
       camera.left = pose.edgeX - width / pixelsPerUnit;
-      camera.top = 2.2;
+      camera.top = native ? 5.8 : 2.2;
       camera.bottom = camera.top - height / pixelsPerUnit;
       camera.updateProjectionMatrix();
       renderer.render(scene, camera);

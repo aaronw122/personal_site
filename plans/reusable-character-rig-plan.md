@@ -2,16 +2,26 @@
 
 ## Execution status
 - [x] Phase 1: baseline checkpoint and shared typed contracts.
-- [ ] Phase 2: body generator — PR #67 under corrective review.
-- [ ] Phase 3: grip solver — PR #66 under corrective review.
-- [ ] Phase 4: development tuner — implemented; integrated runtime verification pending.
+- [x] Phase 2: proportioned skinned body generator — reviewed PR #67 merged into integration.
+- [x] Phase 3: grip solver — reviewed PR #66 merged into integration.
+- [x] Phase 4: neutral development tuner — real browser checks of presets, yaw, reach warnings, overlay, materials and export passed. Head attachment controls await phase 5 assets.
 - [ ] Neutral lean/full visual approval — required before head fitting.
 - [ ] Phase 5: head preparation — awaits visual approval and confirmed replacement assets.
 - [ ] Phase 6: Bob/Jerry reuse proof.
 - [ ] Phase 7: production-behavior cutover.
-- [ ] Phase 8: integrated verification, test cleanup, readability report.
+- [ ] Phase 8: full character verification awaits head fitting/cutover. Neutral checkpoint checks and cleanup completed below.
 
-Integration branch: `feat/reusable-character-rig-integration`. Isolated preview: port 4540; original checkout/server unchanged. User approved fixing initial blocking geometry and hand-pose review findings before merge.
+Integration branch: `feat/reusable-character-rig-integration`. Isolated preview: http://127.0.0.1:4540/character-rig. Original checkout/server unchanged.
+
+### Neutral checkpoint evidence
+- 10 Bun tests pass (449 assertions), including real generated rigs under both preset poses/yaw extremes and finger/edge contact checks.
+- New CharacterRig, demo and test files pass scoped lint. Repository-wide lint still reports unrelated existing diagnostics in checkpointed Bob experiments and other site code; not suppressed or changed.
+- Production build passed; no e2e framework configured. Browser smoke captures: `/tmp/rig-review/shots/`, `/tmp/rig-final-workshop.png`, `/tmp/rig-final-full-native.png`.
+- Continuous limbs and sleeves, distinct proportions, visible yaw, unreachable-target warnings and configuration export verified. Same-preset status reset fixed; native canvas moved to lower-third framing.
+- Test cleanup removed one incidental preset test and four structural assertions/blocks; retained seam/normal/reach coverage and replaced fake wrap proof with real assemblies.
+- Readability report: `notes/readability-2026-10-24-reusable-character-rig.md`, 10 advisory findings (2 high, 5 medium, 3 low). No readability refactors applied without approval.
+- Known visual limits for approval: neutral head, box-like palm silhouette, torso termination visible in native frame. Do not claim reference likeness or final character completion.
+- Existing `/peek` mouse close is obscured by its dev spacing panel; keyboard close works. This predates reusable-rig integration; do not treat it as a passed mouse round trip. Original feature remains unchanged.
 
 ## Approved direction
 Build in Three.js/TypeScript without Blender or regenerating characters in Meshy. Preserve character identity through interchangeable head geometry and textures. Generate proportioned bodies from shared code; share skeleton topology, grip behavior, and animation logic, not a single fixed body mesh.

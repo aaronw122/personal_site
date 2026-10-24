@@ -1,7 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { Bone, Group, Quaternion, Vector3 } from "three";
+import { Bone, BufferAttribute, Group, Object3D, Quaternion, SkinnedMesh, Vector3 } from "three";
+import { createCharacterRig, HAND_KNUCKLE_OFFSET_RATIO } from "../../src/components/CharacterRig/body.ts";
 import { applyPeekPose, createPoseScratch } from "../../src/components/CharacterRig/pose.ts";
-import { HAND_KNUCKLE_OFFSET_RATIO } from "../../src/components/CharacterRig/body.ts";
+import { CHARACTER_PRESETS } from "../../src/components/CharacterRig/presets.ts";
 import type {
   ArmRig,
   BodyProportions,
@@ -117,6 +118,38 @@ function wristTarget(pose: PeekPose, side: Side): Vector3 {
   );
 }
 
+function requireSkinnedMesh(root: Object3D, name: string): SkinnedMesh {
+  const object = root.getObjectByName(name);
+  if (!(object instanceof SkinnedMesh)) throw new Error(`Expected ${name} to be a SkinnedMesh`);
+  return object;
+}
+
+function fingertipRootPosition(rig: CharacterRig, side: Side, fingerIndex: number): Vector3 {
+  const mesh = requireSkinnedMesh(rig.root, `${side}Finger${fingerIndex}`);
+  const position = mesh.geometry.getAttribute("position");
+  if (!(position instanceof BufferAttribute)) throw new Error("Expected finger position buffer");
+  mesh.skeleton.update();
+
+  let fingertipBindY = Number.POSITIVE_INFINITY;
+  for (let vertex = 0; vertex < position.count; vertex += 1) {
+    fingertipBindY = Math.min(fingertipBindY, position.getY(vertex));
+  }
+
+  const fingertip = new Vector3();
+  const deformed = new Vector3();
+  let fingertipVertices = 0;
+  for (let vertex = 0; vertex < position.count; vertex += 1) {
+    if (Math.abs(position.getY(vertex) - fingertipBindY) > 1e-7) continue;
+    deformed.fromBufferAttribute(position, vertex);
+    mesh.applyBoneTransform(vertex, deformed);
+    fingertip.add(deformed.applyMatrix4(mesh.matrixWorld));
+    fingertipVertices += 1;
+  }
+  if (fingertipVertices === 0) throw new Error("Expected finger tip vertices");
+  fingertip.multiplyScalar(1 / fingertipVertices);
+  return rig.root.worldToLocal(fingertip);
+}
+
 describe("applyPeekPose", () => {
   test("places wrists behind edge-relative contacts through world transforms", () => {
     const rig = makeRig();
@@ -222,25 +255,27 @@ describe("applyPeekPose", () => {
     expect(rig.neck.quaternion.equals(expectedNeck)).toBe(false);
   });
 
-  test("places preset-scale knuckles before the edge and fingertips across it", () => {
-    for (const handSize of [0.36, 0.37]) {
-      const rig = makeRig(handSize);
-      const contactOffset = -0.03;
-      const pose = makePose(
-        [contactOffset, -0.8, 0.2],
-        [contactOffset, -0.8, 0.2],
-      );
-      applyPeekPose(rig, pose, 0, createPoseScratch());
-      rig.root.updateWorldMatrix(true, true);
+  test("wraps every preset hand around the edge at both yaw extremes", () => {
+    for (const preset of CHARACTER_PRESETS) {
+      for (const turn of [-1, 1]) {
+        const rig = createCharacterRig(preset.proportions, preset.appearance);
+        const status = applyPeekPose(rig, preset.pose, turn, createPoseScratch());
+        rig.root.updateWorldMatrix(true, true);
 
-      const finger = rig.arms.right.fingers[1];
-      const knuckle = rig.root.worldToLocal(finger[0].getWorldPosition(new Vector3()));
-      const segmentLength = 0.44 * handSize / 3;
-      const fingertipWorld = finger[2].localToWorld(new Vector3(0, -segmentLength, 0));
-      const fingertip = rig.root.worldToLocal(fingertipWorld);
-      expect(knuckle.x).toBeLessThan(pose.edgeX);
-      expect(fingertip.x).toBeGreaterThan(pose.edgeX);
-      expect(fingertip.z).toBeLessThan(pose.right.position[2]);
+        for (const side of ["left", "right"] as const) {
+          expect(status[side].reachable).toBe(true);
+          for (let fingerIndex = 1; fingerIndex < 5; fingerIndex += 1) {
+            const knuckle = rig.root.worldToLocal(
+              rig.arms[side].fingers[fingerIndex][0].getWorldPosition(new Vector3()),
+            );
+            const fingertip = fingertipRootPosition(rig, side, fingerIndex);
+            expect(knuckle.x).toBeLessThan(preset.pose.edgeX);
+            expect(fingertip.x).toBeGreaterThan(preset.pose.edgeX);
+            expect(fingertip.z).toBeLessThan(preset.pose[side].position[2]);
+          }
+        }
+        rig.dispose();
+      }
     }
   });
 });
