@@ -69,6 +69,7 @@ export type ReachStatus = { reachable: boolean; distance: number; minimum: numbe
 export type PoseStatus = Record<Side, ReachStatus>;
 export type ArmSolution = { elbow: Vector3; wrist: Vector3; status: ReachStatus };
 export type PoseScratch = {
+  status: PoseStatus;
   shoulder: Vector3;
   target: Vector3;
   pole: Vector3;
