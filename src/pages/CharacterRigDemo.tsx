@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import RigPreview from "../components/CharacterRig/RigPreview";
 import type { TurnMode } from "../components/CharacterRig/RigPreview";
 import { CHARACTER_PRESETS } from "../components/CharacterRig/presets";
+import { validateBodyShape } from "../components/CharacterRig/body";
 import type { BodyShape, CharacterConfig, PoseStatus, Vec3 } from "../components/CharacterRig/types";
 
 const shapeControls: { key: keyof BodyShape; min: number; max: number }[] = [
@@ -38,6 +39,17 @@ export default function CharacterRigDemo() {
   const [referenceY, setReferenceY] = useState(0);
   const [opacity, setOpacity] = useState(0.35);
   const [exported, setExported] = useState("");
+  const [shapeError, setShapeError] = useState("");
+  const changeShape = (key: keyof BodyShape, value: number) => {
+    const shape = { ...config.shape, [key]: value };
+    try {
+      validateBodyShape(shape);
+      setShapeError("");
+      setConfig({ ...config, shape });
+    } catch (error) {
+      setShapeError(error instanceof Error ? error.message : String(error));
+    }
+  };
   useEffect(() => () => { if (reference) URL.revokeObjectURL(reference); }, [reference]);
   const changePose = (patch: Partial<CharacterConfig["pose"]>) => setConfig((current) => ({ ...current, pose: { ...current.pose, ...patch } }));
   const exportConfig = () => {
@@ -55,13 +67,14 @@ export default function CharacterRigDemo() {
       <aside style={{ width: 270, display: "grid", gap: 12 }}>
         <label>Body preset <select aria-label="Body preset" value={config.id} onChange={(event) => {
           const preset = CHARACTER_PRESETS.find((entry) => entry.id === event.target.value);
-          if (preset) { setConfig(structuredClone(preset)); setStatus(null); }
+          if (preset) { setConfig(structuredClone(preset)); setStatus(null); setShapeError(""); }
         }}>{CHARACTER_PRESETS.map((preset) => <option key={preset.id} value={preset.id}>{preset.label}</option>)}</select></label>
         <label>Head turn <select aria-label="Head turn" value={mode} onChange={(event) => setMode(event.target.value as TurnMode)}>{["auto", "left", "centre", "right"].map((value) => <option key={value}>{value}</option>)}</select></label>
         <label><input type="checkbox" checked={debug} onChange={(event) => setDebug(event.target.checked)} /> Bones and grip targets</label>
         <p role="status">{status ? `Left arm: ${status.left.reachable ? "reachable" : "UNREACHABLE"}; right arm: ${status.right.reachable ? "reachable" : "UNREACHABLE"}` : "Preparing rig…"}</p>
         <button onClick={exportConfig}>Export configuration</button>
-        <details open><summary>Body proportions</summary>{shapeControls.map(({ key, min, max }) => <Slider key={key} label={labelText(key)} value={config.shape[key]} min={min} max={max} onChange={(value) => setConfig((current) => ({ ...current, shape: { ...current.shape, [key]: value } }))} />)}</details>
+        {shapeError && <p role="alert">{shapeError}</p>}
+        <details open><summary>Body proportions</summary>{shapeControls.map(({ key, min, max }) => <Slider key={key} label={labelText(key)} value={config.shape[key]} min={min} max={max} onChange={(value) => changeShape(key, value)} />)}</details>
         <details><summary>Pose and movement</summary>
           <VectorControls label="Torso" value={config.pose.torsoPosition} onChange={(torsoPosition) => changePose({ torsoPosition })} />
           {(["left", "right"] as const).map((side) => <div key={side}>
