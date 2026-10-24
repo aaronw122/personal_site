@@ -31,6 +31,7 @@ const Bob3Demo = import.meta.env.DEV ? lazy(() => import("./pages/Bob3Demo")) : 
 // Dev-only page for the animated gif in public/images/bob.
 const Bob4Demo = import.meta.env.DEV ? lazy(() => import("./pages/Bob4Demo")) : null;
 const PeekDemo = import.meta.env.DEV ? lazy(() => import("./pages/PeekDemo")) : null;
+const CharacterRigDemo = import.meta.env.DEV ? lazy(() => import("./pages/CharacterRigDemo")) : null;
 
 const writingEntries = getWritingEntries();
 const listsEntries = getListsEntries();
@@ -51,6 +52,7 @@ export default function App() {
         </Suspense>
       )}
       <Routes>
+        {CharacterRigDemo && <Route path="/character-rig" element={<Suspense fallback={<div>loading rig…</div>}><CharacterRigDemo /></Suspense>} />}
         {/* standalone immersive notebook — no site chrome, so its own Suspense */}
         <Route
           path="/era-notebook"
