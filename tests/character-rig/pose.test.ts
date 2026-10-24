@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { Bone, Group, Quaternion, Vector3 } from "three";
 import { applyPeekPose, createPoseScratch } from "../../src/components/CharacterRig/pose.ts";
+import { HAND_KNUCKLE_OFFSET_RATIO } from "../../src/components/CharacterRig/body.ts";
 import type {
   Appearance,
   ArmRig,
@@ -46,7 +47,11 @@ function makeArm(side: Side, torso: Bone): ArmRig {
     let parent = hand;
     for (let jointIndex = 0; jointIndex < 3; jointIndex += 1) {
       const joint = new Bone();
-      joint.position.set(fingerIndex * 0.01, jointIndex === 0 ? -0.12 : -0.07, 0);
+      joint.position.set(
+        fingerIndex * 0.01,
+        jointIndex === 0 ? -HAND_KNUCKLE_OFFSET_RATIO * shape.handSize : -0.07,
+        0,
+      );
       parent.add(joint);
       parent = joint;
       chain.push(joint);
@@ -103,12 +108,22 @@ function handWorldPosition(rig: CharacterRig, side: Side): Vector3 {
   return rig.arms[side].hand.getWorldPosition(new Vector3());
 }
 
+function wristTarget(pose: PeekPose, side: Side): Vector3 {
+  const grip = pose[side].position;
+  return new Vector3(
+    pose.edgeX + grip[0] - HAND_KNUCKLE_OFFSET_RATIO * shape.handSize,
+    grip[1],
+    grip[2],
+  );
+}
+
 describe("applyPeekPose", () => {
-  test("places reachable wrists on root-local targets through world transforms", () => {
+  test("places wrists behind edge-relative contacts through world transforms", () => {
     const rig = makeRig();
     rig.root.position.set(3, -2, 4);
     rig.root.rotation.set(0.22, -0.47, 0.31);
     const pose = makePose([-0.2, -0.8, 0.25], [0.25, -0.72, 0.3]);
+    pose.edgeX = 0.4;
 
     rig.root.scale.setScalar(1.7);
     const status = applyPeekPose(rig, pose, 0, createPoseScratch());
@@ -116,14 +131,24 @@ describe("applyPeekPose", () => {
 
     expect(status.left.reachable).toBe(true);
     expect(status.right.reachable).toBe(true);
-    expectVectorClose(handWorldPosition(rig, "left"), new Vector3(...pose.left.position).applyMatrix4(rig.root.matrixWorld));
-    expectVectorClose(handWorldPosition(rig, "right"), new Vector3(...pose.right.position).applyMatrix4(rig.root.matrixWorld));
+    expectVectorClose(handWorldPosition(rig, "left"), wristTarget(pose, "left").applyMatrix4(rig.root.matrixWorld));
+    expectVectorClose(handWorldPosition(rig, "right"), wristTarget(pose, "right").applyMatrix4(rig.root.matrixWorld));
+    const rightHand = rig.arms.right.hand;
+    const fingerAxis = new Vector3(0, -1, 0).transformDirection(rightHand.matrixWorld);
+    const dorsal = new Vector3(0, 0, 1).transformDirection(rightHand.matrixWorld);
+    const rootRight = new Vector3(1, 0, 0).transformDirection(rig.root.matrixWorld);
+    const rootDorsal = new Vector3(0, 0, 1).transformDirection(rig.root.matrixWorld);
+    expectVectorClose(fingerAxis, rootRight);
+    expectVectorClose(dorsal, rootDorsal);
+    const knuckle = rig.root.worldToLocal(rightHand.children[1].getWorldPosition(new Vector3()));
+    expect(knuckle.x).toBeCloseTo(pose.edgeX + pose.right.position[0], 8);
   });
 
   test("reports and clamps targets outside both reach boundaries without stretching", () => {
     const rig = makeRig();
     const shoulderX = -shape.shoulderWidth / 2;
-    const pose = makePose([shoulderX, -2, 0], [shape.shoulderWidth / 2, -0.1, 0]);
+    const knuckleOffset = HAND_KNUCKLE_OFFSET_RATIO * shape.handSize;
+    const pose = makePose([shoulderX + knuckleOffset, -2, 0], [-shoulderX + knuckleOffset, -0.1, 0]);
 
     const status = applyPeekPose(rig, pose, 0, createPoseScratch());
     rig.root.updateWorldMatrix(true, true);
@@ -142,7 +167,8 @@ describe("applyPeekPose", () => {
 
   test("uses a deterministic fallback for zero and parallel elbow poles", () => {
     const rig = makeRig();
-    const pose = makePose([-0.6, -0.7, 0], [0.6, -0.7, 0]);
+    const knuckleOffset = HAND_KNUCKLE_OFFSET_RATIO * shape.handSize;
+    const pose = makePose([-0.6 + knuckleOffset, -0.7, 0], [0.6 + knuckleOffset, -0.7, 0]);
     pose.left.elbowDirection = [0, 0, 0];
     pose.right.elbowDirection = [0, -1, 0];
 
@@ -153,7 +179,7 @@ describe("applyPeekPose", () => {
       const elbow = rig.arms[side].forearm.getWorldPosition(new Vector3());
       expect(Number.isFinite(elbow.x + elbow.y + elbow.z)).toBe(true);
       expect(Math.abs(elbow.z)).toBeGreaterThan(0.1);
-      expectVectorClose(handWorldPosition(rig, side), new Vector3(...pose[side].position));
+      expectVectorClose(handWorldPosition(rig, side), wristTarget(pose, side));
     }
   });
 
@@ -188,16 +214,16 @@ describe("applyPeekPose", () => {
     expect(rig.neck.quaternion.equals(expectedNeck)).toBe(false);
   });
 
-  test("curls finger bind axes toward edge-right while retaining dorsal +Z", () => {
+  test("curls finger joints behind the edge around local X", () => {
     const rig = makeRig();
     const pose = makePose([-0.2, -0.8, 0.2], [0.2, -0.8, 0.2]);
     applyPeekPose(rig, pose, 0, createPoseScratch());
 
     const finger = rig.arms.right.fingers[1][0];
-    const down = new Vector3(0, -1, 0).applyQuaternion(finger.quaternion);
-    const dorsal = new Vector3(0, 0, 1).applyQuaternion(finger.quaternion);
-    expect(down.x).toBeGreaterThan(0);
-    expect(down.y).toBeLessThan(0);
-    expectVectorClose(dorsal, new Vector3(0, 0, 1));
+    const bindAxis = new Vector3(0, -1, 0).applyQuaternion(finger.quaternion);
+    const hingeAxis = new Vector3(1, 0, 0).applyQuaternion(finger.quaternion);
+    expect(bindAxis.y).toBeLessThan(0);
+    expect(bindAxis.z).toBeLessThan(0);
+    expectVectorClose(hingeAxis, new Vector3(1, 0, 0));
   });
 });

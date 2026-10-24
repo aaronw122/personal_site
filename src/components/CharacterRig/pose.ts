@@ -1,4 +1,5 @@
 import { Quaternion, Vector3 } from "three";
+import { HAND_KNUCKLE_OFFSET_RATIO } from "./body";
 import type { ArmRig, CharacterRig, PeekPose, PoseScratch, PoseStatus, ReachStatus, Side } from "./types";
 
 const DOWN_X = 0;
@@ -44,10 +45,13 @@ export function applyPeekPose(
   for (let sideIndex = 0; sideIndex < SIDES.length; sideIndex += 1) {
     const side = SIDES[sideIndex];
     const grip = pose[side];
+    // Grip X is an offset from the edge plane; Y/Z are root-local contact coordinates.
     solveArm(
       rig,
       rig.arms[side],
-      grip.position,
+      pose.edgeX + grip.position[0] - HAND_KNUCKLE_OFFSET_RATIO * rig.shape.handSize,
+      grip.position[1],
+      grip.position[2],
       grip.elbowDirection,
       scratch.status[side],
       scratch,
@@ -59,14 +63,16 @@ export function applyPeekPose(
 function solveArm(
   rig: CharacterRig,
   arm: ArmRig,
-  target: readonly [number, number, number],
+  targetX: number,
+  targetY: number,
+  targetZ: number,
   pole: readonly [number, number, number],
   status: ReachStatus,
   scratch: PoseScratch,
 ): void {
   arm.upper.getWorldPosition(scratch.shoulder);
   rig.root.worldToLocal(scratch.shoulder);
-  scratch.target.set(target[0], target[1], target[2]);
+  scratch.target.set(targetX, targetY, targetZ);
 
   scratch.direction.subVectors(scratch.target, scratch.shoulder);
   const distance = scratch.direction.length();
@@ -116,8 +122,18 @@ function solveArm(
   aimBoneAtWorldPoint(arm.forearm, scratch.wrist, scratch);
   arm.forearm.updateWorldMatrix(false, true);
 
-  // Keep the palm facing away from the viewer and the dorsal side at +Z in rig space.
+  // Fingers point edge-right (+X), with the back of the hand facing the viewer (+Z).
   rig.root.getWorldQuaternion(scratch.rotation);
+  const rootX = scratch.rotation.x;
+  const rootY = scratch.rotation.y;
+  const rootZ = scratch.rotation.z;
+  const rootW = scratch.rotation.w;
+  scratch.rotation.set(
+    Math.SQRT1_2 * (rootX + rootY),
+    Math.SQRT1_2 * (rootY - rootX),
+    Math.SQRT1_2 * (rootZ + rootW),
+    Math.SQRT1_2 * (rootW - rootZ),
+  );
   arm.forearm.getWorldQuaternion(scratch.parentRotation).invert();
   arm.hand.quaternion.copy(scratch.parentRotation).multiply(scratch.rotation).normalize();
   curlFingers(arm);
@@ -155,7 +171,7 @@ function curlFingers(arm: ArmRig): void {
     const isThumb = fingerIndex === 0;
     for (let jointIndex = 0; jointIndex < chain.length; jointIndex += 1) {
       const angle = isThumb ? 0.48 + jointIndex * 0.16 : 0.62 + jointIndex * 0.24;
-      chain[jointIndex].quaternion.set(0, 0, Math.sin(angle / 2), Math.cos(angle / 2));
+      chain[jointIndex].quaternion.set(Math.sin(angle / 2), 0, 0, Math.cos(angle / 2));
     }
   }
 }
