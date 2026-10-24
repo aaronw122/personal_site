@@ -32,7 +32,7 @@ export const CHARACTER_PRESETS: CharacterConfig[] = [
       cycleSeconds: 5.5,
       edgeX: 0,
       left: { position: [0, -0.78, 0.16], elbowDirection: [-0.62, 0.08, 0.78] },
-      right: { position: [0, 0.3, 0.18], elbowDirection: [0.58, 0.12, 0.81] },
+      right: { position: [-0.03, 0.3, 0.18], elbowDirection: [-0.85, 0.45, -0.3] },
     },
   },
   {
@@ -66,7 +66,7 @@ export const CHARACTER_PRESETS: CharacterConfig[] = [
       cycleSeconds: 5.8,
       edgeX: 0,
       left: { position: [0, -0.76, 0.18], elbowDirection: [-0.58, 0.06, 0.81] },
-      right: { position: [0, 0.3, 0.2], elbowDirection: [0.55, 0.1, 0.83] },
+      right: { position: [-0.03, 0.3, 0.2], elbowDirection: [-0.85, 0.45, -0.3] },
     },
   },
 ];
