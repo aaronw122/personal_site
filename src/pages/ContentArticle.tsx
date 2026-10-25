@@ -125,7 +125,7 @@ export default function ContentArticle({ section, entries, fixedSlug }: Props) {
           {processMarkdown(article.content, section)}
         </ReactMarkdown>
       </div>
-      <hr className="article-hr" />
+      <hr />
       <p>
         <Link to={`/${section}`} className="link-underline">
           &larr; back to {section}

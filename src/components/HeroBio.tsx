@@ -13,13 +13,13 @@ export default function HeroBio() {
 
       <div className="hero-content">
         <div className="prose hero-bio">
-          <p className="hero-bio-text">
+          <p>
             hey! i'm aaron. aspiring renaissance man. engineer currently hacking at{" "}
             <a href="https://www.recurse.com" target="_blank" rel="noreferrer">
               recurse center
             </a>.
           </p>
-          <p className="hero-bio-text">
+          <p>
             i spent two years as a PM at expedia building products that drove $7M in annual profit. switched to engineering because i wanted to build things instead. check out my projects below.
           </p>
         </div>

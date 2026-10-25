@@ -3,7 +3,7 @@
 img, picture, video, canvas, svg { display: block; max-width: 100%; }
 button, input, select, textarea { font: inherit; }
 a { text-decoration: none; }
-hr { border: none; border-top: 1px solid rgba(0, 0, 0, 0.15); }
+hr { border: none; border-top: 1px solid rgba(0, 0, 0, 0.15); margin: var(--divider-gap) 0; }
 
 @font-face {
   font-family: "Geist";
@@ -43,8 +43,11 @@ hr { border: none; border-top: 1px solid rgba(0, 0, 0, 0.15); }
   /* line spacing — body, prose and headings; fixed-grid components (notebook
      cards, Era pages) and single-line labels keep literal values */
   --leading-body: 1.6;     /* general UI text */
-  --leading-prose: 1.5;    /* long-form reading (.prose) */
+  --leading-prose: 1.55;   /* long-form reading (.prose) */
   --leading-heading: 1.25; /* h1–h6 */
+  --text-body: 1.075rem;   /* base text size; explicitly sized elements opt out */
+  --space-p: 0.5em;        /* gap between .prose paragraphs */
+  --divider-gap: 1rem;     /* space above and below every divider line */
 }
 
 html {
@@ -59,6 +62,7 @@ html {
 
 body {
   box-sizing: inherit;
+  font-size: var(--text-body);
   line-height: var(--leading-body);
   margin: 0;
   background: transparent;
@@ -74,7 +78,7 @@ h6 { font-size: 0.875rem; font-weight: 400; margin: 0.6em 0 0.5em; }
 h1, h2, h3, h4, h5, h6 { line-height: var(--leading-heading); }
 
 .prose { line-height: var(--leading-prose); }
-.prose p { margin: 0.5em 0; }
+.prose p { margin: var(--space-p) 0; }
 .prose ul, .prose ol { margin: 0.5em 0; }
 .prose li { margin: 0.15em 0; }
 .prose ul ul, .prose ul ol, .prose ol ul, .prose ol ol { margin: 0.25em 0; }
@@ -101,12 +105,14 @@ blockquote, blockquote p {
   padding-left: 1em;
 }
 
-/* tighten hr in prose */
-.prose hr { margin: 1.5em 0; border-top: 1px solid rgba(0, 0, 0, 0.15); }
-
-/* prose table borders */
+/* prose table borders; wide tables scroll inside the column instead of
+   widening the page */
 .prose table {
   border-collapse: collapse;
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-wrap: normal; /* cells keep words whole; the table scrolls instead */
 }
 
 .prose th,
@@ -119,6 +125,8 @@ blockquote, blockquote p {
 .prose {
   color: var(--color-fg-1);
   max-width: 65ch;
+  /* bare URLs and long inline code would otherwise widen the page on mobile */
+  overflow-wrap: anywhere;
 }
 .prose a {
   text-decoration: underline;
@@ -355,9 +363,9 @@ a:visited {
   font-size: 0.75rem;
   line-height: 1rem;
   color: #737373;
-  padding-top: 2rem;
+  padding-top: var(--divider-gap);
   padding-bottom: 2rem;
-  margin-top: 0;
+  margin-top: var(--divider-gap);
   border-top: 1px solid #d4d4d4;
 }
 
@@ -444,7 +452,6 @@ a:visited {
 }
 
 .hero-location {
-  font-size: 1rem;
   line-height: 1.5rem;
   font-weight: 300;
   margin-top: 0px;
@@ -459,11 +466,6 @@ a:visited {
 
 .hero-bio {
   flex: 1;
-}
-
-.hero-bio-text {
-  font-size: 1rem;
-  line-height: var(--leading-body);
 }
 
 .hero-photo-wrapper {
@@ -592,7 +594,10 @@ a:visited {
 }
 .about-quote {
   margin-top: 1.5rem;
+  font-size: 16px;
+  line-height: 1.5;
   font-style: italic;
+  color: #8a8a8a;
 }
 .email-tooltip-wrap {
   position: relative;
@@ -662,8 +667,8 @@ a:visited {
 
 /* --- component: Experience --- */
 .exp-entry {
-  padding-top: 1rem;
-  padding-bottom: 1rem;
+  padding-top: var(--divider-gap);
+  padding-bottom: var(--divider-gap);
   border-bottom: 1px dotted rgba(0, 0, 0, 0.2);
 }
 .exp-entry-header {
@@ -712,12 +717,6 @@ a:visited {
 }
 .rss-link:hover {
   opacity: 1;
-}
-.article-hr {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-  border: none;
-  border-top: 1px solid rgba(0, 0, 0, 0.15);
 }
 .lightbox-trigger {
   cursor: pointer;
