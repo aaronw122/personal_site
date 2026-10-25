@@ -119,7 +119,7 @@ export default function SpacingPanel() {
 // Fixed type metrics so the panel itself doesn't reflow while you tune.
 const panel: CSSProperties = {
   position: "fixed",
-  right: 16,
+  left: 16,
   bottom: 16,
   zIndex: 1000,
   width: 220,
