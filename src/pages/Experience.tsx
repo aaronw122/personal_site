@@ -21,17 +21,17 @@ export default function Experience() {
 
       <div>
         <Entry title="full stack engineer at thera" date="2026">
-          built a full-stack AI copilot for{" "}
+          2 week sprint building a full-stack AI copilot for{" "}
           <a href="https://www.getthera.com/" className="link-underline">Thera</a>, a global payroll
           platform. streaming SSE chat UI in Next.js. designed backend
           orchestration layer in Kotlin for sending messages, updating history, and
           determining which tools to call.
         </Entry>
 
-        <Entry title="product at expedia" date="2023–2025">
+        <Entry title="pm + fe engineer at expedia" date="2023–2026">
           led a team of 8 developers, two machine learning engineers and one
           designer to help our travellers get better prices on hotels. contributed
-          to 7M in annual GP. also shipped react code.
+          to 7M in annual GP. also shipped react code my last 6 months.
         </Entry>
 
         <Entry title="nonpolar" date="2021–2022">
@@ -50,6 +50,11 @@ export default function Experience() {
           takes vocals from one song, instrumentals from the other, and mixes them
           together. anyone can be a DJ! check it out{" "}
           <a href="https://mixer.awill.co" className="link-underline">here.</a>
+        </Entry>
+
+        <Entry title="voicemixy" date="2026">
+          send your friends audio in the voice of trump or elon. check it out{" "}
+          <a href="https://x.com/aaaronwill/status/2076804018714673460" className="link-underline">here.</a>
         </Entry>
 
         <Entry title="particleArt" date="2026">
