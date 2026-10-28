@@ -77,6 +77,7 @@ export default function Nutshell({ def, children, renderMarkdown }: NutshellProp
       // ancestors open while interacting with any open card or term.
       if (target instanceof Element && target.closest(".nutshell-popup, .nutshell-trigger")) return;
       setOpen(false);
+      setExpanded(false);
     };
     const onEscape = (event: KeyboardEvent) => {
       const cards = Array.from(openCards);
@@ -84,6 +85,7 @@ export default function Nutshell({ def, children, renderMarkdown }: NutshellProp
       event.preventDefault();
       event.stopImmediatePropagation();
       setOpen(false);
+      setExpanded(false);
       trigger.focus();
     };
     document.addEventListener("pointerdown", dismissOutside);
@@ -110,12 +112,11 @@ export default function Nutshell({ def, children, renderMarkdown }: NutshellProp
     };
   }, [open, expanded]);
 
+  // Every close (trigger, outside click, Escape) also collapses the card, so
+  // the next open starts as a small popover rather than a full-screen modal.
   const toggle = () => {
-    if (!open) {
-      setLayer(++nextLayer);
-    } else {
-      setExpanded(false);
-    }
+    if (!open) setLayer(++nextLayer);
+    setExpanded(false);
     setOpen(!open);
   };
 

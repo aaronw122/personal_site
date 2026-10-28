@@ -1,4 +1,4 @@
-import { Children, createContext, isValidElement, useContext, useState, type ReactNode } from "react";
+import { Children, createContext, isValidElement, useContext, useRef, useState, type ReactNode } from "react";
 import type { Element, ElementContent } from "hast";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -14,6 +14,7 @@ import WaveBlock from "./wave/WaveBlock";
 import { processMarkdown } from "../lib/content";
 import { headingSlug } from "../lib/nutshell";
 import { WAVE_LANGS, articlePlugins } from "../lib/articlePlugins";
+import useFitDisplayMath from "../hooks/useFitDisplayMath";
 
 function hastText(node: ElementContent): string {
   if (node.type === "text") return node.value;
@@ -124,15 +125,21 @@ const COMPONENTS: Components = {
 // cards render their definitions through this same component, so nested terms,
 // math and graphs inside a definition behave like the article body.
 export default function ArticleMarkdown({ markdown, section }: Props) {
+  const root = useRef<HTMLDivElement>(null);
+  useFitDisplayMath(root, markdown);
+
   return (
     <SectionContext.Provider value={section}>
-      <ReactMarkdown
-        remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkFrontmatter]}
-        rehypePlugins={[rehypeRaw, ...articlePlugins()]}
-        components={COMPONENTS}
-      >
-        {markdown}
-      </ReactMarkdown>
+      {/* display: contents keeps the markdown's block layout exactly as before */}
+      <div ref={root} style={{ display: "contents" }}>
+        <ReactMarkdown
+          remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkFrontmatter]}
+          rehypePlugins={[rehypeRaw, ...articlePlugins()]}
+          components={COMPONENTS}
+        >
+          {markdown}
+        </ReactMarkdown>
+      </div>
     </SectionContext.Provider>
   );
 }
