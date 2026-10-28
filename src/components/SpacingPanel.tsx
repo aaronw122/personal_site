@@ -1,18 +1,18 @@
-// TEMPORARY dev-only tuner for the --leading-*, --text-body and --space-p tokens in index.css
-// :root. Drag a slider to preview live, "copy css" the result into :root, then
-// delete this file and its mount in App.tsx.
+// TEMPORARY dev-only tuner for the --leading-*, --text-body, --space-p and
+// --nutshell-* tokens in index.css :root. Drag a slider to preview live,
+// "copy css" the result into :root, then delete this file and its mount in App.tsx.
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 
 const TOKENS = [
-  { name: "--leading-body", label: "body / ui line height", min: 1, max: 2.2, unit: "" },
-  { name: "--leading-prose", label: "prose line height", min: 1, max: 2.2, unit: "" },
-  { name: "--leading-heading", label: "heading line height", min: 0.8, max: 1.8, unit: "" },
-  { name: "--text-body", label: "text size", min: 0.75, max: 1.5, unit: "rem" },
-  { name: "--space-p", label: "paragraph gap", min: 0, max: 2, unit: "em" },
+  { name: "--leading-body", label: "body / ui line height", min: 1, max: 2.2, step: 0.025, unit: "" },
+  { name: "--leading-prose", label: "prose line height", min: 1, max: 2.2, step: 0.025, unit: "" },
+  { name: "--leading-heading", label: "heading line height", min: 0.8, max: 1.8, step: 0.025, unit: "" },
+  { name: "--text-body", label: "text size", min: 0.75, max: 1.5, step: 0.025, unit: "rem" },
+  { name: "--space-p", label: "paragraph gap", min: 0, max: 2, step: 0.025, unit: "em" },
+  { name: "--nutshell-hue", label: "nutshell hue", min: 0, max: 360, step: 1, unit: "" },
+  { name: "--nutshell-lightness", label: "nutshell lightness", min: 10, max: 75, step: 0.5, unit: "%" },
 ] as const;
-
-const STEP = 0.025;
 const STORAGE_KEY = "spacing-panel";
 const root = document.documentElement;
 
@@ -93,7 +93,7 @@ export default function SpacingPanel() {
             type="range"
             min={t.min}
             max={t.max}
-            step={STEP}
+            step={t.step}
             value={values[i]}
             onChange={(e) => {
               const next = [...values];

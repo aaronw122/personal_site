@@ -1,0 +1,45 @@
+/* tldraw palettes (DEFAULT_THEME.colors): stroke = solid, box fill = semi */
+.uwb-device-pulse {
+  --background-modifier-border: rgba(0, 0, 0, .12);
+  --background-primary: var(--color-paper);
+  --font-text: var(--font-primary);
+  --uwb-black: #1d1d1d;
+  --uwb-black-fill: #e8e8e8;
+  --uwb-blue: #4465e9;
+  --uwb-blue-fill: #dce1f8;
+  --uwb-green: #099268;
+  --uwb-green-fill: #d3e9e3;
+
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin: 8px 0;
+  background: var(--background-primary);
+}
+
+.uwb-device-pulse-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.uwb-device-pulse-wave {
+  fill: none;
+  stroke: var(--uwb-blue);
+}
+
+.uwb-device-pulse-device[data-color="black"] { --c: var(--uwb-black); --f: var(--uwb-black-fill); }
+.uwb-device-pulse-device[data-color="blue"] { --c: var(--uwb-blue); --f: var(--uwb-blue-fill); }
+.uwb-device-pulse-device[data-color="green"] { --c: var(--uwb-green); --f: var(--uwb-green-fill); }
+
+.uwb-device-pulse-device rect {
+  stroke: var(--c);
+  fill: var(--f);
+}
+
+.uwb-device-pulse-label {
+  fill: var(--c);
+  font-family: "Shantell Sans", var(--font-text);
+  font-size: 30px;
+  font-weight: 600;
+}

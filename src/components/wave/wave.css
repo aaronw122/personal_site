@@ -1,0 +1,118 @@
+.wave-plot {
+  --text-normal: var(--color-fg-1);
+  --text-muted: #6c757d;
+  --text-error: #b42336;
+  --background-modifier-border: rgba(0, 0, 0, .12);
+  --background-primary: var(--color-paper);
+  --background-secondary: var(--color-surface);
+  --interactive-accent: var(--color-accent);
+  --font-interface: var(--font-primary);
+  --font-monospace: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-ui-small: .85rem;
+  color: var(--text-normal);
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin: 8px 0;
+}
+
+.wave-plot-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.wave-plot-canvas {
+  display: block;
+  width: 100%;
+}
+
+.wave-plot-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+  margin: 4px 0 6px;
+}
+
+.wave-plot-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wave-plot-swatch {
+  width: 18px;
+  border-top: 2px solid;
+}
+
+.wave-plot-swatch.is-dashed {
+  border-top-style: dashed;
+}
+
+.wave-plot-slider {
+  display: grid;
+  grid-template-columns: 4em 1fr 6em;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 0;
+}
+
+.wave-plot-slider-name {
+  font-family: var(--font-monospace);
+}
+
+.wave-plot-slider input[type="range"] {
+  width: 100%;
+}
+
+.wave-plot-readout {
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+}
+
+.wave-plot-formula {
+  font-family: var(--font-monospace);
+  margin: 2px 0 6px;
+}
+
+.wave-plot-play {
+  margin: 6px 0 2px;
+}
+
+.wave-plot-panel + .wave-plot-panel {
+  margin-top: 14px;
+}
+
+.wave-plot-panel-title {
+  font-weight: 600;
+  font-size: var(--font-ui-small);
+  margin: 4px 0 2px;
+}
+
+/* Sliders above stacked panels: set off from the first panel by a divider. */
+.wave-plot-sliders.is-top {
+  border-bottom: 1px solid var(--background-modifier-border);
+  padding: 4px 0 6px;
+  margin-bottom: 6px;
+}
+
+.wave-plot-controls {
+  display: flex;
+  gap: 8px;
+  margin: 6px 0;
+}
+
+.wave-plot-error {
+  color: var(--text-error, #b42336);
+  font-family: var(--font-monospace, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+  font-size: var(--font-ui-small, .85rem);
+  white-space: pre-wrap;
+}
+
+
+.wave-plot-error:empty {
+  display: none;
+}
