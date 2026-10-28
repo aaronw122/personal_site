@@ -1,4 +1,4 @@
-import { Children, isValidElement, useState, type ReactNode } from "react";
+import { Children, createContext, isValidElement, useContext, useState, type ReactNode } from "react";
 import type { Element, ElementContent } from "hast";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -70,60 +70,69 @@ interface Props {
   section: "writing" | "lists";
 }
 
+// Nutshell cards render their definitions with the same section as the article.
+const SectionContext = createContext<Props["section"]>("writing");
+
+const Pre: Components["pre"] = ({ node, children, ...rest }) => {
+  const code = node?.children.find(
+    (c): c is Element => c.type === "element" && c.tagName === "code",
+  );
+  const classes = code?.properties.className;
+  const lang = (Array.isArray(classes) ? classes : [])
+    .map(String)
+    .find((c) => c.startsWith("language-"))
+    ?.slice("language-".length);
+  if (code && lang === "uwb-pulse") return <UwbPulse />;
+  const waveLang = WAVE_LANGS.find((l) => l === lang);
+  if (code && waveLang) {
+    return <WaveBlock lang={waveLang} source={hastText(code).replace(/\n$/, "")} />;
+  }
+  return <pre {...rest}>{children}</pre>;
+};
+
+const Span: Components["span"] = ({ node, children, ...rest }) => {
+  const section = useContext(SectionContext);
+  const def = node?.properties.dataDef;
+  if (rest.className !== "nutshell" || def == null) return <span {...rest}>{children}</span>;
+  return (
+    <Nutshell
+      def={decodeURIComponent(String(def))}
+      renderMarkdown={(md) => <ArticleMarkdown markdown={processMarkdown(md, section)} section={section} />}
+    >
+      {children}
+    </Nutshell>
+  );
+};
+
+// Module-level so every render passes react-markdown the same component types;
+// new functions per render would remount simulations and close nested cards.
+const COMPONENTS: Components = {
+  img: LightboxImage,
+  a: MarkdownLink,
+  h1: heading("h1"),
+  h2: heading("h2"),
+  h3: heading("h3"),
+  h4: heading("h4"),
+  h5: heading("h5"),
+  h6: heading("h6"),
+  pre: Pre,
+  span: Span,
+};
+
 // Renders vault markdown (already passed through processMarkdown) with math,
 // interactive wave/pulse simulations, and nutshell definition popovers. Nutshell
 // cards render their definitions through this same component, so nested terms,
 // math and graphs inside a definition behave like the article body.
 export default function ArticleMarkdown({ markdown, section }: Props) {
-  const renderDefinition = (md: string) => (
-    <ArticleMarkdown markdown={processMarkdown(md, section)} section={section} />
-  );
-
-  const components: Components = {
-    img: LightboxImage,
-    a: MarkdownLink,
-    h1: heading("h1"),
-    h2: heading("h2"),
-    h3: heading("h3"),
-    h4: heading("h4"),
-    h5: heading("h5"),
-    h6: heading("h6"),
-    pre({ node, children, ...rest }) {
-      const code = node?.children.find(
-        (c): c is Element => c.type === "element" && c.tagName === "code",
-      );
-      const classes = code?.properties.className;
-      const lang = (Array.isArray(classes) ? classes : [])
-        .map(String)
-        .find((c) => c.startsWith("language-"))
-        ?.slice("language-".length);
-      if (code && lang === "uwb-pulse") return <UwbPulse />;
-      const waveLang = WAVE_LANGS.find((l) => l === lang);
-      if (code && waveLang) {
-        return <WaveBlock lang={waveLang} source={hastText(code).replace(/\n$/, "")} />;
-      }
-      return <pre {...rest}>{children}</pre>;
-    },
-    span({ node, children, ...rest }) {
-      const def = node?.properties.dataDef;
-      if (rest.className === "nutshell" && def != null) {
-        return (
-          <Nutshell def={decodeURIComponent(String(def))} renderMarkdown={renderDefinition}>
-            {children}
-          </Nutshell>
-        );
-      }
-      return <span {...rest}>{children}</span>;
-    },
-  };
-
   return (
-    <ReactMarkdown
-      remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkFrontmatter]}
-      rehypePlugins={[rehypeRaw, ...articlePlugins()]}
-      components={components}
-    >
-      {markdown}
-    </ReactMarkdown>
+    <SectionContext.Provider value={section}>
+      <ReactMarkdown
+        remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkFrontmatter]}
+        rehypePlugins={[rehypeRaw, ...articlePlugins()]}
+        components={COMPONENTS}
+      >
+        {markdown}
+      </ReactMarkdown>
+    </SectionContext.Provider>
   );
 }

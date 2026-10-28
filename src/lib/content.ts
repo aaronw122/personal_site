@@ -105,8 +105,14 @@ export function loadEntry(
   entries: ContentEntry[],
   slug: string,
 ): Promise<LoadedEntry | null> {
-  // React Router decodes URL params, so compare decoded slugs
-  const decoded = decodeURIComponent(slug);
+  // React Router decodes URL params, so compare decoded slugs. A malformed
+  // escape (e.g. a truncated %2) can't name a post, so it's "not found".
+  let decoded: string;
+  try {
+    decoded = decodeURIComponent(slug);
+  } catch {
+    return Promise.resolve(null);
+  }
   const entry = entries.find((e) => e.slug === decoded);
   if (!entry) return Promise.resolve(null);
   let load = entryLoads.get(entry.slug);

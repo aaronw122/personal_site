@@ -58,9 +58,9 @@ function transformText(text: string): string {
         if (target !== undefined) {
           result += `<a href="#${escapeHtml(headingSlug(target.replace(/^#/, "")))}">${label}</a>`;
         } else {
-          // One decode is the plugin's storage format. The note also contains
-          // a doubly stored newline (%250A), which still denotes a line break.
-          const definition = (term[4] ?? "").trim().replace(/%0A/g, "\n").replace(/%25/g, "%").replace(/%0A/g, "\n");
+          // Decode once, as the plugin stores it. A nested term's own definition
+          // stays encoded (%0A, %25) until its card renders.
+          const definition = (term[4] ?? "").trim().replace(/%0A/g, "\n").replace(/%25/g, "%");
           result += definition
             ? `<span class="nutshell" data-def="${escapeHtml(encodeURIComponent(definition))}">${label}</span>`
             : label;
