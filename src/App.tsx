@@ -6,7 +6,7 @@ import About from "./pages/About";
 import Experience from "./pages/Experience";
 import NotFound from "./pages/NotFound";
 import Rick from "./pages/Rick";
-import { getWritingEntries, getListsEntries } from "./lib/content";
+import { getWritingEntries, getListsEntries, loadEntry } from "./lib/content";
 import useNavHaptics from "./hooks/useNavHaptics";
 
 // Split off the routes that drag in heavy deps (react-markdown + remark/rehype,
@@ -25,6 +25,27 @@ const SpacingPanel = import.meta.env.DEV
 
 const writingEntries = getWritingEntries();
 const listsEntries = getListsEntries();
+
+// Standalone top-level routes that render a specific writing post.
+const FIXED_ARTICLES = [
+  { path: "/haystack-errw-proof", slug: "haystack-errw-proof" },
+  { path: "/oboe", slug: "most inneficient way to find needle in a haystack" },
+  { path: "/uwb-pt1", slug: "ultrawide band pt. 1 - intuition" },
+];
+
+// Start fetching the post this page opened on (its markdown plus any math or
+// highlighting it needs) alongside the article chunk, instead of after it.
+function preloadInitialArticle() {
+  const path = window.location.pathname.replace(/\/$/, "");
+  const fixed = FIXED_ARTICLES.find((a) => a.path === path);
+  const match = path.match(/^\/(writing|lists)\/([^/]+)$/);
+  const load = fixed
+    ? loadEntry(writingEntries, fixed.slug)
+    : match && loadEntry(match[1] === "writing" ? writingEntries : listsEntries, match[2]);
+  // The article page reports failures when it awaits the same load.
+  load?.catch(() => {});
+}
+preloadInitialArticle();
 
 // Index file loaders — these point to the curated index.md in each Obsidian folder
 const loadWritingIndex = () =>
@@ -83,26 +104,19 @@ export default function App() {
               <ContentArticle section="lists" entries={listsEntries} />
             }
           />
-          <Route
-            path="/haystack-errw-proof"
-            element={
-              <ContentArticle
-                section="writing"
-                entries={writingEntries}
-                fixedSlug="haystack-errw-proof"
-              />
-            }
-          />
-          <Route
-            path="/oboe"
-            element={
-              <ContentArticle
-                section="writing"
-                entries={writingEntries}
-                fixedSlug="most inneficient way to find needle in a haystack"
-              />
-            }
-          />
+          {FIXED_ARTICLES.map(({ path, slug }) => (
+            <Route
+              key={path}
+              path={path}
+              element={
+                <ContentArticle
+                  section="writing"
+                  entries={writingEntries}
+                  fixedSlug={slug}
+                />
+              }
+            />
+          ))}
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

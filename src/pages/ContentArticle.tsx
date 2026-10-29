@@ -1,54 +1,12 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import remarkBreaks from "remark-breaks";
-import remarkFrontmatter from "remark-frontmatter";
-import remarkMath from "remark-math";
-import rehypeRaw from "rehype-raw";
-import rehypeKatex from "rehype-katex";
-import rehypeHighlight from "rehype-highlight";
-import "highlight.js/styles/github.css";
-import "katex/dist/katex.min.css";
 import usePageTitle from "../hooks/usePageTitle";
 import {
   type ContentEntry,
   loadEntry,
   processMarkdown,
 } from "../lib/content";
-import Lightbox from "../components/Lightbox";
-import MarkdownLink from "../components/MarkdownLink";
-
-function LightboxImage(props: React.ImgHTMLAttributes<HTMLImageElement>) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <>
-      <img
-        {...props}
-        loading="lazy"
-        decoding="async"
-        className="lightbox-trigger"
-        tabIndex={0}
-        role="button"
-        aria-label="View full size image"
-        onClick={() => setOpen(true)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            setOpen(true);
-          }
-        }}
-      />
-      <Lightbox
-        open={open}
-        onClose={() => setOpen(false)}
-        src={props.src ?? ""}
-        alt={props.alt}
-      />
-    </>
-  );
-}
+import ArticleMarkdown from "../components/ArticleMarkdown";
 
 interface Props {
   section: "writing" | "lists";
@@ -117,13 +75,10 @@ export default function ContentArticle({ section, entries, fixedSlug }: Props) {
         </p>
       )}
       <div className="prose prose-content">
-        <ReactMarkdown
-          remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkFrontmatter]}
-          rehypePlugins={[rehypeRaw, rehypeKatex, rehypeHighlight]}
-          components={{ img: LightboxImage, a: MarkdownLink }}
-        >
-          {processMarkdown(article.content, section)}
-        </ReactMarkdown>
+        <ArticleMarkdown
+          markdown={processMarkdown(article.content, section)}
+          section={section}
+        />
       </div>
       <hr />
       <p>
