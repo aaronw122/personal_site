@@ -132,6 +132,46 @@
   -moz-appearance: textfield;
   appearance: textfield;
 }
+/* Every control button in a graph (play, reset, gate toggles): a rounded pill
+   on the paper background, matching the slider number boxes */
+.wave-plot button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 999px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font: inherit;
+  font-family: var(--font-interface);
+  font-size: var(--font-ui-small);
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.wave-plot button:hover {
+  background: var(--background-secondary);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+.wave-plot button:active {
+  background: rgba(0, 0, 0, 0.06);
+}
+.wave-plot button:focus-visible {
+  outline: none;
+  border-color: rgba(75, 189, 255, 0.7);
+  box-shadow: 0 0 0 3px rgba(75, 189, 255, 0.2);
+}
+/* the slider reset sits quietly at the right edge of the slider block */
+.wave-plot .wave-plot-reset {
+  display: flex;
+  margin: 4px 0 0 auto;
+  padding: 3px 12px;
+  color: var(--text-muted);
+}
+.wave-plot .wave-plot-reset:hover {
+  color: var(--text-normal);
+}
 
 .wave-plot-readout {
   font-family: var(--font-monospace);
@@ -145,7 +185,7 @@
 }
 
 .wave-plot-play {
-  margin: 6px 0 2px;
+  margin: 8px 0 2px;
 }
 
 .wave-plot-panel + .wave-plot-panel {
@@ -167,8 +207,9 @@
 
 .wave-plot-controls {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  margin: 6px 0;
+  margin: 8px 0;
 }
 
 .wave-plot-error {
