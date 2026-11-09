@@ -29,7 +29,7 @@ export default defineConfig({
       fixed: [
         { route: "haystack-errw-proof", dir: WRITING, slug: "haystack-errw-proof" },
         { route: "oboe", dir: WRITING, slug: "most inneficient way to find needle in a haystack" },
-        { route: "uwb-pt1", dir: WRITING, slug: "ultrawide band pt. 1 - intuition" },
+        { route: "uwb-pt1", dir: WRITING, slug: "ultra-wideband pt. 1 - intuition" },
       ],
     }),
     rssFeed({ siteUrl: "https://awill.co", urlPrefix: "writing", dir: WRITING }),

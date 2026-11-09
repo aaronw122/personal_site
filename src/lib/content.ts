@@ -70,11 +70,14 @@ export function processMarkdown(
     return `[${(alias ?? target).trim()}](#${headingSlug(target)})`;
   });
 
-  // Convert [[wikilinks]] to standard markdown links
+  // Convert [[wikilinks]] to standard markdown links. Obsidian prefixes a vault
+  // path (`[[published/writing/post|…]]`) when two notes share a name; posts
+  // are addressed by file name alone, so only the last path segment is kept.
   result = result.replace(/\[\[([^\]]+)\]\]/g, (_match, link: string) => {
     const [target, alias] = link.split("|");
     const display = alias?.trim() || target.trim();
-    return `[${display}](/${section}/${encodeURIComponent(target.trim())})`;
+    const slug = target.trim().split("/").pop()!.trim();
+    return `[${display}](/${section}/${encodeURIComponent(slug)})`;
   });
 
   // Fix standard markdown image references to images/ subfolder

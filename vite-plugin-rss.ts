@@ -68,9 +68,10 @@ async function renderHtml(body: string, opts: Options): Promise<string> {
 
 async function readItems(opts: Options, indexBody: string): Promise<Item[]> {
   const items: Item[] = [];
-  // [[target]] or [[target|alias]] — the target is the source filename.
+  // [[target]] or [[target|alias]] — the target is the source filename, minus
+  // any vault path Obsidian prefixes when two notes share a name.
   for (const match of indexBody.matchAll(/\[\[([^\]]+)\]\]/g)) {
-    const slug = match[1].split("|")[0].trim();
+    const slug = match[1].split("|")[0].trim().split("/").pop()!.trim();
     const file = path.join(opts.dir, `${slug}.md`);
     if (!fs.existsSync(file)) continue;
     const raw = fs.readFileSync(file, "utf8");

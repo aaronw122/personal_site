@@ -213,9 +213,14 @@ function parseSpec(source) {
         panel().stems.push({ label: label || "stems", count, x, y, color: COLOR_NAMES.findIndex((c) => flags.includes(c)) });
         break;
       }
-      case "mark":
-        panel().marks.push({ label: name || value, expr: value });
+      case "mark": {
+        // A trailing ", axis" also prints the mark's x value in the x-axis number row.
+        const parts = (name || "").split(",");
+        const axis = parts.length > 1 && parts[parts.length - 1].trim() === "axis";
+        const label = axis ? parts.slice(0, -1).join(",").trim() : name;
+        panel().marks.push({ label: label || value, expr: value, axis });
         break;
+      }
       case "formula":
         if (name && !name.startsWith("if ")) fail('write "formula: text" or "formula if CONDITION: text"');
         panel().formulas.push({ cond: name ? name.slice(3).trim() : null, text: value });
@@ -324,6 +329,20 @@ class WavePlot extends MarkdownRenderChild {
       }),
     );
     this.stopPlays = spec.plays.map((p) => this.addPlayButton(sliders, p, handles));
+    if (spec.sliders.length) {
+      // Puts every slider back to the value the block was written with.
+      const reset = el("button", "wave-plot-reset", "reset");
+      reset.type = "button";
+      reset.addEventListener("click", () => {
+        this.stopPlays.forEach((stop) => stop());
+        spec.sliders.forEach((s, i) => {
+          this.values[i] = s.value;
+          handles[i].set(s.value);
+        });
+        this.schedule();
+      });
+      sliders.appendChild(reset);
+    }
     this.readoutEls = spec.readouts.map(() => el("div", "wave-plot-readout"));
 
     const boxes = this.panelEls.map((p) => p.box);
@@ -503,13 +522,22 @@ class WavePlot extends MarkdownRenderChild {
     g.fillStyle = muted;
     g.textAlign = "center";
     g.textBaseline = "top";
+    // Marks flagged "axis" print their value in the tick row (in the normal text
+    // color) and drop any tick label they would overlap.
+    const axisMarks = compiled.marks
+      .map((make, i) => (panel.marks[i].axis ? make(values)(0) : NaN))
+      .filter((x) => x >= t0 && x <= t1);
     for (const { v, label } of ticks(t0, t1, Math.max(2, Math.floor(plotW / 80)))) {
       g.beginPath();
       g.moveTo(sx(v), PAD.top);
       g.lineTo(sx(v), PAD.top + plotH);
       g.stroke();
+      if (axisMarks.some((x) => Math.abs(sx(x) - sx(v)) < 28)) continue;
       g.fillText(label, sx(v), PAD.top + plotH + 4);
     }
+    g.fillStyle = css.getPropertyValue("--text-normal").trim() || "#222";
+    for (const x of axisMarks) g.fillText(String(Number(x.toFixed(2))), sx(x), PAD.top + plotH + 4);
+    g.fillStyle = muted;
     g.textAlign = "right";
     g.textBaseline = "middle";
     for (const { v, label } of ticks(y0, y1, 5)) {
@@ -659,13 +687,14 @@ function makeSlider(parent, s, onChange, cls = "") {
  * b: 500          # bandwidth of bottom pulse (MHz)
  * distance: 5     # TX to RX (m)
  * step: 0.1       # simulated ns added per tick
+ * extras: 1       # 0 hides the distance, tick and carrier sliders
  * tick: 0.1       # real seconds between ticks
  * carrier: 8      # GHz
  * ```
  * Every line is optional; each value is also a slider.
  */
 const C = 0.299792458; // metres per ns
-const PULSE_DEFAULTS = { a: 100, b: 500, distance: 5, step: 0.1, tick: 0.1, carrier: 8 };
+const PULSE_DEFAULTS = { a: 100, b: 500, distance: 5, step: 0.1, tick: 0.1, carrier: 8, extras: 1 };
 const CLOCK_H = 30;
 const LANE_H = 130;
 const AXIS_H = 40;
@@ -756,10 +785,13 @@ class PulseSim extends MarkdownRenderChild {
     const restart = () => this.playing && this.play();
     knob("a", "top pulse (MHz)", 20, 1000, 10);
     knob("b", "bottom pulse (MHz)", 20, 1000, 10);
-    knob("distance", "TX to RX (m)", 1, 20, 0.5);
-    knob("step", "ns per tick", 0.01, 2, 0.01);
-    knob("tick", "seconds per tick", 0.01, 1, 0.01, restart);
-    knob("carrier", "carrier (GHz)", 0.5, 10, 0.1);
+    // extras: 0 keeps only the time and pulse sliders
+    if (this.cfg.extras) {
+      knob("distance", "TX to RX (m)", 1, 20, 0.5);
+      knob("step", "ns per tick", 0.01, 2, 0.01);
+      knob("tick", "seconds per tick", 0.01, 1, 0.01, restart);
+      knob("carrier", "carrier (GHz)", 0.5, 10, 0.1);
+    }
 
     this.resizer = new ResizeObserver(() => this.schedule());
     this.resizer.observe(this.canvas);

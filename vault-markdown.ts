@@ -49,11 +49,13 @@ export function processMarkdown(
     return `![${file}](${siteUrl}/writing-images/${encodeURIComponent(file)})`;
   });
 
-  // [[target]] / [[target|alias]] wikilinks → links.
+  // [[target]] / [[target|alias]] wikilinks → links. A vault path prefix
+  // (`[[published/writing/post]]`) is dropped: posts are addressed by file name.
   result = result.replace(/\[\[([^\]]+)\]\]/g, (_match, link: string) => {
     const [target, alias] = link.split("|");
     const display = alias?.trim() || target.trim();
-    return `[${display}](${siteUrl}/${section}/${encodeURIComponent(target.trim())})`;
+    const slug = target.trim().split("/").pop()!.trim();
+    return `[${display}](${siteUrl}/${section}/${encodeURIComponent(slug)})`;
   });
 
   // images/foo.png references → synced writing-images.
