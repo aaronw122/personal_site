@@ -1,4 +1,3 @@
-/* Reading-mode trigger and popover, adapted to the site's paper palette. */
 .nutshell-trigger {
   color: hsl(var(--nutshell-hue) 100% var(--nutshell-lightness));
   border-bottom: 1px dotted hsl(var(--nutshell-hue) 78% 35%);
@@ -46,8 +45,6 @@
   from { opacity: 0; transform: translateY(-3px); }
   to { opacity: 1; transform: translateY(0); }
 }
-/* Zero-height sticky row: the expand button floats in the top-right corner
-   without pushing the text down, so top and bottom padding stay equal. */
 .nutshell-toolbar {
   position: sticky;
   top: 0;

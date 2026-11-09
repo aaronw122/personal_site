@@ -15,20 +15,15 @@ export default function Lightbox({ open, onClose, src, alt }: LightboxProps) {
   useEffect(() => {
     if (!open) return;
 
-    // Save the element that had focus before the lightbox opened
     previousFocusRef.current = document.activeElement;
 
-    // Lock body scroll to prevent iOS Safari from scrolling behind the overlay
     document.body.style.overflow = "hidden";
 
-    // Focus the overlay
     overlayRef.current?.focus();
 
     return () => {
-      // Restore body scroll
       document.body.style.overflow = "";
 
-      // Restore focus to the previously focused element
       if (previousFocusRef.current instanceof HTMLElement) {
         previousFocusRef.current.focus();
       }
@@ -49,13 +44,11 @@ export default function Lightbox({ open, onClose, src, alt }: LightboxProps) {
       if (!overlay || !closeBtn) return;
 
       if (e.shiftKey) {
-        // Shift+Tab: if on overlay, wrap to close button
         if (document.activeElement === overlay) {
           e.preventDefault();
           closeBtn.focus();
         }
       } else {
-        // Tab: if on close button, wrap to overlay
         if (document.activeElement === closeBtn) {
           e.preventDefault();
           overlay.focus();

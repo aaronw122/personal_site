@@ -18,27 +18,12 @@ import {
   stripFrontmatter,
 } from "./vault-markdown";
 
-// RSS 2.0 feed for the writing section with full post bodies, emitted at
-// dist/rss.xml on build (nginx serves it via `try_files $uri`) and served
-// live at /rss.xml by the dev server.
-//
-// The item set is the curated writing/index.md — the same [[wikilinks]] that
-// drive the /writing landing page — so unlisted drafts sitting in the vault
-// folder never leak into the feed. Items are ordered newest-first by the
-// post's `creation_date` frontmatter (authored date), falling back to the
-// file's birthtime when it's missing or unparseable.
-//
-// Bodies go through the same remark/rehype plugins ContentArticle uses, with
-// two feed-specific choices: every URL is absolute (readers render off-site),
-// and math is emitted as MathML only — KaTeX's HTML output needs its
-// stylesheet, which readers don't load, so it would render twice and garbled.
-
 const FEED_FILE = "rss.xml";
 
 interface Options {
-  siteUrl: string; // e.g. "https://awill.co" (no trailing slash)
-  urlPrefix: string; // URL segment for the section, e.g. "writing"
-  dir: string; // vault directory holding index.md and the posts
+  siteUrl: string;
+  urlPrefix: string;
+  dir: string;
 }
 
 interface Item {
@@ -62,14 +47,11 @@ const markdown = unified()
 async function renderHtml(body: string, opts: Options): Promise<string> {
   const md = processMarkdown(body, opts.urlPrefix, opts.siteUrl);
   const html = String(await markdown.process(md));
-  // Anything still site-relative (hand-written [x](/foo) links) → absolute.
   return html.replace(/(href|src)="\/(?!\/)/g, `$1="${opts.siteUrl}/`);
 }
 
 async function readItems(opts: Options, indexBody: string): Promise<Item[]> {
   const items: Item[] = [];
-  // [[target]] or [[target|alias]] — the target is the source filename, minus
-  // any vault path Obsidian prefixes when two notes share a name.
   for (const match of indexBody.matchAll(/\[\[([^\]]+)\]\]/g)) {
     const slug = match[1].split("|")[0].trim().split("/").pop()!.trim();
     const file = path.join(opts.dir, `${slug}.md`);
@@ -90,8 +72,6 @@ async function readItems(opts: Options, indexBody: string): Promise<Item[]> {
   return items.sort((a, b) => b.date.getTime() - a.date.getTime());
 }
 
-// CDATA can hold any markup verbatim except its own terminator, and XML still
-// forbids the C0 control characters even inside CDATA.
 function cdata(s: string): string {
   return `<![CDATA[${s
     .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "")
@@ -155,7 +135,6 @@ async function generateFeed(
 export function rssFeed(opts: Options): Plugin {
   return {
     name: "rss-feed",
-    // Dev: regenerate on every request so vault edits show up without a restart.
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
         if (req.url?.split("?")[0] !== `/${FEED_FILE}`) return next();
@@ -170,7 +149,6 @@ export function rssFeed(opts: Options): Plugin {
       const feed = await generateFeed(opts);
       if (!feed) return;
       fs.writeFileSync(path.join(path.resolve("dist"), FEED_FILE), feed.xml);
-      // eslint-disable-next-line no-console
       console.log(`[rss-feed] wrote ${feed.count} items to dist/${FEED_FILE}`);
     },
   };

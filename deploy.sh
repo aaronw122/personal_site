@@ -1,14 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Deploys awill.co to BOTH boxes so the Cloudflare-tunnel HA pair stays in sync:
-#   - homeserver (primary)  : docker-compose.yml            via `home` context
-#   - Hetzner   (hot backup): docker-compose.hetzner.yml    via `hetzner` context
-# Both run a cloudflared replica of the same tunnel; Cloudflare fails over between
-# them automatically. If they serve different builds, visitors get random versions —
-# so always deploy to both. The Hetzner step is non-fatal: if the backup is
-# unreachable, the primary still deploys (and you can re-run later to resync).
-
 echo "→ Building React app..."
 bun run build
 echo "→ Done. Output in dist/"

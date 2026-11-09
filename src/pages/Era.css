@@ -1,19 +1,14 @@
-/* ===========================================================================
-   era — an openable notebook. standalone immersive route (no site chrome).
-   =========================================================================== */
-
 .era-stage {
-  --era-edge: #ded2ba; /* page-block edge + spine color */
+  --era-edge: #ded2ba;
   position: fixed;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100dvh; /* fill the true visible viewport (mobile URL bar aware) */
+  height: 100dvh;
   background:
     radial-gradient(120% 90% at 50% 18%, #34302a 0%, #211e1a 55%, #141210 100%);
   overflow: hidden;
-  /* don't inherit the site's global lowercase / layout constraints */
   text-transform: none;
   perspective: 2400px;
   -webkit-tap-highlight-color: transparent;
@@ -34,8 +29,6 @@
 .era-back:visited { color: rgba(255, 255, 255, 0.55); }
 .era-back:hover { color: rgba(255, 255, 255, 0.95); }
 
-/* until first paint settles, no transitions — prevents the book/leaves from
-   animating in from their default (un-translated, full-width) state on load */
 .era-stage:not(.is-ready) .era-book,
 .era-stage:not(.is-ready) .era-leaf,
 .era-stage:not(.is-ready) .era-mpage {
@@ -45,11 +38,8 @@
   transition: none !important;
 }
 
-/* --- the book -------------------------------------------------------------- */
 .era-book {
   --era-paper: #f7f5f2;
-  /* grow to whichever screen dimension is the limit, so the open spread fills
-     the viewport without overflowing (width: 2 pages; height: page * 1.4) */
   --page-w: clamp(150px, min(47vw, 62vh), 560px);
   --page-h: calc(var(--page-w) * 1.4);
   position: relative;
@@ -59,12 +49,9 @@
   transition: transform 900ms cubic-bezier(0.2, 0.7, 0.2, 1);
   filter: drop-shadow(0 30px 50px rgba(0, 0, 0, 0.55));
 }
-/* closed: slide right half to center, then tilt (rotateY) so the page-edge
-   thickness on the fore-edge is visible — a real 3D book, à la scastiel.dev */
 .era-book.is-closed {
   transform: translateX(calc(var(--page-w) * -0.5));
 }
-/* closed from the back: slide the left half (the back cover) to center */
 .era-book.is-closed-back {
   transform: translateX(calc(var(--page-w) * 0.5));
 }
@@ -72,13 +59,7 @@
 .era-book.is-closed-back::after,
 .era-book.is-closed-back::before { opacity: 0; }
 
-/* spine gutter — the soft valley where the two pages dive into the binding.
-   Modeled on how 3D book viewers (turn.js / StPageFlip) render the center
-   shadow: darkest exactly at the spine with a smooth falloff to each side, plus
-   a faint sheen where each page crests back up away from the gutter. Sits above
-   resting pages (z 100–106) but below a turning leaf (z 200). */
 .era-book::after {
-  /* the valley shadow */
   content: "";
   position: absolute;
   top: 0;
@@ -105,7 +86,6 @@
   transition: opacity 400ms ease;
 }
 .era-book::before {
-  /* the page-crest sheen flanking the spine */
   content: "";
   position: absolute;
   top: 0;
@@ -130,12 +110,8 @@
 }
 .era-book.is-closed::after,
 .era-book.is-closed::before { opacity: 0; }
-/* on the opening spread the left page is the brown inside cover (which carries
-   its own binding shadow) — the cream crest sheen reads as a white streak there,
-   so drop it for that spread; the dark valley shadow still works on brown. */
 .era-book.is-cover-left::before { opacity: 0; }
 
-/* static pages sitting behind the flipping leaves */
 .era-page-base {
   position: absolute;
   top: 0;
@@ -148,7 +124,6 @@
 .era-page-base--right { left: 50%; box-shadow: inset 14px 0 24px -14px rgba(0, 0, 0, 0.28); }
 .era-book.is-closed .era-page-base--left { opacity: 0; }
 
-/* --- flipping leaves ------------------------------------------------------- */
 .era-leaf {
   position: absolute;
   top: 0;
@@ -170,7 +145,6 @@
 }
 .era-face--back { transform: rotateY(180deg); }
 
-/* --- cover (kraft) --------------------------------------------------------- */
 .era-cover {
   background-color: #c19a5b;
   background-image:
@@ -181,8 +155,6 @@
 }
 .era-cover-frame {
   position: absolute;
-  /* inset from the edges so the engraved frame has breathing room — extra on
-     the left to clear the binding strip (6%) with a gap */
   inset: 4% 5% 4% 9%;
   opacity: 0.82;
 }
@@ -207,7 +179,6 @@
   -webkit-text-stroke: 1.3px #3a2a17;
   text-stroke: 1.3px #3a2a17;
 }
-/* if the browser can't stroke text, fall back to a solid fill so "era" never vanishes */
 @supports not ((-webkit-text-stroke: 1px #000) or (text-stroke: 1px #000)) {
   .era-cover-brand { color: #3a2a17; }
 }
@@ -227,22 +198,18 @@
   padding-left: 0.3em;
 }
 
-/* inside front cover */
 .era-inside-cover {
   background-color: #b98f50;
   background-image: radial-gradient(120% 120% at 70% 30%, rgba(255, 244, 222, 0.25), transparent 60%);
   box-shadow: inset 14px 0 30px -14px rgba(0, 0, 0, 0.4);
 }
 
-/* crisp cloth binding strip at the spine edge (front cover: left, back: right) */
 .era-spine {
   position: absolute;
   top: 0;
   bottom: 0;
   width: 6%;
   background: #6f4a28;
-  /* cull the strip when its cover leaf flips, so it never bleeds into the
-     gutter on an open spread (it used to, only hidden by being cream before) */
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
@@ -255,13 +222,11 @@
   border-left: 2px solid rgba(40, 24, 8, 0.5);
 }
 
-/* --- back cover (plain kraft + cloth spine + dark barcode) ------------------ */
 .era-backcover {
   position: absolute;
   inset: 0;
   color: #2a1d0e;
 }
-/* bottom-left: barcode with the origin line beneath it */
 .era-backcover-tag {
   position: absolute;
   left: 12%;
@@ -278,7 +243,6 @@
   opacity: 0.8;
 }
 
-/* fake barcode — dark bars printed straight onto the kraft (no white label) */
 .era-barcode {
   display: inline-flex;
 }
@@ -293,14 +257,9 @@
   background: rgba(26, 16, 6, 0.6);
 }
 
-/* --- paper pages ----------------------------------------------------------- */
 .era-page {
-  /* flat fill, no highlight — so the page is EXACTLY the Figma swatch (#f7f5f2)
-     everywhere, with nothing lightening it to break the match */
   background-color: var(--era-paper, #f7f5f2);
 }
-/* No per-page spine seam — every spread reads as one continuous sheet. A single
-   soft gutter shadow at the book's center adds depth (see .era-book::after). */
 
 .era-page-inner {
   position: absolute;
@@ -322,12 +281,11 @@
   border-radius: 3px;
 }
 
-/* handwriting */
 .era-hand {
   font-family: "Caveat", var(--font-serif);
   color: #2a2622;
   font-size: clamp(1rem, 2.7vw, 1.42rem);
-  line-height: 32px; /* aligns to the ruled lines */
+  line-height: 32px;
   font-weight: 500;
 }
 .era-hand p { margin: 0 0 0.55em; }
@@ -340,13 +298,8 @@
   color: #2a2622;
 }
 
-/* --- notebook writing (real text in a handwriting font) --------------------
-   font-size is set by JS (Writing component) to auto-fit each page; no scroll */
 .era-writing {
   position: absolute;
-  /* top-aligned: every page (quill, tiger) starts at the same fixed top padding;
-     a short page (quill) just has extra space at the bottom. Intro overrides to
-     centered via .era-writing--center. */
   inset: 3% 5% 3% 5%;
   overflow: hidden;
   display: flex;
@@ -354,16 +307,14 @@
   justify-content: flex-start;
   font-family: "Reenie Beanie", var(--font-serif);
   color: #2a2622;
-  font-size: 24px; /* fallback before JS fits */
+  font-size: 24px;
   line-height: 1.12;
 }
 .era-writing-inner { width: 100%; }
-/* the intro page is vertically centered (the device pages stay top-aligned) */
 .era-writing--center { justify-content: center; }
 .era-writing p { margin: 0 0 0.5em; }
 .era-writing p:last-child { margin-bottom: 0; }
 
-/* --- device page: sketch with its elevator pitch (plain text) beneath -------- */
 .era-devpage {
   position: absolute;
   inset: 7% 9% 8% 10%;
@@ -389,9 +340,6 @@
   text-align: center;
 }
 
-/* --- transparent page artwork (one PNG per page, on the solid paper) --------
-   Full-bleed: each PNG carries its own internal margins, so it fills the page
-   edge-to-edge and object-fit keeps its aspect without distortion. */
 .era-media-img {
   position: absolute;
   inset: 0;
@@ -400,7 +348,6 @@
   object-fit: contain;
 }
 
-/* shown only until the artwork file exists */
 .era-media-placeholder {
   position: absolute;
   inset: 8%;
@@ -431,7 +378,6 @@
   opacity: 0.45;
 }
 
-/* --- navigation ------------------------------------------------------------ */
 .era-nav {
   position: absolute;
   bottom: 26px;
@@ -466,12 +412,9 @@
 }
 .era-dot.is-active { background: rgba(255, 255, 255, 0.9); transform: scale(1.2); }
 
-/* --- mobile: one page at a time (single-page flip), used at <= 700px --------- */
 .era-mobile {
   --era-paper: #f7f5f2;
   position: relative;
-  /* maximize within the viewport: as wide as possible (96vw) but never so tall
-     (×1.4) that it overflows the visible height, leaving room for the nav */
   width: min(96vw, 63dvh);
   height: calc(min(96vw, 63dvh) * 1.4);
   transform-style: preserve-3d;
@@ -490,7 +433,5 @@
 .era-mobile .era-mpage.is-flipped .era-face {
   opacity: 0;
 }
-/* mobile back face remains a real page-sized tap target for previous-page turns */
 .era-mobile-back { background: var(--era-paper, #f7f5f2); }
-/* the cover sits flush full-width on mobile (no spine offset needed) */
 .era-mobile .era-cover-frame { opacity: 0.85; }

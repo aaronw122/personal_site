@@ -2,40 +2,13 @@ import fs from "node:fs";
 import path from "node:path";
 import type { Plugin } from "vite";
 
-// Build-time sync of images embedded in published writing/lists docs (plus any
-// standalone vault docs a page renders, e.g. the era page).
-//
-// Markdown is loaded straight from the Obsidian vault (via the @writing/@lists
-// aliases), but the images those docs embed are served from public/writing-images/.
-// Historically that folder was a MANUAL copy of vault attachments, so every new
-// embed required remembering to copy the file over — and forgetting shipped a
-// broken image (a frequent 404 in production).
-//
-// This plugin closes that gap. On each build it scans the published docs for the
-// same image-reference forms that processMarkdown() rewrites (![[file]] embeds and
-// ](images/file) links), then ensures each referenced image physically exists in
-// public/writing-images/:
-//   - already present            -> left untouched (preserves historical images
-//                                   that no longer live in the vault)
-//   - missing but in the vault   -> copied in (and thus committed for posterity)
-//   - missing everywhere         -> hard build failure, so it can never ship broken
-//
-// public/ is copied into dist/ by Vite's default publicDir handling, so anything
-// synced here lands in the deployed artifact.
-
 interface Options {
-  // Vault directories holding the published markdown, e.g. …/published/writing.
   sourceDirs: string[];
-  // Individual vault docs outside sourceDirs whose embeds are served the same way.
   sourceFiles: string[];
-  // Vault attachment directories to pull referenced images from, searched in order.
   attachmentsDirs: string[];
-  // Destination served at /writing-images/, e.g. <repo>/public/writing-images.
   destDir: string;
 }
 
-// Extract the on-disk-relative names of images a doc references. Mirrors the two
-// forms processMarkdown() rewrites to /writing-images/… so the set matches exactly.
 function extractImageRefs(markdown: string): Set<string> {
   const refs = new Set<string>();
   for (const m of markdown.matchAll(/!\[\[([^\]]+)\]\]/g)) {
@@ -57,13 +30,11 @@ export function syncWritingImages(opts: Options): Plugin {
       };
       for (const dir of opts.sourceDirs) {
         if (!fs.existsSync(dir)) continue;
-        // Recursive to match the runtime import.meta.glob("**/*.md") in content.ts.
-        for (const file of fs.readdirSync(dir, { recursive: true })) {
-          if (typeof file !== "string" || !file.endsWith(".md")) continue;
+        for (const file of fs.readdirSync(dir, { recursive: true, encoding: "utf8" })) {
+          if (!file.endsWith(".md")) continue;
           scan(path.join(dir, file));
         }
       }
-      // Pages import these directly, so a missing file fails the build anyway.
       for (const file of opts.sourceFiles) scan(file);
 
       fs.mkdirSync(opts.destDir, { recursive: true });
@@ -85,7 +56,6 @@ export function syncWritingImages(opts: Options): Plugin {
         fs.mkdirSync(path.dirname(dest), { recursive: true });
         fs.copyFileSync(source, dest);
         copied++;
-        // eslint-disable-next-line no-console
         console.log(`[writing-images] synced ${ref}`);
       }
 
@@ -97,7 +67,6 @@ export function syncWritingImages(opts: Options): Plugin {
         );
       }
 
-      // eslint-disable-next-line no-console
       console.log(
         `[writing-images] ${referenced.size} referenced, ${copied} newly synced`,
       );

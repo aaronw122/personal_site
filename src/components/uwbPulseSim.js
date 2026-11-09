@@ -1,21 +1,9 @@
-// @ts-nocheck
-// Adapted from the Obsidian uwb-device-pulse plugin.
 class MarkdownRenderChild {
   constructor(containerEl) { this.containerEl = containerEl; }
 }
 
-/*
- * ```uwb-pulse
- * ```
- *
- * Port of devicePulseSim() from uwb.tldraw (script/main.js, "recurse tech talk", slide 2):
- * device 1 fires a pulse, device 2 takes it in. Same wave packet, timeline, easing and
- * colors; drawn in the slide's page coordinates and looped only while on screen.
- */
-
 const SVG_NS = "http://www.w3.org/2000/svg";
 
-// slide-2 geometry (page units inside the 1920x1080 slide frame)
 const DEV_W = 340;
 const DEV_H = 240;
 const DEV1 = { x: 200, y: 600, label: "device 1" };
@@ -26,13 +14,11 @@ const N = 80;
 const PACKET_W = 260;
 const AMP = 70;
 const CYCLES = 6;
-// timeline (ms): emit flash, travel, receive flash, rest
 const EMIT = 300;
 const TRAVEL = 1800;
 const RECEIVE = 700;
 const LOOP = EMIT + TRAVEL + RECEIVE + 700;
 
-// gaussian-enveloped wiggle, x centered on 0; shape is fixed, only position animates
 const WAVE_PATH = (() => {
   const pts = [];
   for (let i = 0; i < N; i++) {
@@ -71,7 +57,6 @@ class DevicePulseSim extends MarkdownRenderChild {
       "aria-label": "device 1 emits a UWB pulse that travels to device 2",
     }, root);
 
-    // pulse first so it hides behind the boxes at both ends
     this.pulse = svg("path", {
       d: WAVE_PATH,
       class: "uwb-device-pulse-wave",
@@ -102,7 +87,6 @@ class DevicePulseSim extends MarkdownRenderChild {
     this.frame = 0;
   }
 
-  // colors live in styles.css (tldraw light/dark palettes keyed off body.theme-dark)
   device(parent, { x, y, label }) {
     const g = svg("g", { class: "uwb-device-pulse-device", "data-color": "black" }, parent);
     svg("rect", {

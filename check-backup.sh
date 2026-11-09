@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-# On-demand health check for the Hetzner awill.co backup replica.
-# Verifies: both containers up, nginx serves the real site, the tunnel replica is
-# connected, and the backup isn't serving a STALE build vs the homeserver (drift).
-# Run anytime:  ./check-backup.sh
-
 COMPOSE="docker-compose.hetzner.yml"
 fail=0
 

@@ -9,16 +9,10 @@ import Rick from "./pages/Rick";
 import { getWritingEntries, getListsEntries, loadEntry } from "./lib/content";
 import useNavHaptics from "./hooks/useNavHaptics";
 
-// Split off the routes that drag in heavy deps (react-markdown + remark/rehype,
-// KaTeX, highlight.js, the Era notebook) so the home page's initial bundle
-// doesn't pay for them.
 const ContentIndex = lazy(() => import("./pages/ContentIndex"));
 const ContentArticle = lazy(() => import("./pages/ContentArticle"));
 const Era = lazy(() => import("./pages/Era"));
 const EraDevices = lazy(() => import("./pages/EraDevices"));
-// TEMPORARY: dev-only line-spacing tuner. `import.meta.env.DEV` is statically
-// false in production builds, so the chunk is never emitted. Remove together
-// with components/SpacingPanel.tsx.
 const SpacingPanel = import.meta.env.DEV
   ? lazy(() => import("./components/SpacingPanel"))
   : null;
@@ -26,15 +20,12 @@ const SpacingPanel = import.meta.env.DEV
 const writingEntries = getWritingEntries();
 const listsEntries = getListsEntries();
 
-// Standalone top-level routes that render a specific writing post.
 const FIXED_ARTICLES = [
   { path: "/haystack-errw-proof", slug: "haystack-errw-proof" },
   { path: "/oboe", slug: "most inneficient way to find needle in a haystack" },
   { path: "/uwb-pt1", slug: "ultra-wideband pt. 1 - intuition" },
 ];
 
-// Start fetching the post this page opened on (its markdown plus any math or
-// highlighting it needs) alongside the article chunk, instead of after it.
 function preloadInitialArticle() {
   const path = window.location.pathname.replace(/\/$/, "");
   const fixed = FIXED_ARTICLES.find((a) => a.path === path);
@@ -42,12 +33,10 @@ function preloadInitialArticle() {
   const load = fixed
     ? loadEntry(writingEntries, fixed.slug)
     : match && loadEntry(match[1] === "writing" ? writingEntries : listsEntries, match[2]);
-  // The article page reports failures when it awaits the same load.
   load?.catch(() => {});
 }
 preloadInitialArticle();
 
-// Index file loaders — these point to the curated index.md in each Obsidian folder
 const loadWritingIndex = () =>
   import("@writing/index.md?raw").then((m) => m.default);
 const loadListsIndex = () =>
@@ -63,7 +52,6 @@ export default function App() {
         </Suspense>
       )}
       <Routes>
-        {/* standalone immersive notebook — no site chrome, so its own Suspense */}
         <Route
           path="/era-notebook"
           element={
@@ -72,11 +60,9 @@ export default function App() {
             </Suspense>
           }
         />
-        {/* standalone full-screen rickroll — no site chrome */}
         <Route path="/rick" element={<Rick />} />
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
-          {/* simple md-driven page */}
           <Route path="/era" element={<EraDevices />} />
           <Route path="/about" element={<About />} />
           <Route path="/experience" element={<Experience />} />

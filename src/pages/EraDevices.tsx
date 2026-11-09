@@ -7,13 +7,9 @@ import usePageTitle from "../hooks/usePageTitle";
 import MarkdownLink from "../components/MarkdownLink";
 import "./EraDevices.css";
 
-// live content — editing this .md and redeploying updates the page
 import raw from "@era-content/era/era devices 2.md?raw";
 
-// ![[embeds]] resolve to /writing-images/, where vite-plugin-writing-images
-// syncs exactly the images this doc references from the vault.
 function prepare(md: string): string {
-  // verbatim content — only resolve ![[embeds]] to real image URLs
   return md
     .replace(/!\[\[([^\]]+)\]\]/g, (_m, inner: string) => {
       const file = inner.split("|")[0].trim();

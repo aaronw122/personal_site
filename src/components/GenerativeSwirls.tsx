@@ -1,16 +1,14 @@
 import { useRef, useEffect } from "react";
 import useIsDesktop from "../hooks/useIsDesktop";
 
-/* ── colour palette (from site theme) ── */
 const PALETTE = [
-  [255, 136, 34],   // orange  #ff8822  (--color-bg / #f82)
-  [75, 189, 255],   // blue    rgb(75, 189, 255) (--color-accent)
+  [255, 136, 34],
+  [75, 189, 255],
 ] as const;
 
-/* ── splotch tuning ── */
 const MAX_SPLOTCHES = 2;
-const LIFETIME_MIN_FRAMES = 180;   // 6s  @ 30 fps
-const LIFETIME_MAX_FRAMES = 420;   // 14s @ 30 fps
+const LIFETIME_MIN_FRAMES = 180;
+const LIFETIME_MAX_FRAMES = 420;
 const CONTENT_WIDTH = 680;
 const MARGIN_OVERLAP = 40;
 const SPIRAL_TURNS = 3;
@@ -46,19 +44,12 @@ export default function GenerativeSwirls() {
     let spawnTimer: ReturnType<typeof setTimeout> | null = null;
     let visibilityHandler: (() => void) | null = null;
 
-    // Decorative: wait for idle so the ~1 MB p5 chunk doesn't compete with
-    // the hero image and fonts for bandwidth right after mount.
     const idle =
       window.requestIdleCallback ??
       ((cb: () => void) => window.setTimeout(cb, 200));
     const whenIdle = new Promise<void>((resolve) => idle(() => resolve()));
     whenIdle.then(() => import("p5")).then((mod) => {
       if (cancelled || !containerRef.current) return;
-
-      const p5Constructor = mod.default as unknown as new (
-        sketch: (p: import("p5").default) => void,
-        node: HTMLElement,
-      ) => import("p5").default;
 
       const splotches: Splotch[] = [];
       let running = false;
@@ -68,9 +59,7 @@ export default function GenerativeSwirls() {
         const colRight = colLeft + CONTENT_WIDTH;
 
         const zones: Array<() => [number, number]> = [
-          // left gutter
           () => [randomBetween(0, colLeft + MARGIN_OVERLAP), randomBetween(0, p.height)],
-          // right gutter
           () => [randomBetween(colRight - MARGIN_OVERLAP, p.width), randomBetween(0, p.height)],
         ];
 
@@ -92,7 +81,6 @@ export default function GenerativeSwirls() {
         });
       }
 
-      // spawn a wave of splotches staggered over time, then stop
       function spawnWave(p: import("p5").default) {
         if (cancelled) return;
         const count = Math.random() < 0.67 ? 2 : 1;
@@ -109,7 +97,6 @@ export default function GenerativeSwirls() {
         }
       }
 
-      // schedule next wave after a 1-2s break
       function scheduleNextWave(p: import("p5").default) {
         spawnTimer = setTimeout(() => {
           if (cancelled) return;
@@ -197,7 +184,7 @@ export default function GenerativeSwirls() {
         };
       };
 
-      p5Instance = new p5Constructor(sketch, containerRef.current!);
+      p5Instance = new mod.default(sketch, containerRef.current!);
 
       visibilityHandler = () => {
         if (!p5Instance) return;
@@ -210,7 +197,6 @@ export default function GenerativeSwirls() {
       };
       document.addEventListener("visibilitychange", visibilityHandler);
 
-      // store full cleanup so the effect teardown can call it
       cleanupRef.current = () => {
         if (spawnTimer) clearTimeout(spawnTimer);
         if (visibilityHandler) {

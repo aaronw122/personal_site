@@ -1,4 +1,3 @@
-/** Convert Obsidian's inline nutshell syntax before markdown rendering. */
 const TERM_RE = /\[:([^\]\n]+)\](?:\((?:<([^>\n]*)>|([^\s)]+))\)|%%(.*?)%%)?/y;
 
 function escapeHtml(text: string): string {
@@ -21,7 +20,6 @@ function transformText(text: string): string {
   let result = "";
   let at = 0;
   while (at < text.length) {
-    // Obsidian comments are invisible in reading mode, including multiline comments.
     if (text.startsWith("%%", at)) {
       const end = text.indexOf("%%", at + 2);
       if (end !== -1) {
@@ -30,7 +28,6 @@ function transformText(text: string): string {
       }
     }
 
-    // A code span is literal markdown; its delimiter may contain any number of ticks.
     if (text[at] === "`") {
       let endTicks = at + 1;
       while (text[endTicks] === "`") endTicks++;
@@ -58,8 +55,6 @@ function transformText(text: string): string {
         if (target !== undefined) {
           result += `<a href="#${escapeHtml(headingSlug(target.replace(/^#/, "")))}">${label}</a>`;
         } else {
-          // Decode once, as the plugin stores it. A nested term's own definition
-          // stays encoded (%0A, %25) until its card renders.
           const definition = (term[4] ?? "").trim().replace(/%0A/g, "\n").replace(/%25/g, "%");
           result += definition
             ? `<span class="nutshell" data-def="${escapeHtml(encodeURIComponent(definition))}">${label}</span>`
@@ -76,7 +71,6 @@ function transformText(text: string): string {
   return result;
 }
 
-/** Leave fenced code untouched, even when it contains term/comment syntax. */
 export function nutshellsToHtml(md: string): string {
   let result = "";
   let prose = "";

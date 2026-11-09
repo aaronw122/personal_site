@@ -25,7 +25,6 @@ export default defineConfig({
         { urlPrefix: "writing", dir: WRITING },
         { urlPrefix: "lists", dir: LISTS },
       ],
-      // Standalone top-level routes declared in App.tsx.
       fixed: [
         { route: "haystack-errw-proof", dir: WRITING, slug: "haystack-errw-proof" },
         { route: "oboe", dir: WRITING, slug: "most inneficient way to find needle in a haystack" },

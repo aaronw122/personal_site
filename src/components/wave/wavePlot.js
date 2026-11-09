@@ -1,49 +1,8 @@
-// @ts-nocheck
-// Adapted from the Obsidian wave-plot plugin; rendering and parsing are unchanged.
 class MarkdownRenderChild {
   constructor(containerEl) {
     this.containerEl = containerEl;
   }
 }
-
-/*
- * ```wave
- * title: Two cosines
- * t: -T, T                       # x range (ns); may use sliders
- * y: -2.2, 2.2                   # optional fixed y range (default: auto)
- * samples: 4000                  # optional
- * slider f1: 8.0, 7, 9, 0.01     # value, min, max, step
- * let gap: abs(f2 - f1)          # constant/function built from sliders (no t)
- * plot sum: cos(2*pi*f1*t) + cos(2*pi*f2*t)
- * plot envelope, dashed: 2*abs(cos(pi*gap*t))
- * plot fit, green: exp(-t*t)      # color flag: blue, orange, green, red, purple, brown (default: next in order)
- * readout gap (GHz): gap
- * formula: y(t) = cos(2π · {f1} · t)   # text under the plot; {expr} filled live from sliders
- * mark repeats here: 1/gap          # dashed vertical line at this t
- * formula if f2 > f1: f2 is faster     # only shown while the condition is true (no ":" in it)
- * play f1: 10                      # play button: runs slider f1 from min to max over 10 s
- * family tones: N, a(i)*cos(2*pi*f(i)*t)   # N curves, i = 0..N-1, rainbow colors (red = first, violet = last)
- * stems tones: N, f(i), a(i)     # N vertical lines at x = f(i) with height a(i), same colors as a family of N (or "stems tones, blue:" for one color)
- *                                 # families and stems draw under the plot lines; plot colors skip them
- * arrow hyp, red: 0, 0, cx, sy    # arrow from (x0, y0) to (x1, y1) in plot coordinates; flags: color, dashed, line (no head)
- * plot circle, dashed, nolegend: sqrt(1 - t*t)   # nolegend: leave this plot out of the legend
- * aspect: equal                   # this panel draws 1 unit of x as long as 1 unit of y (narrows the canvas to fit)
- *
- * Several stacked plots sharing the same sliders: start each with "panel: title".
- * y / plot / mark / formula lines after a panel line belong to that panel.
- * A "t:" line after a panel line gives that panel its own x range; "xlabel:" sets a panel's x axis label.
- * height: 200                    # optional canvas height (px); before any panel = every panel, after a panel line = that panel only
- * sliders: here                  # optional: put the sliders at this point, e.g. between two panels (default: top when stacked)
- * panel: 1. first stage
- * plot a: cos(2*pi*f1*t)
- * panel: 2. second stage
- * plot b: cos(2*pi*f1*t)**2
- * panel: 3. spectrum
- * t: -1000, 1000                 # this panel only; t is still the variable name in its expressions
- * xlabel: offset from carrier (MHz)
- * plot c: exp(-(t/300)**2)
- * ```
- */
 
 const HELPERS = {
   pi: Math.PI,
@@ -60,13 +19,11 @@ const HELPERS = {
   floor: Math.floor,
   round: Math.round,
   sign: Math.sign,
-  // sum(n, i => term) = term(0) + ... + term(n-1)
   sum: (n, term) => {
     let s = 0;
     for (let i = 0; i < n; i++) s += term(i);
     return s;
   },
-  // Gaussian bump at 0 with standard deviation sigma, peak 1
   gauss: (x, sigma) => Math.exp(-(x * x) / (2 * sigma * sigma)),
 };
 const HELPER_NAMES = Object.keys(HELPERS);
@@ -76,14 +33,12 @@ const PALETTE = ["#4e9af1", "#f28e2b", "#59a14f", "#e15759", "#b07aa1", "#9c755f
 const COLOR_NAMES = ["blue", "orange", "green", "red", "purple", "brown"];
 const plotColor = (q, i) => PALETTE[q.color >= 0 ? q.color : i % PALETTE.length];
 const MAX_FAMILY = 400;
-// Color of item i out of count, red (first) to violet (last), so a family and stems with the same count match.
 const rainbow = (i, count) => `hsl(${count > 1 ? (270 * i) / (count - 1) : 0}, 80%, 58%)`;
 const RAINBOW_SWATCH = "linear-gradient(90deg, hsl(0,80%,58%), hsl(60,80%,58%), hsl(120,80%,58%), hsl(200,80%,58%), hsl(270,80%,58%)) 1";
 const HEIGHT = 280;
 const PAD = { left: 48, right: 12, top: 10, bottom: 28 };
 const IDENT = /^[A-Za-z_]\w*$/;
 
-// Split on commas that are not inside parentheses.
 function splitTop(value) {
   const parts = [];
   let depth = 0;
@@ -107,7 +62,6 @@ function newPanel(title) {
 
 function parseSpec(source) {
   const spec = { title: null, t: ["-5", "5"], samples: 4000, height: null, slidersAt: null, sliders: [], lets: [], readouts: [], plays: [], panels: [] };
-  // y, plot, mark and formula lines belong to the latest "panel:" line (an untitled panel if there is none).
   const panel = () => {
     if (!spec.panels.length) spec.panels.push(newPanel(null));
     return spec.panels[spec.panels.length - 1];
@@ -214,7 +168,6 @@ function parseSpec(source) {
         break;
       }
       case "mark": {
-        // A trailing ", axis" also prints the mark's x value in the x-axis number row.
         const parts = (name || "").split(",");
         const axis = parts.length > 1 && parts[parts.length - 1].trim() === "axis";
         const label = axis ? parts.slice(0, -1).join(",").trim() : name;
@@ -244,7 +197,6 @@ function parseSpec(source) {
   return spec;
 }
 
-// Returns (sliderValues) => ((...params) => expr). Lets are evaluated once per render, before t.
 function compile(expr, spec, params = "t") {
   const lets = spec.lets.map((l) => `const ${l.name} = (${l.expr});`).join("\n");
   const make = new Function(
@@ -274,7 +226,7 @@ function ticks(lo, hi, target) {
 
 function formatValue(v) {
   if (!Number.isFinite(v)) return v > 0 ? "∞" : v < 0 ? "−∞" : "—";
-  if (Math.abs(v) < 1e-9) return "0"; // floating-point residue from cancelling sums
+  if (Math.abs(v) < 1e-9) return "0";
   return Number(v.toPrecision(4)).toString();
 }
 
@@ -293,7 +245,6 @@ class WavePlot extends MarkdownRenderChild {
 
     if (spec.title) root.appendChild(el("div", "wave-plot-title", spec.title));
 
-    // With stacked panels the sliders go on top, above the first panel (they scroll with the plot).
     const stacked = spec.panels.length > 1;
     this.height = spec.height || (stacked ? 200 : HEIGHT);
 
@@ -330,7 +281,6 @@ class WavePlot extends MarkdownRenderChild {
     );
     this.stopPlays = spec.plays.map((p) => this.addPlayButton(sliders, p, handles));
     if (spec.sliders.length) {
-      // Puts every slider back to the value the block was written with.
       const reset = el("button", "wave-plot-reset", "reset");
       reset.type = "button";
       reset.addEventListener("click", () => {
@@ -361,7 +311,6 @@ class WavePlot extends MarkdownRenderChild {
         t: p.t && p.t.map((e) => compile(e, spec)),
         y: p.y && p.y.map((e) => compile(e, spec)),
         marks: p.marks.map((m) => compile(m.expr, spec)),
-        // Literal text alternates with compiled {expression} parts: [text, fn, text, fn, ..., text].
         formulas: p.formulas.map((f) => ({
           cond: f.cond && compile(f.cond, spec),
           parts: f.text.split(/\{([^{}]+)\}/).map((part, i) => (i % 2 ? compile(part, spec) : part)),
@@ -383,7 +332,6 @@ class WavePlot extends MarkdownRenderChild {
     (this.stopPlays || []).forEach((stop) => stop());
   }
 
-  // Button that runs one slider from its min to its max over `seconds`, then stops. Returns a stop function.
   addPlayButton(parent, play, handles) {
     const i = this.spec.sliders.findIndex((s) => s.name === play.name);
     const s = this.spec.sliders[i];
@@ -462,7 +410,6 @@ class WavePlot extends MarkdownRenderChild {
     };
     const countOf = (make) => Math.max(0, Math.min(MAX_FAMILY, Math.floor(make(values)(0))));
     const series = compiled.plots.map((make) => sample(make(values)));
-    // Rainbow curves: every member i of every family, colored by its position in that family.
     const members = compiled.families.flatMap((fam) => {
       const curve = fam.curve(values);
       const count = countOf(fam.count);
@@ -492,7 +439,6 @@ class WavePlot extends MarkdownRenderChild {
       y1 += pad;
     }
 
-    // Size the canvas now that the y range is known: an equal-aspect panel narrows its width to match its height.
     const H = panel.height || this.height;
     let width = canvas.parentElement.clientWidth;
     if (!width) return;
@@ -522,8 +468,6 @@ class WavePlot extends MarkdownRenderChild {
     g.fillStyle = muted;
     g.textAlign = "center";
     g.textBaseline = "top";
-    // Marks flagged "axis" print their value in the tick row (in the normal text
-    // color) and drop any tick label they would overlap.
     const axisMarks = compiled.marks
       .map((make, i) => (panel.marks[i].axis ? make(values)(0) : NaN))
       .filter((x) => x >= t0 && x <= t1);
@@ -648,7 +592,6 @@ function el(tag, cls, text) {
   return node;
 }
 
-// Range + number input pair kept in sync. Returns setters for programmatic updates.
 function makeSlider(parent, s, onChange, cls = "") {
   const row = el("div", `wave-plot-slider ${cls}`.trim());
   const range = el("input");
@@ -681,26 +624,13 @@ function makeSlider(parent, s, onChange, cls = "") {
   };
 }
 
-/*
- * ```pulse
- * a: 100          # bandwidth of top pulse (MHz)
- * b: 500          # bandwidth of bottom pulse (MHz)
- * distance: 5     # TX to RX (m)
- * step: 0.1       # simulated ns added per tick
- * extras: 1       # 0 hides the distance, tick and carrier sliders
- * tick: 0.1       # real seconds between ticks
- * carrier: 8      # GHz
- * ```
- * Every line is optional; each value is also a slider.
- */
-const C = 0.299792458; // metres per ns
+const C = 0.299792458;
 const PULSE_DEFAULTS = { a: 100, b: 500, distance: 5, step: 0.1, tick: 0.1, carrier: 8, extras: 1 };
 const CLOCK_H = 30;
 const LANE_H = 130;
 const AXIS_H = 40;
 const PULSE_H = CLOCK_H + LANE_H * 2 + AXIS_H;
 
-// Parser for blocks made only of optional "key: number" lines with known defaults.
 const parseKeys = (defaults) => (source) => {
   const cfg = { ...defaults };
   source.split("\n").forEach((raw, n) => {
@@ -718,7 +648,6 @@ const parseKeys = (defaults) => (source) => {
 const fmt = (v) => Number(v.toFixed(2)).toString();
 const fmtLength = (m) => (m >= 1 ? `${m.toFixed(2)} m` : `${Math.round(m * 100)} cm`);
 
-// Pulses leave TX (x = 0) at t = 0 and move right at c. Drawn in space, not time.
 class PulseSim extends MarkdownRenderChild {
   constructor(containerEl, cfg) {
     super(containerEl);
@@ -785,7 +714,6 @@ class PulseSim extends MarkdownRenderChild {
     const restart = () => this.playing && this.play();
     knob("a", "top pulse (MHz)", 20, 1000, 10);
     knob("b", "bottom pulse (MHz)", 20, 1000, 10);
-    // extras: 0 keeps only the time and pulse sliders
     if (this.cfg.extras) {
       knob("distance", "TX to RX (m)", 1, 20, 0.5);
       knob("step", "ns per tick", 0.01, 2, 0.01);
@@ -871,7 +799,6 @@ class PulseSim extends MarkdownRenderChild {
       g.textBaseline = "top";
       g.fillText(`${fmt(lane.bw)} MHz`, 4, top + 4);
 
-      // TX antenna and RX line
       g.strokeStyle = muted;
       g.lineWidth = 1;
       g.setLineDash([]);
@@ -892,7 +819,6 @@ class PulseSim extends MarkdownRenderChild {
       g.lineTo(sx(d), mid + amp + 6);
       g.stroke();
       g.setLineDash([]);
-      // carrier (thin) and envelope (bold), sampled twice per pixel
       const n = Math.ceil(plotW * 2);
       const xs = (k) => x0 + (k / n) * (x1 - x0);
       g.save();
@@ -921,7 +847,6 @@ class PulseSim extends MarkdownRenderChild {
       }
       g.restore();
 
-      // length bracket from back to front of the pulse
       const front = C * time;
       const back = Math.max(0, C * (time - lane.dur));
       if (time > 0 && back < x1) {
@@ -955,7 +880,6 @@ class PulseSim extends MarkdownRenderChild {
       }
     });
 
-    // distance axis
     const axisY = CLOCK_H + LANE_H * 2;
     g.fillStyle = muted;
     g.strokeStyle = grid;
@@ -974,7 +898,6 @@ class PulseSim extends MarkdownRenderChild {
     g.fillText("TX", sx(0), axisY + 22);
     g.fillText("RX", sx(d), axisY + 22);
 
-    // clock, top-right
     g.fillStyle = text;
     g.textAlign = "right";
     g.textBaseline = "top";
@@ -987,18 +910,8 @@ class PulseSim extends MarkdownRenderChild {
   }
 }
 
-/*
- * ```slice
- * source: 100     # bandwidth of the original signal (MHz); its bump is 1000/source ns wide
- * cut: 2          # how long the switch stays on (ns)
- * smooth: 0       # 0 = hard on/off switch, 1 = smooth Gaussian gate (width at half height = cut)
- * carrier: 8      # GHz; only changes the wiggles in the time panel
- * span: 1500      # spectrum x range: carrier ± span (MHz)
- * ```
- * Every line is optional; each value is also a control.
- */
 const SLICE_DEFAULTS = { source: 100, cut: 2, smooth: 0, carrier: 8, span: 1500 };
-const CHANNEL_MHZ = 499.2; // 802.15.4 HRP UWB channel width
+const CHANNEL_MHZ = 499.2;
 const FWHM_PER_SIGMA = 2 * Math.sqrt(2 * Math.LN2);
 const DB_FLOOR = -40;
 const CAPTION_H = 18;
@@ -1006,8 +919,6 @@ const TIME_H = 200;
 const SPEC_H = 240;
 const SLICE_H = TIME_H + SPEC_H;
 
-// Baseband envelopes with peak 1 at t = 0 (ns). The carrier multiplies all of them and only
-// moves the spectrum to the carrier frequency, so spectra are computed on the envelopes.
 function sliceModel(cfg) {
   const { gauss } = HELPERS;
   const srcFwhm = 1000 / cfg.source;
@@ -1022,8 +933,6 @@ function sliceModel(cfg) {
   return { srcFwhm, source, gate, sliced, srcReach, slicedReach };
 }
 
-// Even, real envelope e(t) that is ~0 beyond ±reach  ->  X(f) = ∫ e(t) cos(2π f t) dt, f in GHz.
-// Midpoint samples on [0, reach] never straddle a hard gate edge placed at reach.
 function spectrumOf(e, reach, n = 600) {
   const dt = reach / n;
   const ts = new Float64Array(n);
@@ -1043,7 +952,6 @@ function spectrumOf(e, reach, n = 600) {
   return { X, energy, db: (f) => 10 * Math.log10(X(f) ** 2 / peak) };
 }
 
-// Full width (MHz) where power first drops 10 dB below the peak at f = 0.
 function width10dB(spec, stepGHz) {
   let prev = 0;
   for (let i = 1; i < 1e5; i++) {
@@ -1054,7 +962,6 @@ function width10dB(spec, stepGHz) {
   return Infinity;
 }
 
-// Share of the pulse's energy that lands inside the UWB channel around the carrier.
 function channelShare(spec, n = 200) {
   const b = CHANNEL_MHZ / 2000;
   let s = 0;
@@ -1062,7 +969,6 @@ function channelShare(spec, n = 200) {
   return (2 * s * b) / n / spec.energy;
 }
 
-// Grid, tick labels and x label for one panel; returns data -> pixel maps.
 function drawAxes(g, box, colors) {
   const { left, top, w, h, x0, x1, y0, y1, xlabel, yTicks } = box;
   const sx = (x) => left + ((x - x0) / (x1 - x0)) * w;
@@ -1103,7 +1009,6 @@ function strokeCurve(g, n, point) {
   g.stroke();
 }
 
-// A long, narrowband signal switched on for `cut` ns: time on top, spectrum below.
 class SliceSim extends MarkdownRenderChild {
   constructor(containerEl, cfg) {
     super(containerEl);
@@ -1220,7 +1125,6 @@ class SliceSim extends MarkdownRenderChild {
       g.font = `11px ${font}`;
     };
 
-    // Time panel: envelopes at baseband, carrier wiggles under the sliced one.
     {
       const top = CAPTION_H;
       const h = TIME_H - CAPTION_H - PAD.bottom;
@@ -1263,7 +1167,6 @@ class SliceSim extends MarkdownRenderChild {
       g.restore();
     }
 
-    // Spectrum panel: power in dB relative to each signal's own peak, around the carrier.
     {
       const top = TIME_H + CAPTION_H;
       const h = SPEC_H - CAPTION_H - PAD.bottom;
@@ -1319,7 +1222,6 @@ class SliceSim extends MarkdownRenderChild {
       strokeCurve(g, n, (k) => [sx(fAt(k)), sy(clampDb(srcSpec.db(fAt(k) / 1000)))]);
       g.setLineDash([]);
 
-      // -10 dB bracket on the sliced spectrum
       const [a, b, y] = [sx(-slicedBw / 2), sx(slicedBw / 2), sy(-10)];
       g.strokeStyle = blue;
       g.lineWidth = 1.5;
@@ -1348,7 +1250,6 @@ class SliceSim extends MarkdownRenderChild {
   }
 }
 
-// Match the Obsidian code block processors: parse errors appear inline with the language prefix.
 export function mountWaveBlock(lang, source, container) {
   const blocks = {
     wave: [parseSpec, WavePlot],

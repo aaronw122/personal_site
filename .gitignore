@@ -33,3 +33,5 @@ dist-ssr
 conversations/
 notes/
 docs/
+
+__pycache__/
