@@ -63,7 +63,6 @@
   font-family: var(--font-monospace);
 }
 
-/* Obsidian-style controls: flat thin track, pill thumb, rounded number box */
 .wave-plot-slider input[type="range"] {
   width: 100%;
   height: 20px;
@@ -132,8 +131,6 @@
   -moz-appearance: textfield;
   appearance: textfield;
 }
-/* Every control button in a graph (play, reset, gate toggles): a rounded pill
-   on the paper background, matching the slider number boxes */
 .wave-plot button {
   display: inline-flex;
   align-items: center;
@@ -162,7 +159,6 @@
   border-color: rgba(75, 189, 255, 0.7);
   box-shadow: 0 0 0 3px rgba(75, 189, 255, 0.2);
 }
-/* the slider reset sits quietly at the right edge of the slider block */
 .wave-plot .wave-plot-reset {
   display: flex;
   margin: 4px 0 0 auto;
@@ -198,7 +194,6 @@
   margin: 4px 0 2px;
 }
 
-/* Sliders above stacked panels: set off from the first panel by a divider. */
 .wave-plot-sliders.is-top {
   border-bottom: 1px solid var(--background-modifier-border);
   padding: 4px 0 6px;

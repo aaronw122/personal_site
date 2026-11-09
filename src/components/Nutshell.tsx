@@ -11,7 +11,6 @@ type NutshellProps = {
 
 const GAP = 6;
 const EDGE = 8;
-// In insertion order, the last open card receives Escape first.
 const openCards = new Set<HTMLElement>();
 let nextLayer = 2000;
 
@@ -73,8 +72,6 @@ export default function Nutshell({ def, children, renderMarkdown }: NutshellProp
 
     const dismissOutside = (event: PointerEvent) => {
       const target = event.target;
-      // Portaled nested cards are outside their parent's DOM tree; keep all
-      // ancestors open while interacting with any open card or term.
       if (target instanceof Element && target.closest(".nutshell-popup, .nutshell-trigger")) return;
       setOpen(false);
       setExpanded(false);
@@ -101,7 +98,6 @@ export default function Nutshell({ def, children, renderMarkdown }: NutshellProp
     };
   }, [open, expanded]);
 
-  // An expanded card acts as a modal: the page underneath must not scroll.
   useLayoutEffect(() => {
     if (!open || !expanded) return;
     const root = document.documentElement;
@@ -112,8 +108,6 @@ export default function Nutshell({ def, children, renderMarkdown }: NutshellProp
     };
   }, [open, expanded]);
 
-  // Every close (trigger, outside click, Escape) also collapses the card, so
-  // the next open starts as a small popover rather than a full-screen modal.
   const toggle = () => {
     if (!open) setLayer(++nextLayer);
     setExpanded(false);

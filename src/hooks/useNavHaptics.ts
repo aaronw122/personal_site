@@ -3,7 +3,6 @@ import { WebHaptics } from "web-haptics";
 
 let _haptics: WebHaptics | null = null;
 function getHaptics(): WebHaptics | null {
-  if (typeof window === "undefined") return null;
   if (!_haptics) {
     try {
       _haptics = new WebHaptics();

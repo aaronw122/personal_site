@@ -71,7 +71,6 @@ interface Props {
   section: "writing" | "lists";
 }
 
-// Nutshell cards render their definitions with the same section as the article.
 const SectionContext = createContext<Props["section"]>("writing");
 
 const Pre: Components["pre"] = ({ node, children, ...rest }) => {
@@ -105,8 +104,6 @@ const Span: Components["span"] = ({ node, children, ...rest }) => {
   );
 };
 
-// Module-level so every render passes react-markdown the same component types;
-// new functions per render would remount simulations and close nested cards.
 const COMPONENTS: Components = {
   img: LightboxImage,
   a: MarkdownLink,
@@ -120,17 +117,12 @@ const COMPONENTS: Components = {
   span: Span,
 };
 
-// Renders vault markdown (already passed through processMarkdown) with math,
-// interactive wave/pulse simulations, and nutshell definition popovers. Nutshell
-// cards render their definitions through this same component, so nested terms,
-// math and graphs inside a definition behave like the article body.
 export default function ArticleMarkdown({ markdown, section }: Props) {
   const root = useRef<HTMLDivElement>(null);
   useFitDisplayMath(root, markdown);
 
   return (
     <SectionContext.Provider value={section}>
-      {/* display: contents keeps the markdown's block layout exactly as before */}
       <div ref={root} style={{ display: "contents" }}>
         <ReactMarkdown
           remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkFrontmatter]}

@@ -7,33 +7,21 @@ import {
   htmlEscape,
 } from "./vault-markdown";
 
-// Build-time prerendering of per-post OG / social-preview metadata.
-//
-// The site is a client-rendered SPA, so link-preview bots (iMessage, Slack,
-// Twitter, Discord…) that don't run JS only ever see the static index.html —
-// which has the generic "aaron williams" OG tags. This plugin emits a physical
-// HTML file per post at dist/<section>/<slug>/index.html, identical to
-// index.html but with the OG/title/description/canonical tags swapped for the
-// post's own. nginx's `try_files $uri/ /index.html` serves these to bots; real
-// visitors still boot the full SPA (assets are absolute-pathed).
-
 interface Section {
-  // URL prefix and vault directory, e.g. { urlPrefix: "writing", dir: "…/writing" }
   urlPrefix: string;
   dir: string;
 }
 
 interface FixedRoute {
-  // Standalone top-level routes (e.g. /oboe) that render a specific post.
-  route: string; // URL path without leading slash, e.g. "haystack-errw-proof"
-  dir: string; // vault directory to look in
-  slug: string; // source filename without .md
+  route: string;
+  dir: string;
+  slug: string;
 }
 
 interface Options {
   sections: Section[];
   fixed?: FixedRoute[];
-  siteUrl: string; // e.g. "https://awill.co" (no trailing slash)
+  siteUrl: string;
 }
 
 function buildHtml(
@@ -66,8 +54,6 @@ function buildHtml(
       `<meta property="og:url" content="${url}" />`,
     );
 
-  // Add Twitter Card tags (index.html has none) right after og:url so
-  // Twitter/X and other consumers get a title too.
   html = html.replace(
     /(<meta property="og:url"[^>]*>)/,
     `$1\n    <meta name="twitter:card" content="summary_large_image" />` +
@@ -108,10 +94,6 @@ export function ogPrerender(opts: Options): Plugin {
 
       for (const section of opts.sections) {
         if (!fs.existsSync(section.dir)) continue;
-        // Section landing page (e.g. /writing) from the curated index.md, so
-        // link-preview bots get section-specific OG meta and a self-canonical
-        // URL instead of the generic homepage tags. nginx serves this inline
-        // via try_files $uri/index.html.
         const sectionIndex = path.join(section.dir, "index.md");
         if (fs.existsSync(sectionIndex)) {
           emit(section.urlPrefix, sectionIndex, `${opts.siteUrl}/${section.urlPrefix}`);
@@ -137,7 +119,6 @@ export function ogPrerender(opts: Options): Plugin {
         count++;
       }
 
-      // eslint-disable-next-line no-console
       console.log(`\n[og-prerender] wrote ${count} social-preview pages`);
     },
   };

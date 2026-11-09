@@ -1,9 +1,5 @@
 import { useEffect, type RefObject } from "react";
 
-// Mounts a framework-free renderer into `ref` only after the page has finished
-// loading and the element is near the viewport, then during idle time, so
-// heavy simulations never delay the initial render. `mount` returns cleanup,
-// or a promise of it when the renderer's code is fetched on demand.
 export default function useLazyMount(
   ref: RefObject<HTMLElement | null>,
   mount: (element: HTMLElement) => (() => void) | Promise<() => void>,
@@ -34,7 +30,6 @@ export default function useLazyMount(
     const schedule = () => {
       if (!loaded || !intersecting || disposed) return;
       observer.disconnect();
-      // Safari has no requestIdleCallback
       if (window.requestIdleCallback) idle = window.requestIdleCallback(run);
       else timer = window.setTimeout(run, 0);
     };
@@ -61,6 +56,5 @@ export default function useLazyMount(
       window.clearTimeout(timer);
       cleanup?.();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- caller owns deps
   }, deps);
 }

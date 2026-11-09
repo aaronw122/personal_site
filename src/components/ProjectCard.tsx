@@ -17,7 +17,6 @@ interface SmartLinkProps {
 
 const cardClassName = "notebook-card notebook-card-inner project-card";
 
-// In-app paths route through react-router; external URLs open a new tab.
 function SmartLink({ href, className, style, ariaLabel, children }: SmartLinkProps) {
   if (href.startsWith("/")) {
     return (
@@ -40,8 +39,6 @@ function SmartLink({ href, className, style, ariaLabel, children }: SmartLinkPro
   );
 }
 
-// `labelHref` set: the label is its own link, separate from the card's.
-// Unset: the label is plain text inside the single card link.
 function CardContent({ project, labelHref }: ProjectCardProps & { labelHref?: string }) {
   return (
     <>
@@ -63,9 +60,6 @@ function CardContent({ project, labelHref }: ProjectCardProps & { labelHref?: st
 export default function ProjectCard({ project }: ProjectCardProps) {
   const clipStyle = useTornClip(project.name);
 
-  // Links can't nest, so a card with a separate story link becomes a <div>
-  // with a stretched overlay link (card -> story) and the label raised above
-  // it as a second link (label -> live site).
   if (project.blogUrl) {
     return (
       <div className={cardClassName} style={clipStyle}>

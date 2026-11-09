@@ -1,14 +1,12 @@
 import { headingSlug, nutshellsToHtml } from "./nutshell";
 import { loadArticlePlugins } from "./articlePlugins";
 
-// Discover and load markdown content from Obsidian vault via Vite aliases
-
-const writingModules = import.meta.glob("@writing/**/*.md", {
+const writingModules = import.meta.glob<string>("@writing/**/*.md", {
   query: "?raw",
   import: "default",
 });
 
-const listsModules = import.meta.glob("@lists/**/*.md", {
+const listsModules = import.meta.glob<string>("@lists/**/*.md", {
   query: "?raw",
   import: "default",
 });
@@ -23,19 +21,12 @@ export function stripFrontmatter(raw: string): string {
   return raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n*/, "");
 }
 
-// Convert Obsidian syntax (nutshell terms, toggle callouts, [[wikilinks]],
-// embeds) to markdown/HTML the article renderer understands
 export function processMarkdown(
   raw: string,
   section: "writing" | "lists",
 ): string {
-  // Nutshell definition terms become popover spans. Runs first: stored
-  // definitions can hold [[links]] and embeds that are converted when the
-  // definition itself is rendered.
   let result = nutshellsToHtml(raw);
 
-  // `> [!toggle]- summary` callouts (toggle-block plugin) become <details>.
-  // The first line is the summary; the remaining quoted lines are the body.
   result = result.replace(
     /^> \[!toggle\][-+]? ?(.*)\n((?:>.*(?:\n|$))*)/gm,
     (_match, summary: string, body: string) => {
@@ -44,9 +35,6 @@ export function processMarkdown(
     },
   );
 
-  // Obsidian renders a line that is only `$$...$$` as display math; remark-math
-  // treats it as inline math (and merges adjacent lines into one paragraph).
-  // Expand such lines into fenced `$$` blocks, leaving code fences untouched.
   let inFence = false;
   result = result
     .split("\n")
@@ -57,22 +45,15 @@ export function processMarkdown(
     })
     .join("\n");
 
-  // Convert ![[image.png]] embeds to standard markdown images. Obsidian allows a
-  // trailing size hint (![[image.png|300]]); split it off so only the real
-  // filename is encoded into the URL (encoding the whole string yields %7C 404s).
   result = result.replace(/!\[\[([^\]]+)\]\]/g, (_match, inner: string) => {
     const file = inner.split("|")[0].trim();
     return `![${file}](/writing-images/${encodeURIComponent(file)})`;
   });
 
-  // [[#heading|alias]] links point at a heading on the same page
   result = result.replace(/\[\[#([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_match, target: string, alias?: string) => {
     return `[${(alias ?? target).trim()}](#${headingSlug(target)})`;
   });
 
-  // Convert [[wikilinks]] to standard markdown links. Obsidian prefixes a vault
-  // path (`[[published/writing/post|…]]`) when two notes share a name; posts
-  // are addressed by file name alone, so only the last path segment is kept.
   result = result.replace(/\[\[([^\]]+)\]\]/g, (_match, link: string) => {
     const [target, alias] = link.split("|");
     const display = alias?.trim() || target.trim();
@@ -80,7 +61,6 @@ export function processMarkdown(
     return `[${display}](/${section}/${encodeURIComponent(slug)})`;
   });
 
-  // Fix standard markdown image references to images/ subfolder
   result = result.replace(
     /!\[([^\]]*)\]\(images\/([^)]+)\)/g,
     (_match, alt: string, filename: string) => {
@@ -101,15 +81,12 @@ export function getListsEntries(): ContentEntry[] {
 
 type LoadedEntry = { title: string; date: string | null; content: string };
 
-// One load per post, shared by the startup preload and the article page.
 const entryLoads = new Map<string, Promise<LoadedEntry | null>>();
 
 export function loadEntry(
   entries: ContentEntry[],
   slug: string,
 ): Promise<LoadedEntry | null> {
-  // React Router decodes URL params, so compare decoded slugs. A malformed
-  // escape (e.g. a truncated %2) can't name a post, so it's "not found".
   let decoded: string;
   try {
     decoded = decodeURIComponent(slug);
@@ -122,7 +99,6 @@ export function loadEntry(
   if (!load) {
     load = fetchEntry(entry);
     entryLoads.set(entry.slug, load);
-    // Let a failed load (e.g. a dropped connection) be retried on the next visit.
     load.catch(() => entryLoads.delete(entry.slug));
   }
   return load;
@@ -140,37 +116,38 @@ async function fetchEntry(entry: ContentEntry): Promise<LoadedEntry> {
   };
 }
 
-// — Private helpers —
-
 function slugFromPath(p: string): string {
-  // Use the filename without extension as the slug — no encoding
-  // React Router decodes URL params, so slugs must be unencoded to match
   return p.split("/").pop()!.replace(/\.md$/, "");
 }
 
-function extractFrontmatter(raw: string): Record<string, string> {
+interface Frontmatter {
+  title?: string;
+  creation_date?: string;
+}
+
+function extractFrontmatter(raw: string): Frontmatter {
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!match) return {};
-  const result: Record<string, string> = {};
+  const values = new Map<string, string>();
   for (const line of match[1].split("\n")) {
     const idx = line.indexOf(":");
     if (idx === -1) continue;
     const key = line.slice(0, idx).trim();
     const val = line.slice(idx + 1).trim().replace(/^["']|["']$/g, "");
-    if (key && val) result[key] = val;
+    if (key && val) values.set(key, val);
   }
-  return result;
+  return { title: values.get("title"), creation_date: values.get("creation_date") };
 }
 
 function buildEntries(
-  markdownModules: Record<string, () => Promise<unknown>>,
+  markdownModules: Record<string, () => Promise<string>>,
 ): ContentEntry[] {
   return Object.entries(markdownModules)
     .filter(([p]) => !p.endsWith("/index.md"))
     .map(([p, loader]) => ({
       slug: slugFromPath(p),
       title: slugFromPath(p),
-      loader: loader as () => Promise<string>,
+      loader,
     }))
     .sort((a, b) => a.title.localeCompare(b.title));
 }

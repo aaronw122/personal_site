@@ -9,27 +9,19 @@ import { Link } from "react-router-dom";
 import usePageTitle from "../hooks/usePageTitle";
 import "./Era.css";
 
-// Page-turn sound — played through the Web Audio API (a sound-effect path) rather
-// than an <audio> element, so iOS doesn't treat it as media: no "Now Playing" on
-// the lock screen and it won't pause your music. The audio session is marked
-// "ambient" so it mixes in as incidental noise.
 import turnSound from "../era-art/page-turn.mp3";
 let _audioCtx: AudioContext | null = null;
 let _turnBuffer: AudioBuffer | null = null;
 let _bufferLoading = false;
 function ensureTurnAudio() {
-  if (typeof window === "undefined") return;
   if (!_audioCtx) {
     const Ctx = window.AudioContext || (window as any).webkitAudioContext;
     if (!Ctx) return;
     _audioCtx = new Ctx();
     try {
-      // tell iOS this is ambient noise, not media — keeps it off the lock screen
       const session = (navigator as any).audioSession;
       if (session) session.type = "ambient";
-    } catch {
-      /* audioSession unsupported — Web Audio alone still avoids Now Playing */
-    }
+    } catch {}
   }
   if (!_turnBuffer && !_bufferLoading) {
     _bufferLoading = true;
@@ -50,24 +42,19 @@ function playPageTurn() {
     ensureTurnAudio();
     if (!_audioCtx) return;
     if (_audioCtx.state === "suspended") void _audioCtx.resume();
-    if (!_turnBuffer) return; // not decoded yet (rare: only the very first turn)
+    if (!_turnBuffer) return;
     const src = _audioCtx.createBufferSource();
     src.buffer = _turnBuffer;
     const gain = _audioCtx.createGain();
     gain.gain.value = 0.7;
     src.connect(gain).connect(_audioCtx.destination);
     src.start();
-  } catch {
-    /* audio not available — silently skip */
-  }
+  } catch {}
 }
 
-// Page-turn haptic — a single soft tap on each flip (Android: navigator.vibrate;
-// iOS Safari: web-haptics' hidden-switch trick). No-op where unsupported.
 import { WebHaptics } from "web-haptics";
 let _haptics: WebHaptics | null = null;
 function getHaptics(): WebHaptics | null {
-  if (typeof window === "undefined") return null;
   if (!_haptics) {
     try {
       _haptics = new WebHaptics();
@@ -80,19 +67,13 @@ function getHaptics(): WebHaptics | null {
 function playPageHaptic() {
   try {
     void getHaptics()?.trigger("soft");
-  } catch {
-    /* haptics not available — silently skip */
-  }
+  } catch {}
 }
 
-// device sketches stay as images (transparent, content-hashed)
 import quillDeviceImg from "../era-art/quill-device.png";
 import tigerDeviceImg from "../era-art/tiger-device.png";
-// notebook writing is real text now — rendered live from the .md in a handwriting font
 import rawMd from "@era-content/era/era devices 2.md?raw";
 
-/* Engraved corner flourish — drawn once, mirrored into all four corners.
-   Loosely inspired by the LIFE "Noble Note" cover. */
 function CoverFrame() {
   return (
     <svg className="era-cover-frame" viewBox="0 0 400 560" preserveAspectRatio="none" aria-hidden="true">
@@ -122,7 +103,6 @@ function CoverFrame() {
   );
 }
 
-// shared page content, authored once
 const COVER: ReactNode = (
   <>
     <div className="era-spine era-spine--left" aria-hidden="true" />
@@ -135,7 +115,6 @@ const COVER: ReactNode = (
   </>
 );
 
-// fake barcode — a fixed bar-width pattern so it renders identically every time
 const BARCODE_BARS = [
   2, 1, 1, 3, 1, 2, 1, 1, 2, 3, 1, 2, 1, 1, 3, 1, 1, 2, 2, 1, 3, 1, 1, 2, 1, 2,
   1, 3, 1, 1, 2, 1, 1, 3, 1, 2, 2, 1, 1, 2,
@@ -152,9 +131,6 @@ function Barcode() {
   );
 }
 
-// outside back cover — plain kraft like a LIFE Noble Note back: a crisp cloth
-// binding strip at the spine edge and a dark barcode (printed straight onto the
-// kraft) with the origin line beneath it.
 const BACK_COVER: ReactNode = (
   <div className="era-backcover">
     <div className="era-spine era-spine--right" aria-hidden="true" />
@@ -164,13 +140,11 @@ const BACK_COVER: ReactNode = (
     </div>
   </div>
 );
-// split the .md into intro / quill / tiger writing. Markdown blockquotes (the
-// "elevator pitch" lines) become emphasized callouts in the notebook.
 type Block = { quote: boolean; text: string };
 function blocks(section: string): Block[] {
   return section
-    .replace(/!\[\[[^\]]+\]\]/g, "") // drop image embeds
-    .split(/\n{2,}/) // blank line = block break
+    .replace(/!\[\[[^\]]+\]\]/g, "")
+    .split(/\n{2,}/)
     .map((raw) => raw.trim())
     .filter(Boolean)
     .map((raw) => {
@@ -187,8 +161,6 @@ const INTRO_BLOCKS = blocks(_quillSplit[0] || "");
 const QUILL_BLOCKS = blocks(_tigerSplit[0] || "");
 const TIGER_BLOCKS = blocks(_tigerSplit[1] || "");
 
-// the "elevator pitch" (the markdown blockquote) sits under the device sketch on
-// the left page as plain text; the body paragraphs fill the right page.
 const pitchOf = (bs: Block[]) => bs.find((b) => b.quote)?.text ?? "";
 const bodyOf = (bs: Block[]) => bs.filter((b) => !b.quote);
 const QUILL_PITCH = pitchOf(QUILL_BLOCKS);
@@ -196,16 +168,12 @@ const TIGER_PITCH = pitchOf(TIGER_BLOCKS);
 const QUILL_BODY = bodyOf(QUILL_BLOCKS);
 const TIGER_BODY = bodyOf(TIGER_BLOCKS);
 
-// shared auto-fit: each writing page measures the largest font size at which it
-// still fits, and EVERY page renders at the global minimum of those — so quill,
-// tiger and intro read at one consistent size (the longest page sets the size,
-// the shorter ones shrink to match) instead of each fitting independently.
 const FIT_MAX = 120;
 const FIT_MIN = 9;
 const fitStore = {
   sizes: new Map<number, number>(),
-  heights: new Map<number, number>(), // content height at the shared size, per page
-  box: 0, // inner height of the writing box (same for all shared pages)
+  heights: new Map<number, number>(),
+  box: 0,
   listeners: new Set<() => void>(),
   notify() {
     this.listeners.forEach((l) => l());
@@ -228,8 +196,6 @@ const fitStore = {
   min() {
     return this.sizes.size ? Math.min(...this.sizes.values()) : FIT_MAX;
   },
-  // top padding that vertically centers the TALLEST shared page (tiger); the
-  // shorter pages (quill) reuse it so their top lines up with tiger's
   topOffset() {
     if (!this.heights.size || !this.box) return 0;
     const maxH = Math.max(...this.heights.values());
@@ -242,7 +208,6 @@ const fitStore = {
 };
 let _fitId = 0;
 
-// renders the writing; the applied font size is the shared (consistent) fit
 function Writing({ items, independent = false }: { items: Block[]; independent?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -255,8 +220,6 @@ function Writing({ items, independent = false }: { items: Block[]; independent?:
     (cb) => fitStore.subscribe(cb),
     () => fitStore.topOffset(),
   );
-  // independent pages (the shorter intro) fit their own page; shared pages
-  // (quill/tiger) all render at the store min so they stay consistent
   const [own, setOwn] = useState(FIT_MAX);
   const applied = independent ? own : sharedMin;
   useLayoutEffect(() => {
@@ -264,9 +227,6 @@ function Writing({ items, independent = false }: { items: Block[]; independent?:
     if (!el) return;
     const id = idRef.current;
     const measure = () => {
-      // probe this page's own max-fit. The text is vertically centered, so we
-      // compare the inner content's natural height to the box (centering breaks
-      // scrollHeight on the box itself).
       const content = contentRef.current;
       if (!content) return;
       let size = FIT_MAX;
@@ -276,23 +236,15 @@ function Writing({ items, independent = false }: { items: Block[]; independent?:
         el.style.fontSize = size + "px";
       }
       if (independent) {
-        // fill our own page; ignore the shared store entirely
         setOwn(size);
         el.style.fontSize = size + "px";
       } else {
         fitStore.set(id, size);
-        // land on the shared min even if our value was unchanged (store.set may
-        // skip a re-render) so every shared page stays one size
         el.style.fontSize = fitStore.min() + "px";
       }
     };
     measure();
     window.addEventListener("resize", measure);
-    // re-measure once the handwriting font has actually loaded (metrics differ)
-    // re-measure once the handwriting font is actually loaded. load() targets
-    // Reenie Beanie specifically — fonts.ready can resolve before a lazily-used
-    // webfont finishes, leaving the text fitted to the taller fallback serif
-    // (which is what left empty space at the bottom of the longer pages).
     if (document.fonts?.load) {
       document.fonts.load("24px 'Reenie Beanie'").then(measure).catch(() => {});
     } else if (document.fonts?.ready) {
@@ -303,8 +255,6 @@ function Writing({ items, independent = false }: { items: Block[]; independent?:
       if (!independent) fitStore.remove(id);
     };
   }, [items, independent]);
-  // report content height at the applied size so the store can compute a top
-  // offset that centers the tallest shared page (tiger) and aligns quill to it
   useLayoutEffect(() => {
     if (independent) return;
     const el = ref.current;
@@ -331,7 +281,6 @@ function Writing({ items, independent = false }: { items: Block[]; independent?:
   );
 }
 
-// a device sketch with its elevator pitch as plain text underneath
 function DevicePage({ src, alt, pitch }: { src: string; alt: string; pitch: string }) {
   return (
     <div className="era-devpage">
@@ -349,7 +298,6 @@ const TIGER_WRITING = <Writing items={TIGER_BODY} />;
 
 type Leaf = { front: ReactNode; back: ReactNode; frontClass: string; backClass: string };
 
-// desktop: a bound book, two-page spreads
 const LEAVES: Leaf[] = [
   { front: COVER, back: null, frontClass: "era-cover", backClass: "era-inside-cover" },
   { front: INTRO, back: QUILL_DEVICE, frontClass: "era-page", backClass: "era-page" },
@@ -357,7 +305,6 @@ const LEAVES: Leaf[] = [
   { front: TIGER_WRITING, back: BACK_COVER, frontClass: "era-page", backClass: "era-cover" },
 ];
 
-// mobile: one page at a time, in reading order
 const MOBILE: { content: ReactNode; cover?: boolean }[] = [
   { content: COVER, cover: true },
   { content: INTRO },
@@ -371,7 +318,7 @@ const MOBILE: { content: ReactNode; cover?: boolean }[] = [
 function useIsMobile() {
   const query = "(max-width: 700px)";
   const [m, setM] = useState(
-    () => typeof window !== "undefined" && window.matchMedia(query).matches,
+    () => window.matchMedia(query).matches,
   );
   useEffect(() => {
     const mq = window.matchMedia(query);
@@ -383,7 +330,6 @@ function useIsMobile() {
 }
 
 function initialPage(maxPage: number): number {
-  if (typeof window === "undefined") return 0;
   const p = parseInt(new URLSearchParams(window.location.search).get("p") || "", 10);
   return Number.isFinite(p) ? Math.max(0, Math.min(maxPage, p)) : 0;
 }
@@ -391,16 +337,11 @@ function initialPage(maxPage: number): number {
 export default function Era() {
   usePageTitle("era");
   const isMobile = useIsMobile();
-  // desktop has one extra state past the last spread: the closed back cover
   const total = isMobile ? MOBILE.length : LEAVES.length + 1;
   const max = total - 1;
 
   const [page, setPage] = useState(() => initialPage(LEAVES.length));
-  // index of the leaf/page currently mid-flip — kept on top until its transition
-  // ends so the turning sheet never slips behind the destination page.
   const [turning, setTurning] = useState<number | null>(null);
-  // enable transitions only AFTER first paint, so the closed/centered layout
-  // appears instantly instead of animating in from the un-translated state.
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -408,15 +349,10 @@ export default function Era() {
     return () => cancelAnimationFrame(id);
   }, []);
 
-  // prime the haptics engine (mounts the hidden iOS switch) and decode the
-  // page-turn sound before the first turn
   useEffect(() => { getHaptics(); ensureTurnAudio(); }, []);
 
-  // clamp when the layout mode (and thus page count) changes
   useEffect(() => { setPage((p) => Math.min(p, max)); }, [max]);
 
-  // play the page-turn sound + a soft haptic whenever a flip begins (covers
-  // clicks, arrows, taps and swipes — they all set `turning`)
   useEffect(() => {
     if (turning !== null) {
       playPageTurn();
@@ -432,7 +368,6 @@ export default function Era() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [max]);
 
   const step = (dir: number) =>
@@ -456,7 +391,6 @@ export default function Era() {
     "aria-label": label,
   });
 
-  // swipe support on mobile
   let touchX = 0;
   const onTouchStart = (e: ReactTouchEvent) => { touchX = e.changedTouches[0].clientX; };
   const onTouchEnd = (e: ReactTouchEvent) => {
@@ -474,11 +408,7 @@ export default function Era() {
           {MOBILE.map((pg, i) => {
             const flipped = i < page;
             const z = turning === i ? 200 : flipped ? 100 + i : 100 + MOBILE.length - i;
-            // once a page has finished turning, hide it so no "left page" /
-            // spine line shows — mobile is strictly one page at a time
             const hidden = flipped && turning !== i;
-            // mobile turns one page at a time: fade the faces, not the 3D wrapper,
-            // so the rotating page keeps preserve-3d compositing during the flip.
             return (
               <div
                 key={i}

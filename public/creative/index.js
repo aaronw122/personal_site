@@ -1,7 +1,6 @@
 const input = document.querySelector("input")
 const canvas = document.getElementById("canvas")
 
-//canvas settings
 const ctx = canvas.getContext("2d");
 ctx.textBaseline = "top";
 ctx.textAlign = "center"
@@ -53,7 +52,6 @@ class letter {
   }
 
   set Intercepts({ a, b, c }) {
-    // (some help from claude here on quadratic refreshers :) )
     const d = b * b - 4 * a * c;
 
     if (d < 0) { this.xIntercepts = []; }
@@ -95,7 +93,6 @@ class letter {
 
   animation() {
     this.mover()
-    //will never be greater than, only equal
     if (this.y >= this.bottomEdge) {
       this.bounceCount += 1
       this.createParabola()

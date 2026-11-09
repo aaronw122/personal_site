@@ -1,4 +1,3 @@
-/* --- CSS reset --- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 img, picture, video, canvas, svg { display: block; max-width: 100%; }
 button, input, select, textarea { font: inherit; }
@@ -19,7 +18,6 @@ hr { border: none; border-top: 1px solid rgba(0, 0, 0, 0.15); margin: var(--divi
   font-display: swap;
 }
 
-/* Only used on /era-notebook; no preload so other pages never fetch it. */
 @font-face {
   font-family: "Reenie Beanie";
   src: url("/fonts/ReenieBeanie.woff2") format("woff2");
@@ -40,15 +38,13 @@ hr { border: none; border-top: 1px solid rgba(0, 0, 0, 0.15); margin: var(--divi
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
-  /* line spacing — body, prose and headings; fixed-grid components (notebook
-     cards, Era pages) and single-line labels keep literal values */
-  --leading-body: 1.6;     /* general UI text */
-  --leading-prose: 1.4;    /* long-form reading (.prose) */
-  --leading-heading: 1.25; /* h1–h6 */
-  --text-body: 1.075rem;   /* base text size; explicitly sized elements opt out */
-  --space-p: 1em;          /* gap between .prose paragraphs */
-  --divider-gap: 1rem;     /* space above and below every divider line */
-  --nutshell-hue: 202;     /* nutshell term color: hsl(hue 100% lightness) */
+  --leading-body: 1.6;
+  --leading-prose: 1.4;
+  --leading-heading: 1.25;
+  --text-body: 1.075rem;
+  --space-p: 1em;
+  --divider-gap: 1rem;
+  --nutshell-hue: 202;
   --nutshell-lightness: 35%;
 }
 
@@ -70,7 +66,6 @@ body {
   background: transparent;
 }
 
-/* heading hierarchy — inspired by joyceis.online */
 h1 { font-family: var(--font-serif); font-size: 2rem; font-weight: 400; margin: 1em 0 0.8em; }
 h2 { font-size: 1.3rem; font-weight: 600; margin: 1em 0 0.8em; }
 h3 { font-size: 1.15rem; font-weight: 550; margin: 0.8em 0 0.6em; }
@@ -88,27 +83,22 @@ h1, h2, h3, h4, h5, h6 { line-height: var(--leading-heading); }
 
 strong, b { font-weight: 600; }
 
-/* override typography plugin heading sizes inside prose */
 .prose h1 { font-family: var(--font-serif); font-size: 2rem; font-weight: 400; }
 .prose h2 { font-size: 1.3rem; font-weight: 600; }
 .prose h3 { font-size: 1.15rem; font-weight: 550; }
 .prose h4 { font-size: 1.1rem; font-weight: 500; }
 
-/* blockquote text — gray, not italic (Geist has no italic variant) */
 blockquote, blockquote p {
   font-style: normal !important;
   font-weight: 400 !important;
   color: rgba(0, 0, 0, 0.6) !important;
 }
 
-/* blockquote left border */
 .prose blockquote {
   border-left: 3px solid rgba(0, 0, 0, 0.2);
   padding-left: 1em;
 }
 
-/* Obsidian `> [!toggle]-` callouts: a Notion-style shaded block whose
-   summary line opens and closes it */
 .prose details.toggle-block {
   margin: 1em 0;
   padding: 0.7em 1em;
@@ -145,18 +135,14 @@ blockquote, blockquote p {
   margin-bottom: 0;
 }
 
-/* prose table borders; wide tables scroll inside the column instead of
-   widening the page */
 .prose table {
   border-collapse: collapse;
   display: block;
   max-width: 100%;
   overflow-x: auto;
-  overflow-wrap: normal; /* cells keep words whole; the table scrolls instead */
+  overflow-wrap: normal;
 }
 
-/* display equations are shrunk to fit (useFitDisplayMath); one that would get
-   too small to read scrolls inside the column instead of widening the page */
 .prose .katex-display {
   max-width: 100%;
   overflow-x: auto;
@@ -169,11 +155,9 @@ blockquote, blockquote p {
   padding: 0.5em 0.75em;
 }
 
-/* --- vanilla prose base (replaces @tailwindcss/typography foundation) --- */
 .prose {
   color: var(--color-fg-1);
   max-width: 65ch;
-  /* bare URLs and long inline code would otherwise widen the page on mobile */
   overflow-wrap: anywhere;
 }
 .prose a {
@@ -208,27 +192,23 @@ blockquote, blockquote p {
 .prose > :first-child { margin-top: 0; }
 .prose > :last-child { margin-bottom: 0; }
 
-/* prose-full: remove max-width constraint (replaces max-w-none) */
 .prose-full { max-width: none; }
 
-/* link color */
 a,
 a:visited {
   color: var(--color-fg-1);
   font-weight: 400;
 }
 
-/* notebook paper — cards; 23px ruled-line grid, independent of --leading-* */
 .notebook-card {
   --nb-header: 0px;
   position: relative;
   overflow: hidden;
   background: transparent;
   box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.08);
-  /* punch-through holes — site background shows through */
   -webkit-mask-image: radial-gradient(circle at 12px 11.5px, transparent 4px, white 4.5px);
   mask-image: radial-gradient(circle at 12px 11.5px, transparent 4px, white 4.5px);
-  -webkit-mask-size: 100% 23px; /* Must match HOLE_SPACING in TornEdge.tsx */
+  -webkit-mask-size: 100% 23px;
   mask-size: 100% 23px;
   -webkit-mask-position: 0 0;
   mask-position: 0 0;
@@ -236,16 +216,13 @@ a:visited {
   mask-repeat: repeat-y;
 }
 
-/* paper background — offset right so frill area is transparent */
 .notebook-card::before {
   content: "";
   position: absolute;
   inset: 0 0 0 24px;
   background-color: var(--color-paper);
   background-image:
-    /* optional header zone — set --nb-header on the card to enable */
     linear-gradient(to bottom, var(--color-paper) var(--nb-header), transparent var(--nb-header)),
-    /* ruled lines — 23px spacing */
     repeating-linear-gradient(
       to bottom,
       transparent,
@@ -258,7 +235,6 @@ a:visited {
   z-index: -1;
 }
 
-/* red margin line */
 .notebook-card::after {
   content: "";
   position: absolute;
@@ -271,7 +247,6 @@ a:visited {
   z-index: 1;
 }
 
-/* hide scrollbar utility */
 .hide-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -281,7 +256,6 @@ a:visited {
   display: none;
 }
 
-/* --- notebook card layout --- */
 .notebook-card-inner {
   display: flex;
   flex-direction: column;
@@ -292,7 +266,6 @@ a:visited {
   transform: translateY(-2px);
 }
 
-/* --- prose content wrapper --- */
 .prose-content {
   max-width: none;
 }
@@ -313,15 +286,6 @@ a:visited {
   color: var(--color-fg-1);
 }
 
-/* --- z-index stacking order ---
-   -1  BackgroundImage (fixed, behind everything)
-   -1  GenerativeSwirls (fixed canvas, behind everything)
-    0  Main content (default)
-    1  TornEdge red margin line (::after pseudo)
-   50  Lightbox overlay
---- */
-
-/* --- component: BackgroundImage --- */
 .background-image {
   position: fixed;
   top: -50vh;
@@ -335,7 +299,6 @@ a:visited {
   margin: 0;
 }
 
-/* --- component: TornEdge --- */
 .torn-edge-svg {
   position: absolute;
   left: 0;
@@ -346,7 +309,6 @@ a:visited {
   z-index: 2;
 }
 
-/* --- component: GenerativeSwirls --- */
 .generative-swirls {
   position: fixed;
   inset: 0;
@@ -354,7 +316,6 @@ a:visited {
   pointer-events: none;
 }
 
-/* --- component: Lightbox --- */
 .lightbox-overlay {
   position: fixed;
   inset: 0;
@@ -384,7 +345,6 @@ a:visited {
   border-radius: var(--radius-md);
 }
 
-/* --- component: SeeMoreCard --- */
 .see-more-card {
   display: flex;
   align-items: center;
@@ -405,7 +365,6 @@ a:visited {
   line-height: 1.75rem;
 }
 
-/* --- component: Footer --- */
 .site-footer {
   text-align: center;
   font-size: 0.75rem;
@@ -436,7 +395,6 @@ a:visited {
   color: #404040;
 }
 
-/* --- component: Navbar --- */
 .navbar {
   display: flex;
   flex-direction: row;
@@ -472,7 +430,6 @@ a:visited {
   }
 }
 
-/* --- component: Layout --- */
 .layout-shell {
   display: flex;
   flex-direction: column;
@@ -490,7 +447,6 @@ a:visited {
   text-transform: lowercase;
 }
 
-/* --- component: HeroBio --- */
 .hero-header {
   margin-bottom: 1.5rem;
 }
@@ -525,8 +481,6 @@ a:visited {
 .hero-photo {
   width: 100%;
   max-width: 200px;
-  /* width/height attrs give the aspect ratio for CLS; don't let the
-     height attr win over the CSS width. */
   height: auto;
   margin-left: auto;
   margin-right: auto;
@@ -547,7 +501,6 @@ a:visited {
   }
 }
 
-/* --- component: ProjectCard --- */
 .project-card {
   width: 320px;
   min-width: 320px;
@@ -573,9 +526,6 @@ a:visited {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
-/* Split-target cards (ProjectCard with blogUrl): the overlay link covers the
-   card (-> story); the label link sits above it (-> live site). Margin instead
-   of padding so only the label text is clickable, not the gap above it. */
 .project-card-overlay {
   position: absolute;
   inset: 0;
@@ -595,7 +545,6 @@ a:visited {
   opacity: 0.5;
 }
 
-/* --- component: ProjectShowcase --- */
 .showcase-section {
   margin-top: 2.5rem;
 }
@@ -636,7 +585,6 @@ a:visited {
   }
 }
 
-/* --- component: About --- */
 .about-prose {
   margin-top: 1rem;
 }
@@ -713,7 +661,6 @@ a:visited {
   text-underline-offset: 2px;
 }
 
-/* --- component: Experience --- */
 .exp-entry {
   padding-top: var(--divider-gap);
   padding-bottom: var(--divider-gap);
@@ -741,7 +688,6 @@ a:visited {
   margin-top: 2rem;
 }
 
-/* --- component: ContentArticle --- */
 .article-title {
   font-family: var(--font-primary);
   font-size: 1.5rem;
@@ -753,8 +699,6 @@ a:visited {
   margin-top: -0.5rem;
   margin-bottom: 1rem;
 }
-/* muted "subscribe via rss" line at the bottom of /writing, just above the
-   footer rule */
 .rss-link {
   font-size: 0.875rem;
   font-weight: 400;

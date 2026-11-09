@@ -11,8 +11,6 @@ import ArticleMarkdown from "../components/ArticleMarkdown";
 interface Props {
   section: "writing" | "lists";
   entries: ContentEntry[];
-  // When set, serve this fixed slug instead of reading it from the URL param.
-  // Used for standalone top-level routes (e.g. /haystack-errw-proof).
   fixedSlug?: string;
 }
 

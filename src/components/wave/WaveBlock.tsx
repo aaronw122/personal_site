@@ -2,7 +2,6 @@ import { useRef } from "react";
 import "./wave.css";
 import useLazyMount from "../../hooks/useLazyMount";
 
-// Reserve the canvas space before the expensive expression compilation and drawing run.
 function estimatedHeight(lang: "wave" | "pulse" | "slice", source: string): number {
   if (lang === "pulse") return 450;
   if (lang === "slice") return 710;
@@ -51,8 +50,6 @@ export default function WaveBlock({ lang, source }: { lang: "wave" | "pulse" | "
 
   useLazyMount(
     container,
-    // The simulator is fetched only when a block nears the viewport, so its code
-    // stays out of the chunk the article text waits on.
     async (element) => {
       const { mountWaveBlock } = await import("./wavePlot.js");
       const cleanup = mountWaveBlock(lang, source, element);

@@ -7,7 +7,6 @@ export default function UwbPulse() {
 
   useLazyMount(
     container,
-    // Fetched only when the block nears the viewport, keeping it out of the article chunk.
     async (element) => {
       const { mountUwbPulse } = await import("./uwbPulseSim.js");
       element.style.aspectRatio = "";
