@@ -26,9 +26,12 @@ export default function HeroBio() {
 
         <div className="hero-photo-wrapper">
           <img
-            src="/images/Platform_9_34_cropped.webp"
+            src="/images/hero-400.webp"
+            srcSet="/images/hero-200.webp 200w, /images/hero-400.webp 400w"
+            sizes="200px"
             width={400}
             height={470}
+            fetchPriority="high"
             alt="photo of aaron"
             className="hero-photo"
             tabIndex={0}
