@@ -1233,6 +1233,8 @@ export class StageEngine {
   private readonly trackAudio: HTMLAudioElement[] = [];
   private tracksPreparation: Promise<void> | null = null;
   private rejectTracksPreparation: ((reason: Error) => void) | null = null;
+  private preparationVersion = 0;
+  private preparationTimeout: number | undefined;
   private audioElement: HTMLAudioElement | null = null;
   private audioGeneration = 0;
 
@@ -2029,6 +2031,14 @@ export class StageEngine {
     }
     this.tracksPreparation = new Promise<void>((resolve, reject) => {
       this.rejectTracksPreparation = reject;
+      const version = ++this.preparationVersion;
+      this.preparationTimeout = window.setTimeout(() => {
+        if (version === this.preparationVersion) {
+          this.releasePreparedTracks(
+            new Error("Bob's audio took too long to load"),
+          );
+        }
+      }, 45_000);
       const ready = sources.map(
         (source, index) =>
           new Promise<void>((trackReady, trackFailed) => {
@@ -2083,14 +2093,15 @@ export class StageEngine {
       );
       void Promise.all(ready).then(
         () => {
-          if (this.disposed) return;
+          if (this.disposed || version !== this.preparationVersion) return;
+          clearTimeout(this.preparationTimeout);
+          this.preparationTimeout = undefined;
           this.rejectTracksPreparation = null;
           resolve();
         },
         (error) => {
-          this.rejectTracksPreparation = null;
-          this.releasePreparedTracks();
-          reject(error);
+          if (version === this.preparationVersion)
+            this.releasePreparedTracks(error);
         },
       );
     });
@@ -2218,6 +2229,9 @@ export class StageEngine {
   }
 
   private releasePreparedTracks(reason?: Error) {
+    this.preparationVersion++;
+    clearTimeout(this.preparationTimeout);
+    this.preparationTimeout = undefined;
     if (reason && this.rejectTracksPreparation) {
       const reject = this.rejectTracksPreparation;
       this.rejectTracksPreparation = null;
