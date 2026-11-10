@@ -38,6 +38,3 @@ __pycache__/
 test-output/
 tsconfig.tsbuildinfo
 tools/bob3d/*
-!tools/bob3d/local_audio/
-tools/bob3d/local_audio/*
-!tools/bob3d/local_audio/README.md
