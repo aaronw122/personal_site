@@ -17,7 +17,7 @@ def git_lines(*args):
 
 
 def git_show(ref):
-    r = subprocess.run(["git", "show", ref], capture_output=True, text=True, cwd=ROOT)
+    r = subprocess.run(["git", "show", ref], capture_output=True, text=True, errors="replace", cwd=ROOT)
     return r.stdout if r.returncode == 0 else ""
 
 
