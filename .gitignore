@@ -35,3 +35,6 @@ notes/
 docs/
 
 __pycache__/
+test-output/
+tsconfig.tsbuildinfo
+tools/bob3d/*

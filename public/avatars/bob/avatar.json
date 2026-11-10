@@ -1,0 +1,40 @@
+{
+  "id": "bob",
+  "name": "Bob Weir",
+  "guitar": {
+    "src": "/avatars/props/strat-sunburst.glb",
+    "position": [
+      0,
+      0,
+      0
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ]
+  },
+  "tracks": [
+    {
+      "title": "The Music Never Stopped",
+      "artist": "Grateful Dead",
+      "show": "1978-02-03",
+      "archive": "https://archive.org/details/gd78-02-03.aud.warner.19465.sbeok.shnf/gd78-02-03audd1t12.mp3",
+      "src": "/avatars/bob/audio/music-never-stopped.mp3"
+    },
+    {
+      "title": "Dear Prudence",
+      "artist": "Dead & Company",
+      "show": "2021-09-10",
+      "archive": "https://archive.org/details/deadco2021-09-10.DTEEnergyMusicCenterPineKnobMI/DeadCo2021-09-10t06.mp3",
+      "src": "/avatars/bob/audio/dear-prudence.mp3"
+    },
+    {
+      "title": "El Paso",
+      "artist": "Grateful Dead",
+      "show": "1972-08-27",
+      "archive": "https://archive.org/details/gd1972-08-27.sbd.serafin.8045.sbefail.shnf/gd72-08-27d3t03.mp3",
+      "src": "/avatars/bob/audio/el-paso.mp3"
+    }
+  ]
+}
