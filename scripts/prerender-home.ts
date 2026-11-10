@@ -23,10 +23,17 @@ const { render } = await import(
   pathToFileURL(path.join(ssrDir, "entry-server.js")).href
 );
 
+const entryScriptTag = '<script type="module" crossorigin src=';
+if (!template.includes(entryScriptTag)) {
+  throw new Error(`[prerender-home] entry <script> not found in ${indexPath}`);
+}
+
 fs.writeFileSync(path.join(distDir, "spa.html"), template);
 fs.writeFileSync(
   indexPath,
-  template.replace(rootTag, () => `<div id="root">${render("/")}</div>`),
+  template
+    .replace(entryScriptTag, '<script type="module" fetchpriority="low" crossorigin src=')
+    .replace(rootTag, () => `<div id="root">${render("/")}</div>`),
 );
 fs.rmSync(ssrDir, { recursive: true, force: true });
 
