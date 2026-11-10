@@ -11,8 +11,9 @@
 # cloudflared reaches it at localhost:80 (the tunnel's dashboard ingress is
 # awill.co -> http://localhost:80, shared by both replicas).
 #
-# Deploy from the mac (build context is shipped to the Hetzner daemon):
-#   docker --context hetzner compose -f docker-compose.hetzner.yml --env-file .env.hetzner up -d --build
+# Deploy from the mac with ./deploy.sh: site files are rsynced into
+# /srv/awill/releases/<release> and served via the /srv/awill/current symlink;
+# the image only carries nginx.conf.
 # Token lives in .env.hetzner (gitignored), never in this file or git.
 
 services:
@@ -22,6 +23,8 @@ services:
     restart: unless-stopped
     ports:
       - "80:80" # host:container — host-network cloudflared reaches this at localhost:80
+    volumes:
+      - /srv/awill:/srv/awill:ro
 
   # Second replica of awill.co's tunnel. Same token as the homeserver = redundant
   # connection. Host networking so the dashboard ingress (awill.co -> localhost:80)

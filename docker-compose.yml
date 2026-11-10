@@ -4,4 +4,6 @@ services:
     image: personal_site:latest
     ports:
       - "80:80" # host:container
+    volumes:
+      - /srv/awill:/srv/awill:ro
     restart: unless-stopped
