@@ -9,30 +9,35 @@ const WRITING = `${VAULT}/published/writing`;
 const LISTS = `${VAULT}/published/lists`;
 const ERA = `${VAULT}/networking/companies`;
 
-export default defineConfig({
+export default defineConfig(({ isSsrBuild }) => ({
   base: "/",
   plugins: [
     react(),
-    syncWritingImages({
-      sourceDirs: [WRITING, LISTS],
-      sourceFiles: [`${ERA}/era/era devices 2.md`],
-      attachmentsDirs: [`${VAULT}/Code/Images 1`],
-      destDir: "public/writing-images",
-    }),
-    ogPrerender({
-      siteUrl: "https://awill.co",
-      sections: [
-        { urlPrefix: "writing", dir: WRITING },
-        { urlPrefix: "lists", dir: LISTS },
-      ],
-      fixed: [
-        { route: "haystack-errw-proof", dir: WRITING, slug: "haystack-errw-proof" },
-        { route: "oboe", dir: WRITING, slug: "most inneficient way to find needle in a haystack" },
-        { route: "uwb-pt1", dir: WRITING, slug: "ultra-wideband pt. 1 - intuition" },
-      ],
-    }),
-    rssFeed({ siteUrl: "https://awill.co", urlPrefix: "writing", dir: WRITING }),
+    !isSsrBuild && [
+      syncWritingImages({
+        sourceDirs: [WRITING, LISTS],
+        sourceFiles: [`${ERA}/era/era devices 2.md`],
+        attachmentsDirs: [`${VAULT}/Code/Images 1`],
+        destDir: "public/writing-images",
+      }),
+      ogPrerender({
+        siteUrl: "https://awill.co",
+        sections: [
+          { urlPrefix: "writing", dir: WRITING },
+          { urlPrefix: "lists", dir: LISTS },
+        ],
+        fixed: [
+          { route: "haystack-errw-proof", dir: WRITING, slug: "haystack-errw-proof" },
+          { route: "oboe", dir: WRITING, slug: "most inneficient way to find needle in a haystack" },
+          { route: "uwb-pt1", dir: WRITING, slug: "ultra-wideband pt. 1 - intuition" },
+        ],
+      }),
+      rssFeed({ siteUrl: "https://awill.co", urlPrefix: "writing", dir: WRITING }),
+    ],
   ],
+  define: {
+    __BUILD_YEAR__: JSON.stringify(new Date().getFullYear()),
+  },
   resolve: {
     alias: {
       "@writing": WRITING,
@@ -49,4 +54,4 @@ export default defineConfig({
       allow: [".", VAULT],
     },
   },
-});
+}));

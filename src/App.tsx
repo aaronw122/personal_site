@@ -2,10 +2,7 @@ import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
-import About from "./pages/About";
-import Experience from "./pages/Experience";
 import NotFound from "./pages/NotFound";
-import Rick from "./pages/Rick";
 import { getWritingEntries, getListsEntries, loadEntry } from "./lib/content";
 import useNavHaptics from "./hooks/useNavHaptics";
 
@@ -13,6 +10,9 @@ const ContentIndex = lazy(() => import("./pages/ContentIndex"));
 const ContentArticle = lazy(() => import("./pages/ContentArticle"));
 const Era = lazy(() => import("./pages/Era"));
 const EraDevices = lazy(() => import("./pages/EraDevices"));
+const About = lazy(() => import("./pages/About"));
+const Experience = lazy(() => import("./pages/Experience"));
+const Rick = lazy(() => import("./pages/Rick"));
 const SpacingPanel = import.meta.env.DEV
   ? lazy(() => import("./components/SpacingPanel"))
   : null;
@@ -26,7 +26,7 @@ const FIXED_ARTICLES = [
   { path: "/uwb-pt1", slug: "ultra-wideband pt. 1 - intuition" },
 ];
 
-function preloadInitialArticle() {
+export function preloadInitialArticle() {
   const path = window.location.pathname.replace(/\/$/, "");
   const fixed = FIXED_ARTICLES.find((a) => a.path === path);
   const match = path.match(/^\/(writing|lists)\/([^/]+)$/);
@@ -35,7 +35,6 @@ function preloadInitialArticle() {
     : match && loadEntry(match[1] === "writing" ? writingEntries : listsEntries, match[2]);
   load?.catch(() => {});
 }
-preloadInitialArticle();
 
 const loadWritingIndex = () =>
   import("@writing/index.md?raw").then((m) => m.default);
@@ -60,7 +59,14 @@ export default function App() {
             </Suspense>
           }
         />
-        <Route path="/rick" element={<Rick />} />
+        <Route
+          path="/rick"
+          element={
+            <Suspense fallback={null}>
+              <Rick />
+            </Suspense>
+          }
+        />
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
           <Route path="/era" element={<EraDevices />} />
