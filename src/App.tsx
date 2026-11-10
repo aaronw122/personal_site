@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Layout from "./components/Layout";
+import AvatarStage from "./components/AvatarStage";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import { getWritingEntries, getListsEntries, loadEntry } from "./lib/content";
@@ -16,6 +17,8 @@ const Rick = lazy(() => import("./pages/Rick"));
 const SpacingPanel = import.meta.env.DEV
   ? lazy(() => import("./components/SpacingPanel"))
   : null;
+const StageDemo = import.meta.env.DEV ? lazy(() => import("./pages/StageDemo")) : null;
+const PeekSpriteRender = import.meta.env.DEV ? lazy(() => import("./pages/PeekSpriteRender")) : null;
 
 const writingEntries = getWritingEntries();
 const listsEntries = getListsEntries();
@@ -43,6 +46,8 @@ const loadListsIndex = () =>
 
 export default function App() {
   useNavHaptics();
+  const { pathname } = useLocation();
+  const demo = import.meta.env.DEV && pathname === "/stage";
   return (
     <>
       {SpacingPanel && (
@@ -67,11 +72,13 @@ export default function App() {
             </Suspense>
           }
         />
+        {PeekSpriteRender && <Route path="/peek-sprite-render" element={<PeekSpriteRender />} />}
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
           <Route path="/era" element={<EraDevices />} />
           <Route path="/about" element={<About />} />
           <Route path="/experience" element={<Experience />} />
+          {StageDemo && <Route path="/stage" element={<StageDemo />} />}
           <Route
             path="/writing"
             element={
@@ -112,6 +119,7 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
+      <AvatarStage demo={demo} />
     </>
   );
 }

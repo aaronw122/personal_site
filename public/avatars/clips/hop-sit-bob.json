@@ -1,0 +1,12 @@
+{
+  "pullOut": 0.4666666666666667,
+  "pushStart": 0.6,
+  "takeoff": 0.8444444444444444,
+  "fallHoldStart": 0.9333333333333333,
+  "fallHoldEnd": 1.1111111111111112,
+  "contact": 1.1777777777777776,
+  "turnStart": 1.6944444444444444,
+  "turnEnd": 2.1277777777777778,
+  "settled": 2.361111111111111,
+  "toeHeightAtContact": -0.013
+}
