@@ -34,6 +34,7 @@ hr { border: none; border-top: 1px solid rgba(0, 0, 0, 0.15); margin: var(--divi
   --color-accent: rgb(75, 189, 255);
   --color-paper: #faf6f0;
   --color-surface: #f0ebe4;
+  --color-page: #e8e3d6;
   --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -54,7 +55,6 @@ html {
   box-sizing: border-box;
   position: relative;
   min-height: 100%;
-  background-color: var(--color-surface);
   overscroll-behavior: auto;
 }
 
@@ -63,7 +63,7 @@ body {
   font-size: var(--text-body);
   line-height: var(--leading-body);
   margin: 0;
-  background: transparent;
+  background-color: var(--color-page);
 }
 
 h1 { font-family: var(--font-serif); font-size: 2rem; font-weight: 400; margin: 1em 0 0.8em; }
