@@ -299,6 +299,21 @@ a:visited {
   margin: 0;
 }
 
+@media (pointer: coarse) {
+  .background-image {
+    --bg-fade: 72px;
+    --bg-mask: linear-gradient(
+      to bottom,
+      transparent calc(50vh + env(safe-area-inset-top)),
+      #000 calc(50vh + env(safe-area-inset-top) + var(--bg-fade)),
+      #000 calc(50vh + 100svh - var(--bg-fade)),
+      transparent calc(50vh + 100svh)
+    );
+    -webkit-mask-image: var(--bg-mask);
+    mask-image: var(--bg-mask);
+  }
+}
+
 .torn-edge-svg {
   position: absolute;
   left: 0;
