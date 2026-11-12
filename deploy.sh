@@ -21,38 +21,56 @@ purge_edge_cache() {
   fi
 }
 
-publish_release() {
+stage_release() {
   local host="$1"
   local link_dest=()
-  ssh "$host" "[ -w $SITE_ROOT ] || sudo install -d -o \"\$(id -un)\" $SITE_ROOT; mkdir -p $SITE_ROOT/releases" || return 1
+  ssh "$host" "[ -w $SITE_ROOT ] || sudo install -d -o \"\$(id -un)\" $SITE_ROOT; mkdir -p $SITE_ROOT/releases $SITE_ROOT/assets" || return 1
+  rsync -rlc dist/assets/ "$host:$SITE_ROOT/assets/" || return 1
   if ssh "$host" "test -d $SITE_ROOT/current/"; then
     link_dest=(--link-dest="$SITE_ROOT/current/")
   fi
   rsync -rlc --delete --stats ${link_dest[@]+"${link_dest[@]}"} dist/ "$host:$SITE_ROOT/releases/$RELEASE/" \
     | grep -E '^(Number of regular files transferred|Total transferred file size)' || return 1
+  echo "→ $host staged release $RELEASE"
+}
+
+activate_release() {
+  local host="$1"
   ssh "$host" "cd $SITE_ROOT && ln -sfn releases/$RELEASE current.next && mv -Tf current.next current \
-    && ls -1d releases/* | sort | head -n -$KEEP_RELEASES | xargs -r rm -rf" || return 1
+    && ls -1d releases/* | sort | head -n -$KEEP_RELEASES | xargs -r rm -rf \
+    && cd assets && for f in *; do ls ../releases/*/assets/\"\$f\" >/dev/null 2>&1 || rm -f -- \"\$f\"; done" || return 1
   echo "→ $host now serving release $RELEASE"
 }
+
+HOME_COMPOSE=(docker --context home compose)
+HETZNER_COMPOSE=(docker --context hetzner compose -f docker-compose.hetzner.yml --env-file .env.hetzner)
 
 echo "→ Building React app..."
 bun run build
 echo "→ Done. Output in dist/"
 
-echo "→ [primary] Publishing to homeserver"
-publish_release homeserver
-docker --context home compose up -d --build --remove-orphans
-docker --context home compose ps
-purge_edge_cache
-
-echo "→ [backup] Publishing to Hetzner"
-if publish_release root@hetzner \
-  && docker --context hetzner compose -f docker-compose.hetzner.yml --env-file .env.hetzner up -d --build --remove-orphans; then
-  docker --context hetzner compose -f docker-compose.hetzner.yml --env-file .env.hetzner ps
-else
-  echo "⚠️  Hetzner backup deploy failed (box down?). Primary is live; re-run deploy.sh to resync the backup."
+echo "→ Staging on both replicas before switching either"
+stage_release homeserver
+hetzner_ok=1
+if ! stage_release root@hetzner; then
+  hetzner_ok=0
+  echo "⚠️  Hetzner staging failed (box down?). Deploying primary only; re-run deploy.sh to resync the backup."
 fi
+
+echo "→ Activating"
+activate_release homeserver
+"${HOME_COMPOSE[@]}" up -d --build --remove-orphans
+"${HOME_COMPOSE[@]}" ps
+if [ "$hetzner_ok" = 1 ]; then
+  if activate_release root@hetzner && "${HETZNER_COMPOSE[@]}" up -d --build --remove-orphans; then
+    "${HETZNER_COMPOSE[@]}" ps
+  else
+    hetzner_ok=0
+    echo "⚠️  Hetzner activation failed. Primary is live; re-run deploy.sh to resync the backup."
+  fi
+fi
+
 purge_edge_cache
 
-echo "→ Done. Both replicas updated."
+if [ "$hetzner_ok" = 1 ]; then echo "→ Done. Both replicas updated."; else echo "→ Done. Primary only."; fi
 exit "$purge_failed"
