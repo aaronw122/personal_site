@@ -9,6 +9,7 @@ import rehypeRaw from "rehype-raw";
 import Lightbox from "./Lightbox";
 import MarkdownLink from "./MarkdownLink";
 import Nutshell from "./Nutshell";
+import MermaidBlock from "./MermaidBlock";
 import UwbPulse from "./UwbPulse";
 import WaveBlock from "./wave/WaveBlock";
 import { processMarkdown } from "../lib/content";
@@ -83,6 +84,7 @@ const Pre: Components["pre"] = ({ node, children, ...rest }) => {
     .find((c) => c.startsWith("language-"))
     ?.slice("language-".length);
   if (code && lang === "uwb-pulse") return <UwbPulse />;
+  if (code && lang === "mermaid") return <MermaidBlock source={hastText(code).replace(/\n$/, "")} />;
   const waveLang = WAVE_LANGS.find((l) => l === lang);
   if (code && waveLang) {
     return <WaveBlock lang={waveLang} source={hastText(code).replace(/\n$/, "")} />;
