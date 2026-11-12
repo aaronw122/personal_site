@@ -27,6 +27,7 @@
   "dependencies": {
     "highlight.js": "^11.11.1",
     "katex": "^0.17.0",
+    "mermaid": "^12.3.0",
     "p5": "^2.2.3",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",

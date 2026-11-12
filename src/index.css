@@ -185,6 +185,14 @@ blockquote, blockquote p {
   border-radius: 0;
   font-size: 0.8em;
 }
+.mermaid-block {
+  margin: 1em 0;
+  text-align: center;
+}
+.mermaid-block svg {
+  max-width: 100%;
+  height: auto;
+}
 .prose img {
   max-width: 100%;
   height: auto;
