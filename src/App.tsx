@@ -13,6 +13,7 @@ const Era = lazy(() => import("./pages/Era"));
 const EraDevices = lazy(() => import("./pages/EraDevices"));
 const About = lazy(() => import("./pages/About"));
 const Experience = lazy(() => import("./pages/Experience"));
+const Podcast = lazy(() => import("./pages/Podcast"));
 const Rick = lazy(() => import("./pages/Rick"));
 const SpacingPanel = import.meta.env.DEV
   ? lazy(() => import("./components/SpacingPanel"))
@@ -78,6 +79,7 @@ export default function App() {
           <Route path="/era" element={<EraDevices />} />
           <Route path="/about" element={<About />} />
           <Route path="/experience" element={<Experience />} />
+          <Route path="/podcast" element={<Podcast />} />
           {StageDemo && <Route path="/stage" element={<StageDemo />} />}
           <Route
             path="/writing"
