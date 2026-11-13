@@ -18,15 +18,23 @@ interface FixedRoute {
   slug: string;
 }
 
+interface StaticPage {
+  route: string;
+  title: string;
+  description: string;
+  image: string;
+}
+
 interface Options {
   sections: Section[];
   fixed?: FixedRoute[];
+  pages?: StaticPage[];
   siteUrl: string;
 }
 
 function buildHtml(
   template: string,
-  meta: { title: string; description: string; url: string },
+  meta: { title: string; description: string; url: string; image?: string },
 ): string {
   const title = htmlEscape(meta.title);
   const desc = htmlEscape(meta.description);
@@ -54,6 +62,13 @@ function buildHtml(
       `<meta property="og:url" content="${url}" />`,
     );
 
+  if (meta.image) {
+    html = html.replace(
+      /<meta property="og:image"[^>]*>/,
+      `<meta property="og:image" content="${htmlEscape(meta.image)}" />`,
+    );
+  }
+
   html = html.replace(
     /(<meta property="og:url"[^>]*>)/,
     `$1\n    <meta name="twitter:card" content="summary_large_image" />` +
@@ -73,6 +88,12 @@ export function ogPrerender(opts: Options): Plugin {
       if (!fs.existsSync(templatePath)) return;
       const template = fs.readFileSync(templatePath, "utf8");
 
+      const write = (relPath: string, meta: Parameters<typeof buildHtml>[1]) => {
+        const outDir = path.join(distDir, relPath);
+        fs.mkdirSync(outDir, { recursive: true });
+        fs.writeFileSync(path.join(outDir, "index.html"), buildHtml(template, meta));
+      };
+
       const emit = (relPath: string, sourceFile: string, url: string) => {
         const raw = fs.readFileSync(sourceFile, "utf8");
         const fm = extractFrontmatter(raw);
@@ -82,12 +103,7 @@ export function ogPrerender(opts: Options): Plugin {
           raw,
           "aspiring renaissance man. building at fractal.",
         );
-        const outDir = path.join(distDir, relPath);
-        fs.mkdirSync(outDir, { recursive: true });
-        fs.writeFileSync(
-          path.join(outDir, "index.html"),
-          buildHtml(template, { title, description, url }),
-        );
+        write(relPath, { title, description, url });
       };
 
       let count = 0;
@@ -116,6 +132,16 @@ export function ogPrerender(opts: Options): Plugin {
         const sourceFile = path.join(fixed.dir, `${fixed.slug}.md`);
         if (!fs.existsSync(sourceFile)) continue;
         emit(fixed.route, sourceFile, `${opts.siteUrl}/${fixed.route}`);
+        count++;
+      }
+
+      for (const page of opts.pages ?? []) {
+        write(page.route, {
+          title: page.title,
+          description: page.description,
+          url: `${opts.siteUrl}/${page.route}`,
+          image: `${opts.siteUrl}${page.image}`,
+        });
         count++;
       }
 
