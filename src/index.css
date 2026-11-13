@@ -746,7 +746,8 @@ a:visited {
   gap: 0.5rem;
   margin-top: 1rem;
 }
-.podcast-link {
+.podcast-link,
+.podcast-link:visited {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -801,6 +802,8 @@ a:visited {
 }
 .podcast-section-heading {
   margin: 1rem 0 0;
+  font-size: 1.1rem;
+  font-weight: 500;
   padding-top: 1.25rem;
   border-top: 1px dotted rgba(0, 0, 0, 0.2);
 }

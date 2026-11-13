@@ -130,7 +130,7 @@ export default function Podcast() {
 
       <EpisodeRow episode={latest} featured />
 
-      {older.length > 0 && <h4 className="podcast-section-heading">previous episodes</h4>}
+      {older.length > 0 && <h3 className="podcast-section-heading">previous episodes</h3>}
       {older.map((episode) => (
         <EpisodeRow key={episode.slug} episode={episode} featured={false} />
       ))}
