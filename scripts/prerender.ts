@@ -77,25 +77,27 @@ for (const fixed of FIXED_ARTICLES) {
   pages.push({ file: path.join(distDir, fixed.path, "index.html"), url: fixed.path, css: articleCss });
 }
 
+const readCss = (file: string) => fs.readFileSync(path.join(distDir, file), "utf8");
+
 for (const page of pages) {
   const shell = fs.readFileSync(page.file, "utf8");
-  if (!shell.includes(rootTag)) {
-    throw new Error(`[prerender] ${rootTag} not found in ${page.file}`);
+  if (!shell.includes(rootTag) || !stylesheetTag.test(shell)) {
+    throw new Error(`[prerender] ${rootTag} or stylesheet <link> not found in ${page.file}`);
   }
   const markup = await render(page.url);
-  const styles = [
-    ...page.css,
+  const inlined = [...new Set(page.css)].filter((file) => `/${file}` !== stylesheet[1]);
+  const linked = [
     ...(markup.includes('class="katex') ? mathCss : []),
     ...(markup.includes('class="hljs') ? highlightCss : []),
   ];
-  const links = [...new Set(styles)]
-    .filter((file) => !shell.includes(`href="/${file}"`))
+  const styles = `<style>${css}${inlined.map(readCss).join("")}</style>`;
+  const links = [...new Set(linked)]
     .map((file) => `<link rel="stylesheet" crossorigin href="/${file}">`)
     .join("");
   fs.writeFileSync(
     page.file,
     shell
-      .replace("</head>", `${links}</head>`)
+      .replace(stylesheetTag, () => styles + links)
       .replace(rootTag, () => `<div id="root">${markup}</div>`),
   );
 }
