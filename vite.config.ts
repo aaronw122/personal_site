@@ -51,6 +51,7 @@ export default defineConfig(({ isSsrBuild }) => ({
   },
   build: {
     outDir: "dist",
+    manifest: !isSsrBuild,
   },
   server: {
     port: 4200,

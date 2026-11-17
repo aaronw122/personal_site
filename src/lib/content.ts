@@ -1,5 +1,4 @@
 import { headingSlug, nutshellsToHtml } from "./nutshell";
-import { loadArticlePlugins } from "./articlePlugins";
 
 const writingModules = import.meta.glob<string>("@writing/**/*.md", {
   query: "?raw",
@@ -79,27 +78,40 @@ export function getListsEntries(): ContentEntry[] {
   return buildEntries(listsModules);
 }
 
-type LoadedEntry = { title: string; date: string | null; content: string };
+export type LoadedEntry = { title: string; date: string | null; content: string };
 
-const entryLoads = new Map<string, Promise<LoadedEntry | null>>();
+const entryLoads = new Map<ContentEntry, Promise<LoadedEntry>>();
+const loadedEntries = new Map<ContentEntry, LoadedEntry>();
+
+function findEntry(entries: ContentEntry[], slug: string): ContentEntry | undefined {
+  let decoded: string;
+  try {
+    decoded = decodeURIComponent(slug);
+  } catch {
+    return undefined;
+  }
+  return entries.find((e) => e.slug === decoded);
+}
+
+export function peekEntry(entries: ContentEntry[], slug: string): LoadedEntry | null {
+  const entry = findEntry(entries, slug);
+  return (entry && loadedEntries.get(entry)) ?? null;
+}
 
 export function loadEntry(
   entries: ContentEntry[],
   slug: string,
 ): Promise<LoadedEntry | null> {
-  let decoded: string;
-  try {
-    decoded = decodeURIComponent(slug);
-  } catch {
-    return Promise.resolve(null);
-  }
-  const entry = entries.find((e) => e.slug === decoded);
+  const entry = findEntry(entries, slug);
   if (!entry) return Promise.resolve(null);
-  let load = entryLoads.get(entry.slug);
+  let load = entryLoads.get(entry);
   if (!load) {
     load = fetchEntry(entry);
-    entryLoads.set(entry.slug, load);
-    load.catch(() => entryLoads.delete(entry.slug));
+    entryLoads.set(entry, load);
+    load.then(
+      (loaded) => loadedEntries.set(entry, loaded),
+      () => entryLoads.delete(entry),
+    );
   }
   return load;
 }
@@ -107,12 +119,36 @@ export function loadEntry(
 async function fetchEntry(entry: ContentEntry): Promise<LoadedEntry> {
   const raw = await entry.loader();
   const fm = extractFrontmatter(raw);
-  const content = stripFrontmatter(raw);
-  await loadArticlePlugins(content);
   return {
     title: fm.title || entry.title,
     date: fm.creation_date || null,
-    content,
+    content: stripFrontmatter(raw),
+  };
+}
+
+export interface IndexSource {
+  load: () => Promise<string>;
+  peek: () => string | null;
+}
+
+export function createIndexSource(
+  section: "writing" | "lists",
+  loader: () => Promise<string>,
+): IndexSource {
+  let load: Promise<string> | null = null;
+  let value: string | null = null;
+  return {
+    load: () => {
+      load ??= loader().then(
+        (raw) => (value = processMarkdown(stripFrontmatter(raw), section)),
+        (error: Error) => {
+          load = null;
+          throw error;
+        },
+      );
+      return load;
+    },
+    peek: () => value,
   };
 }
 

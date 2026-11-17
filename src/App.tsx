@@ -4,11 +4,19 @@ import Layout from "./components/Layout";
 import AvatarStage from "./components/AvatarStage";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
-import { getWritingEntries, getListsEntries, loadEntry } from "./lib/content";
+import {
+  getWritingEntries,
+  getListsEntries,
+  loadEntry,
+  createIndexSource,
+} from "./lib/content";
+import { loadArticlePlugins } from "./lib/articlePlugins";
 import useNavHaptics from "./hooks/useNavHaptics";
 
-const ContentIndex = lazy(() => import("./pages/ContentIndex"));
-const ContentArticle = lazy(() => import("./pages/ContentArticle"));
+const loadContentIndex = () => import("./pages/ContentIndex");
+const loadContentArticle = () => import("./pages/ContentArticle");
+const ContentIndex = lazy(loadContentIndex);
+const ContentArticle = lazy(loadContentArticle);
 const Era = lazy(() => import("./pages/Era"));
 const EraDevices = lazy(() => import("./pages/EraDevices"));
 const About = lazy(() => import("./pages/About"));
@@ -24,26 +32,41 @@ const PeekSpriteRender = import.meta.env.DEV ? lazy(() => import("./pages/PeekSp
 const writingEntries = getWritingEntries();
 const listsEntries = getListsEntries();
 
-const FIXED_ARTICLES = [
+export const FIXED_ARTICLES = [
   { path: "/haystack-errw-proof", slug: "haystack-errw-proof" },
   { path: "/oboe", slug: "most inneficient way to find needle in a haystack" },
   { path: "/uwb-pt1", slug: "ultra-wideband pt. 1 - intuition" },
 ];
 
-export function preloadInitialArticle() {
-  const path = window.location.pathname.replace(/\/$/, "");
-  const fixed = FIXED_ARTICLES.find((a) => a.path === path);
-  const match = path.match(/^\/(writing|lists)\/([^/]+)$/);
-  const load = fixed
-    ? loadEntry(writingEntries, fixed.slug)
-    : match && loadEntry(match[1] === "writing" ? writingEntries : listsEntries, match[2]);
-  load?.catch(() => {});
+const writingIndex = createIndexSource("writing", () =>
+  import("@writing/index.md?raw").then((m) => m.default),
+);
+const listsIndex = createIndexSource("lists", () =>
+  import("@lists/index.md?raw").then((m) => m.default),
+);
+
+async function preloadArticle(entries: typeof writingEntries, slug: string) {
+  const [article] = await Promise.all([loadEntry(entries, slug), loadContentArticle()]);
+  if (article) await loadArticlePlugins(article.content);
 }
 
-const loadWritingIndex = () =>
-  import("@writing/index.md?raw").then((m) => m.default);
-const loadListsIndex = () =>
-  import("@lists/index.md?raw").then((m) => m.default);
+export async function preloadRoute(pathname: string): Promise<void> {
+  const path = pathname.replace(/(.)\/$/, "$1");
+  const fixed = FIXED_ARTICLES.find((a) => a.path === path);
+  if (fixed) return preloadArticle(writingEntries, fixed.slug);
+  const index = path.match(/^\/(writing|lists)$/);
+  if (index) {
+    await Promise.all([
+      (index[1] === "writing" ? writingIndex : listsIndex).load(),
+      loadContentIndex(),
+    ]);
+    return;
+  }
+  const article = path.match(/^\/(writing|lists)\/([^/]+)$/);
+  if (article) {
+    await preloadArticle(article[1] === "writing" ? writingEntries : listsEntries, article[2]);
+  }
+}
 
 export default function App() {
   useNavHaptics();
@@ -84,7 +107,7 @@ export default function App() {
           <Route
             path="/writing"
             element={
-              <ContentIndex section="writing" loadIndex={loadWritingIndex} />
+              <ContentIndex section="writing" index={writingIndex} />
             }
           />
           <Route
@@ -96,7 +119,7 @@ export default function App() {
           <Route
             path="/lists"
             element={
-              <ContentIndex section="lists" loadIndex={loadListsIndex} />
+              <ContentIndex section="lists" index={listsIndex} />
             }
           />
           <Route
