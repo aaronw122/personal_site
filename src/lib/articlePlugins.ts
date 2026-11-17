@@ -37,6 +37,6 @@ export async function loadArticlePlugins(markdown: string): Promise<void> {
   ]);
 }
 
-export function articlePlugins(): PluggableList {
-  return [...math, ...highlight];
+export function articlePlugins(markdown: string): PluggableList {
+  return [...(needsMath(markdown) ? math : []), ...(needsHighlight(markdown) ? highlight : [])];
 }

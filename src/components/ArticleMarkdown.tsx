@@ -128,7 +128,7 @@ export default function ArticleMarkdown({ markdown, section }: Props) {
       <div ref={root} style={{ display: "contents" }}>
         <ReactMarkdown
           remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkFrontmatter]}
-          rehypePlugins={[rehypeRaw, ...articlePlugins()]}
+          rehypePlugins={[rehypeRaw, ...articlePlugins(markdown)]}
           components={COMPONENTS}
         >
           {markdown}
