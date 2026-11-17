@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import type * as EntryServer from "../src/entry-server";
+import { FIXED_ARTICLES } from "../src/data/fixedArticles";
 
 const distDir = path.resolve("dist");
 const ssrDir = path.resolve("dist-ssr");
@@ -46,16 +47,17 @@ if (!stylesheet) {
 const css = fs.readFileSync(path.join(distDir, stylesheet[1]), "utf8");
 const template = built.replace(stylesheetTag, () => `<style>${css}</style>`);
 
-const { render, FIXED_ARTICLES }: typeof EntryServer = await import(
+const { render }: typeof EntryServer = await import(
   pathToFileURL(path.join(ssrDir, "entry-server.js")).href
 );
 
+const home = await render("/");
 fs.writeFileSync(path.join(distDir, "spa.html"), template);
 fs.writeFileSync(
   indexPath,
   template
     .replace(entryScriptTag, '<script type="module" fetchpriority="low" crossorigin src=')
-    .replace(rootTag, `<div id="root">${await render("/")}</div>`),
+    .replace(rootTag, () => `<div id="root">${home}</div>`),
 );
 
 const articleCss = cssFor("src/pages/ContentArticle.tsx");

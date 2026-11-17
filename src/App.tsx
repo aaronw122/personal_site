@@ -11,6 +11,7 @@ import {
   createIndexSource,
 } from "./lib/content";
 import { loadArticlePlugins } from "./lib/articlePlugins";
+import { FIXED_ARTICLES } from "./data/fixedArticles";
 import useNavHaptics from "./hooks/useNavHaptics";
 
 const loadContentIndex = () => import("./pages/ContentIndex");
@@ -31,12 +32,6 @@ const PeekSpriteRender = import.meta.env.DEV ? lazy(() => import("./pages/PeekSp
 
 const writingEntries = getWritingEntries();
 const listsEntries = getListsEntries();
-
-export const FIXED_ARTICLES = [
-  { path: "/haystack-errw-proof", slug: "haystack-errw-proof" },
-  { path: "/oboe", slug: "most inneficient way to find needle in a haystack" },
-  { path: "/uwb-pt1", slug: "ultra-wideband pt. 1 - intuition" },
-];
 
 const writingIndex = createIndexSource("writing", () =>
   import("@writing/index.md?raw").then((m) => m.default),
