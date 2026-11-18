@@ -1,11 +1,32 @@
+.ar-pose {
   --background-modifier-border: rgba(0, 0, 0, .12);
   --background-primary: var(--color-paper);
   --font-interface: var(--font-primary);
   --font-monospace: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --pose-ink: #1d1d1d;
+  --pose-grey: #9fa8b2;
+  --pose-c0: #e16919;
+  --pose-c1: #099268;
+  --pose-c2: #ae3ec9;
+  --pose-c3: #4465e9;
+  --pose-red: #e03131;
+  --pose-body: #d5d9de;
+  --pose-side: #b8bec6;
+  --pose-back: #5c6370;
+  --pose-display: #2b3445;
+
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin: 8px 0;
+  background: var(--background-primary);
+  color: var(--pose-ink);
 }
 
 .ar-pose-host {
   container-type: inline-size;
+}
+
 .ar-pose-host:empty[data-variant="full"],
 .ar-pose-host:empty[data-variant="col"] { min-height: 599px; }
 .ar-pose-host:empty[data-variant="cup"] { min-height: 478px; }
@@ -16,6 +37,488 @@
   .ar-pose-host:empty[data-variant="col"] { min-height: 534px; }
   .ar-pose-host:empty[data-variant="cup"] { min-height: 739px; }
   .ar-pose-host:empty[data-variant="cup-scale"] { min-height: 572px; }
+}
+
+.ar-pose-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+}
+
+.ar-pose-svg text {
+  font-family: var(--font-interface);
+  font-size: 13px;
+}
+
+.ar-pose-grid {
+  stroke: var(--pose-grey);
+  stroke-width: 1;
+  opacity: 0.35;
+}
+
+.ar-pose-gizmo,
+.ar-pose-origin {
+  stroke: var(--pose-grey);
+  stroke-width: 2;
+}
+
+.ar-pose-dim {
+  fill: var(--pose-grey);
+  font-size: 12px !important;
+}
+
+.ar-pose-drop {
+  stroke: var(--pose-c3);
+  stroke-width: 1.2;
+  stroke-dasharray: 3 4;
+  opacity: 0.7;
+}
+
+.ar-pose-shadow {
+  fill: var(--pose-c3);
+  opacity: 0.25;
+}
+
+.ar-pose-phone {
+  cursor: move;
+}
+
+.ar-pose-face {
+  stroke: var(--pose-ink);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  fill: var(--pose-side);
+}
+
+.ar-pose-face.is-screen {
+  fill: var(--pose-body);
+}
+
+.ar-pose-face.is-back {
+  fill: var(--pose-back);
+}
+
+.ar-pose-display {
+  fill: var(--pose-display);
+}
+
+.ar-pose-island,
+.ar-pose-lens {
+  fill: #000;
+}
+
+.ar-pose-lens {
+  stroke: var(--pose-grey);
+  stroke-width: 1;
+}
+
+.ar-pose-lens.is-main {
+  stroke: var(--pose-c3);
+  stroke-width: 2;
+}
+
+.ar-pose-bump {
+  fill: var(--pose-side);
+  stroke: var(--pose-ink);
+  stroke-width: 0.6;
+}
+
+.ar-pose-port {
+  fill: var(--pose-ink);
+}
+
+.ar-pose-arrow {
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.ar-pose-tip,
+.ar-pose-label {
+  pointer-events: none;
+}
+
+.ar-pose-label {
+  font-weight: 600;
+  paint-order: stroke;
+  stroke: var(--background-primary);
+  stroke-width: 3px;
+}
+
+.ar-pose-arrow.is-c0 { stroke: var(--pose-c0); }
+.ar-pose-arrow.is-c1 { stroke: var(--pose-c1); }
+.ar-pose-arrow.is-c2 { stroke: var(--pose-c2); }
+.ar-pose-arrow.is-c3 { stroke: var(--pose-c3); }
+.ar-pose-tip.is-c0,
+.ar-pose-label.is-c0 { fill: var(--pose-c0); }
+.ar-pose-tip.is-c1,
+.ar-pose-label.is-c1 { fill: var(--pose-c1); }
+.ar-pose-tip.is-c2,
+.ar-pose-label.is-c2 { fill: var(--pose-c2); }
+.ar-pose-tip.is-c3,
+.ar-pose-label.is-c3 { fill: var(--pose-c3); }
+
+.ar-pose-leg,
+.ar-pose-leg-label {
+  pointer-events: none;
+}
+
+.ar-pose-axis {
+  stroke: var(--pose-grey);
+  stroke-width: 1;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.ar-pose-axis-label {
+  fill: var(--pose-grey);
+  font-size: 12px !important;
+  pointer-events: none;
+}
+
+.ar-pose-sphere {
+  fill: var(--pose-c3);
+  fill-opacity: 0.06;
+  stroke: var(--pose-grey);
+  stroke-width: 1.4;
+  pointer-events: none;
+}
+
+.ar-pose-sphere-line {
+  fill: none;
+  stroke: var(--pose-grey);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.ar-pose-sphere-label {
+  fill: var(--pose-ink);
+  font-size: 12px !important;
+  paint-order: stroke;
+  stroke: var(--background-primary);
+  stroke-width: 3px;
+  pointer-events: none;
+}
+
+.ar-pose-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 28px;
+  align-items: flex-start;
+}
+
+.ar-pose-matrix {
+  display: grid;
+  grid-template-columns: repeat(4, 84px) auto;
+  align-items: center;
+}
+
+.ar-pose-head {
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  padding: 0 2px 6px;
+  line-height: 1.2;
+}
+
+.ar-pose-head.is-c0 { color: var(--pose-c0); }
+.ar-pose-head.is-c1 { color: var(--pose-c1); }
+.ar-pose-head.is-c2 { color: var(--pose-c2); }
+.ar-pose-head.is-c3 { color: var(--pose-c3); }
+
+.ar-pose-cell {
+  display: flex;
+  justify-content: center;
+  padding: 3px 4px;
+}
+
+.ar-pose-cell.is-left {
+  border-left: 2px solid var(--pose-ink);
+}
+
+.ar-pose-cell.is-right {
+  border-right: 2px solid var(--pose-ink);
+}
+
+.ar-pose-input {
+  width: 72px;
+  text-align: center;
+  font-family: var(--font-monospace);
+  font-size: 13px;
+}
+
+.ar-pose-cell.is-c0 .ar-pose-input { color: var(--pose-c0); }
+.ar-pose-cell.is-c1 .ar-pose-input { color: var(--pose-c1); }
+.ar-pose-cell.is-c2 .ar-pose-input { color: var(--pose-c2); }
+.ar-pose-cell.is-c3 .ar-pose-input { color: var(--pose-c3); }
+
+.ar-pose-example {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 16px;
+  align-items: start;
+  container-type: inline-size;
+}
+
+.ar-pose-example-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.ar-pose-example-right {
+  min-width: 0;
+}
+
+.ar-pose-matrix.is-static {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.ar-pose-matrix.is-static.has-rows {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+}
+
+.ar-pose-matrix.is-static .ar-pose-row {
+  font-size: clamp(8px, 2cqi, 12px);
+  padding-left: 8px;
+  color: var(--pose-grey);
+}
+
+.ar-pose-matrix.is-static .ar-pose-head {
+  font-size: clamp(8px, 2cqi, 12px);
+}
+
+.ar-pose-matrix.is-static .ar-pose-fixed {
+  font-size: clamp(8px, 2.2cqi, 13px);
+}
+
+.ar-pose-value {
+  font-family: var(--font-monospace);
+  font-size: clamp(8px, 2.2cqi, 13px);
+  padding: 2px 0;
+}
+
+.ar-pose-cell.is-c0 .ar-pose-value { color: var(--pose-c0); }
+.ar-pose-cell.is-c1 .ar-pose-value { color: var(--pose-c1); }
+.ar-pose-cell.is-c2 .ar-pose-value { color: var(--pose-c2); }
+.ar-pose-cell.is-c3 .ar-pose-value { color: var(--pose-c3); }
+
+.ar-pose-svg.is-static {
+  cursor: default;
+}
+
+.ar-pose-svg.is-screen-view {
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.ar-pose-svg.is-mini text {
+  font-size: 17px !important;
+}
+
+.ar-pose-crosshair {
+  stroke: #fff;
+  stroke-width: 1.5;
+  opacity: 0.8;
+}
+
+.ar-pose-feed-wall {
+  fill: #3a3f47;
+}
+
+.ar-pose-feed-floor {
+  fill: #6b5a48;
+}
+
+.ar-pose-feed-grid {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1;
+  opacity: 0.25;
+}
+
+.ar-pose-cup-shadow {
+  fill: #000;
+  opacity: 0.35;
+}
+
+.ar-pose-feed-focus {
+  fill: none;
+  stroke: #fcc419;
+  stroke-width: 1.5;
+}
+
+.ar-pose-feed-bar {
+  fill: #000;
+  opacity: 0.55;
+}
+
+.ar-pose-feed-shutter {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 3;
+}
+
+.ar-pose-feed-shutter-inner {
+  fill: #fff;
+}
+
+.ar-pose-cup-body {
+  fill: #e9ecef;
+  stroke: #495057;
+  stroke-width: 1.2;
+}
+
+.ar-pose-cup-rim {
+  fill: #ced4da;
+  stroke: #495057;
+  stroke-width: 1.2;
+}
+
+.ar-pose-cup-handle {
+  fill: none;
+  stroke: #e9ecef;
+  stroke-width: 2.5;
+}
+
+.ar-pose-example .ar-pose-caption {
+  font-size: clamp(8px, 2cqi, 12px);
+}
+
+.ar-pose-cup-ghost {
+  fill: none;
+  stroke: var(--pose-grey);
+  stroke-width: 1.4;
+  stroke-dasharray: 5 4;
+}
+
+.ar-pose-cup-inside {
+  fill: #868e96;
+  stroke: #495057;
+  stroke-width: 1;
+}
+
+.ar-pose-cup-handle.is-3d {
+  stroke: #adb5bd;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ar-pose-tick {
+  stroke: var(--pose-grey);
+  stroke-width: 1.5;
+}
+
+.ar-pose-value.is-key {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.ar-pose-head.is-muted,
+.ar-pose-cell.is-muted .ar-pose-input,
+.ar-pose-cell.is-muted .ar-pose-fixed {
+  opacity: 0.25;
+}
+
+.ar-pose-leg {
+  stroke: var(--pose-grey);
+  stroke-width: 1.6;
+  stroke-dasharray: 5 4;
+}
+
+.ar-pose-leg-label {
+  fill: var(--pose-ink);
+  font-size: 12px !important;
+  paint-order: stroke;
+  stroke: var(--background-primary);
+  stroke-width: 3px;
+}
+
+.ar-pose-fixed {
+  font-family: var(--font-monospace);
+  color: var(--pose-grey);
+  padding: 4px 0;
+}
+
+.ar-pose-row {
+  font-size: 12px;
+  padding-left: 12px;
+  white-space: nowrap;
+}
+
+.ar-pose-row.is-fixed {
+  color: var(--pose-grey);
+}
+
+.ar-pose-stage {
+  position: relative;
+}
+
+.ar-pose-stage > .ar-pose-controls {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  min-width: 0;
+  width: 192px;
+}
+
+.ar-pose-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 240px;
+}
+
+.ar-pose-slider {
+  display: grid;
+  grid-template-columns: 64px 1fr 48px;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.ar-pose-stage .ar-pose-slider {
+  grid-template-columns: 44px minmax(0, 1fr) 52px;
+}
+
+.ar-pose-stage .ar-pose-slider input[type="range"] {
+  width: 100%;
+  min-width: 0;
+}
+
+.ar-pose-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.ar-pose-presets button {
+  font-size: 12px;
+}
+
+.ar-pose-readout {
+  margin-top: 10px;
+}
+
+.ar-pose-mono {
+  font-family: var(--font-monospace);
+  font-size: 12px;
+}
+
+.ar-pose-message {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--pose-red);
 }
 
 .ar-pose input[type="range"] {
