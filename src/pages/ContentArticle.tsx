@@ -98,12 +98,6 @@ export default function ContentArticle({ section, entries, fixedSlug }: Props) {
           section={section}
         />
       </div>
-      <hr />
-      <p>
-        <Link to={`/${section}`} className="link-underline">
-          &larr; back to {section}
-        </Link>
-      </p>
     </div>
   );
 }
