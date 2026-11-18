@@ -1,10 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot, hydrateRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import App, { preloadInitialArticle } from "./App";
+import App, { preloadRoute } from "./App";
 import "./index.css";
-
-preloadInitialArticle();
 
 const root = document.getElementById("root")!;
 const app = (
@@ -14,9 +12,10 @@ const app = (
     </BrowserRouter>
   </StrictMode>
 );
+const preload = preloadRoute(window.location.pathname).catch(() => undefined);
 
 if (root.hasChildNodes()) {
-  hydrateRoot(root, app);
+  void preload.then(() => hydrateRoot(root, app));
 } else {
   createRoot(root).render(app);
 }

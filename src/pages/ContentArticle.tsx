@@ -3,9 +3,12 @@ import { useEffect, useState } from "react";
 import usePageTitle from "../hooks/usePageTitle";
 import {
   type ContentEntry,
+  type LoadedEntry,
   loadEntry,
+  peekEntry,
   processMarkdown,
 } from "../lib/content";
+import { articlePluginsReady, loadArticlePlugins } from "../lib/articlePlugins";
 import ArticleMarkdown from "../components/ArticleMarkdown";
 
 interface Props {
@@ -14,39 +17,56 @@ interface Props {
   fixedSlug?: string;
 }
 
+type ArticleState = { slug: string; article: LoadedEntry | null; loading: boolean };
+
 export default function ContentArticle({ section, entries, fixedSlug }: Props) {
   const params = useParams<{ slug: string }>();
-  const slug = fixedSlug ?? params.slug;
-  const [article, setArticle] = useState<{
-    title: string;
-    date: string | null;
-    content: string;
-  } | null>(null);
-  const [loading, setLoading] = useState(true);
+  const slug = fixedSlug ?? params.slug ?? "";
+  const [state, setState] = useState<ArticleState>(() => {
+    const article = peekEntry(entries, slug);
+    return { slug, article, loading: !article };
+  });
+  const [, setPluginsLoaded] = useState(0);
+
+  const stale = state.slug !== slug;
+  const cached = stale ? peekEntry(entries, slug) : null;
+  const { article, loading } = stale ? { article: cached, loading: !cached } : state;
 
   usePageTitle(article?.title ?? section);
 
   useEffect(() => {
-    if (!slug) return;
     let cancelled = false;
-    setLoading(true);
+    const cached = peekEntry(entries, slug);
+    if (cached) {
+      setState({ slug, article: cached, loading: false });
+      return;
+    }
+    setState({ slug, article: null, loading: true });
     loadEntry(entries, slug)
       .then((result) => {
-        if (!cancelled) {
-          setArticle(result);
-          setLoading(false);
-        }
+        if (!cancelled) setState({ slug, article: result, loading: false });
       })
       .catch(() => {
-        if (!cancelled) {
-          setArticle(null);
-          setLoading(false);
-        }
+        if (!cancelled) setState({ slug, article: null, loading: false });
       });
     return () => {
       cancelled = true;
     };
   }, [slug, entries]);
+
+  const content = article?.content;
+  useEffect(() => {
+    if (content === undefined || articlePluginsReady(content)) return;
+    let cancelled = false;
+    loadArticlePlugins(content)
+      .then(() => {
+        if (!cancelled) setPluginsLoaded((n) => n + 1);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [content]);
 
   if (loading) return <div>loading...</div>;
   if (!article) {
@@ -78,12 +98,6 @@ export default function ContentArticle({ section, entries, fixedSlug }: Props) {
           section={section}
         />
       </div>
-      <hr />
-      <p>
-        <Link to={`/${section}`} className="link-underline">
-          &larr; back to {section}
-        </Link>
-      </p>
     </div>
   );
 }

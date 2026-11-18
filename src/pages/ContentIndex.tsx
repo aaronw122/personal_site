@@ -3,27 +3,34 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkFrontmatter from "remark-frontmatter";
 import usePageTitle from "../hooks/usePageTitle";
-import { stripFrontmatter, processMarkdown } from "../lib/content";
+import type { IndexSource } from "../lib/content";
 import MarkdownLink from "../components/MarkdownLink";
 
 interface Props {
   section: "writing" | "lists";
-  loadIndex: () => Promise<string>;
+  index: IndexSource;
 }
 
-export default function ContentIndex({ section, loadIndex }: Props) {
+export default function ContentIndex({ section, index }: Props) {
   usePageTitle(section);
-  const [content, setContent] = useState<string | null>(null);
+  const [content, setContent] = useState<string | null>(index.peek);
 
   useEffect(() => {
-    loadIndex()
-      .then((raw) => {
-        setContent(processMarkdown(stripFrontmatter(raw), section));
-      })
-      .catch(() => {
-        setContent("");
-      });
-  }, [loadIndex, section]);
+    const cached = index.peek();
+    if (cached !== null) {
+      setContent(cached);
+      return;
+    }
+    let cancelled = false;
+    setContent(null);
+    index.load().then(
+      (loaded) => !cancelled && setContent(loaded),
+      () => !cancelled && setContent(""),
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [index]);
 
   if (content === null) return <div>loading...</div>;
 

@@ -60,7 +60,7 @@ export default function Experience() {
         <Entry title="particleArt" date="2026">
           a simple web app where you type in text, and it generates particle art
           using a{" "}
-          <Link to="/writing/fine%20tuning%20stable%20diffusion%20to%20create%20particle%20art" className="link-underline">
+          <Link to="/writing/fine%20tuning%20sdxl%20to%20create%20particle%20art" className="link-underline">
             model i fine tuned.
           </Link>{" "}
           check it out <a href="https://prtkl.net" className="link-underline">at prtkl.net</a>

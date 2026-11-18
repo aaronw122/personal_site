@@ -47,7 +47,10 @@ export default function GenerativeSwirls() {
     const idle =
       window.requestIdleCallback ??
       ((cb: () => void) => window.setTimeout(cb, 200));
-    const whenIdle = new Promise<void>((resolve) => idle(() => resolve()));
+    const whenIdle = new Promise<void>((resolve) => {
+      if (document.readyState === "complete") idle(() => resolve());
+      else window.addEventListener("load", () => idle(() => resolve()), { once: true });
+    });
     whenIdle.then(() => import("p5")).then((mod) => {
       if (cancelled || !containerRef.current) return;
 
