@@ -16,7 +16,7 @@ export default defineConfig(({ isSsrBuild }) => ({
   base: "/",
   plugins: [
     react(),
-    tweets({ sourceDirs: [WRITING, LISTS] }),
+    tweets({ sourceDirs: [WRITING, LISTS], snapshot: "src/data/tweets.json" }),
     !isSsrBuild && [
       syncWritingImages({
         sourceDirs: [WRITING, LISTS],

@@ -5,6 +5,7 @@ import { tweetId, type Tweet, type TweetMedia, type TweetQuote, type TweetSegmen
 
 interface Options {
   sourceDirs: string[];
+  snapshot: string;
 }
 
 interface RawEntity {
@@ -149,9 +150,11 @@ function scan(dirs: string[]): TweetRef[] {
   return refs;
 }
 
-export function tweets(opts: Options): Plugin {
-  const cache = new Map<string, Tweet>();
+function readSnapshot(file: string): Record<string, Tweet> {
+  return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")) : {};
+}
 
+export function tweets(opts: Options): Plugin {
   return {
     name: "tweets",
     resolveId(id) {
@@ -160,12 +163,14 @@ export function tweets(opts: Options): Plugin {
     async load(id) {
       if (id !== RESOLVED_ID) return;
       const refs = new Map(scan(opts.sourceDirs).map((ref) => [ref.id, ref]));
-      await Promise.all(
-        [...refs.values()].map(async ({ id: key, url, file }) => {
-          if (cache.has(key)) return;
+      const saved = readSnapshot(opts.snapshot);
+      const missing = [...refs.values()].filter((ref) => !saved[ref.id]);
+      const fetched = await Promise.all(
+        missing.map(async ({ id: key, url, file }) => {
           try {
-            cache.set(key, await fetchTweet(key));
+            const data = await fetchTweet(key);
             console.log(`[tweets] fetched ${url}`);
+            return [key, data] as const;
           } catch (error) {
             throw new Error(
               `[tweets] failed to fetch ${url} (referenced in ${file}): ` +
@@ -174,8 +179,13 @@ export function tweets(opts: Options): Plugin {
           }
         }),
       );
-      const used = [...refs.keys()].map((key) => [key, cache.get(key)]);
-      return `export default new Map(${JSON.stringify(used)});`;
+      const all = { ...saved, ...Object.fromEntries(fetched) };
+      const used = Object.fromEntries([...refs.keys()].sort().map((key) => [key, all[key]]));
+      const json = `${JSON.stringify(used, null, 2)}\n`;
+      if (!fs.existsSync(opts.snapshot) || fs.readFileSync(opts.snapshot, "utf8") !== json) {
+        fs.writeFileSync(opts.snapshot, json);
+      }
+      return `export default new Map(Object.entries(${JSON.stringify(used)}));`;
     },
     handleHotUpdate({ file, server, modules }) {
       if (!file.endsWith(".md") || !opts.sourceDirs.some((dir) => file.startsWith(dir))) return;
