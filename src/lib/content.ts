@@ -81,8 +81,8 @@ export function getListsEntries(): ContentEntry[] {
 
 export type LoadedEntry = { title: string; date: string | null; content: string };
 
-const entryLoads = new Map<ContentEntry, Promise<LoadedEntry>>();
-const loadedEntries = new Map<ContentEntry, LoadedEntry>();
+const NOT_FOUND: Promise<null> = Promise.resolve(null);
+const entryLoads = new Map<ContentEntry, Promise<LoadedEntry | null>>();
 
 function findEntry(entries: ContentEntry[], slug: string): ContentEntry | undefined {
   let decoded: string;
@@ -95,25 +95,21 @@ function findEntry(entries: ContentEntry[], slug: string): ContentEntry | undefi
   return entries.find((e) => urlSlug(e.slug) === wanted);
 }
 
-export function peekEntry(entries: ContentEntry[], slug: string): LoadedEntry | null {
-  const entry = findEntry(entries, slug);
-  return (entry && loadedEntries.get(entry)) ?? null;
-}
-
 export function loadEntry(
   entries: ContentEntry[],
   slug: string,
 ): Promise<LoadedEntry | null> {
   const entry = findEntry(entries, slug);
-  if (!entry) return Promise.resolve(null);
+  if (!entry) return NOT_FOUND;
   let load = entryLoads.get(entry);
   if (!load) {
-    load = fetchEntry(entry);
+    load = fetchEntry(entry)
+      .catch(() => fetchEntry(entry))
+      .catch((error: Error) => {
+        if (import.meta.env.SSR) throw error;
+        return null;
+      });
     entryLoads.set(entry, load);
-    load.then(
-      (loaded) => loadedEntries.set(entry, loaded),
-      () => entryLoads.delete(entry),
-    );
   }
   return load;
 }
@@ -128,29 +124,22 @@ async function fetchEntry(entry: ContentEntry): Promise<LoadedEntry> {
   };
 }
 
-export interface IndexSource {
-  load: () => Promise<string>;
-  peek: () => string | null;
-}
-
-export function createIndexSource(
+export function indexLoader(
   section: "writing" | "lists",
   loader: () => Promise<string>,
-): IndexSource {
+): () => Promise<string> {
   let load: Promise<string> | null = null;
-  let value: string | null = null;
-  return {
-    load: () => {
-      load ??= loader().then(
-        (raw) => (value = processMarkdown(stripFrontmatter(raw), section)),
+  return () => {
+    load ??= loader()
+      .catch(() => loader())
+      .then(
+        (raw) => processMarkdown(stripFrontmatter(raw), section),
         (error: Error) => {
-          load = null;
-          throw error;
+          if (import.meta.env.SSR) throw error;
+          return "";
         },
       );
-      return load;
-    },
-    peek: () => value,
+    return load;
   };
 }
 

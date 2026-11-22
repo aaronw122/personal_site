@@ -1,17 +1,23 @@
 import { StrictMode } from "react";
 import { prerender } from "react-dom/static";
 import { StaticRouter } from "react-router-dom";
-import App, { preloadRoute } from "./App";
+import App from "./App";
 
 export async function render(url: string): Promise<string> {
-  await preloadRoute(new URL(url, "https://awill.co").pathname);
+  let error: Error | undefined;
   const { prelude } = await prerender(
     <StrictMode>
       <StaticRouter location={url}>
         <App />
       </StaticRouter>
     </StrictMode>,
-    { progressiveChunkSize: Number.POSITIVE_INFINITY },
+    {
+      progressiveChunkSize: Number.POSITIVE_INFINITY,
+      onError: (e) => {
+        error ??= e instanceof Error ? e : new Error(String(e));
+      },
+    },
   );
+  if (error) throw new Error(`[prerender] ${url} failed to render: ${error.stack ?? error.message}`);
   return new Response(prelude).text();
 }

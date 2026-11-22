@@ -1,15 +1,9 @@
 import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { Suspense, use, useEffect } from "react";
 import usePageTitle from "../hooks/usePageTitle";
-import {
-  type ContentEntry,
-  type LoadedEntry,
-  loadEntry,
-  peekEntry,
-  processMarkdown,
-} from "../lib/content";
+import { type ContentEntry, loadEntry, processMarkdown } from "../lib/content";
 import { urlSlug } from "../lib/slug";
-import { articlePluginsReady, loadArticlePlugins } from "../lib/articlePlugins";
+import { articlePluginLoads } from "../lib/articlePlugins";
 import ArticleMarkdown from "../components/ArticleMarkdown";
 
 interface Props {
@@ -18,20 +12,21 @@ interface Props {
   fixedSlug?: string;
 }
 
-type ArticleState = { slug: string; article: LoadedEntry | null; loading: boolean };
+interface BodyProps {
+  markdown: string;
+  section: Props["section"];
+  pluginLoads: Promise<void>[];
+}
+
+function StyledBody({ markdown, section, pluginLoads }: BodyProps) {
+  for (const load of pluginLoads) use(load);
+  return <ArticleMarkdown markdown={markdown} section={section} />;
+}
 
 export default function ContentArticle({ section, entries, fixedSlug }: Props) {
   const params = useParams<{ slug: string }>();
   const slug = fixedSlug ?? params.slug ?? "";
-  const [state, setState] = useState<ArticleState>(() => {
-    const article = peekEntry(entries, slug);
-    return { slug, article, loading: !article };
-  });
-  const [, setPluginsLoaded] = useState(0);
-
-  const stale = state.slug !== slug;
-  const cached = stale ? peekEntry(entries, slug) : null;
-  const { article, loading } = stale ? { article: cached, loading: !cached } : state;
+  const article = use(loadEntry(entries, slug));
 
   usePageTitle(article?.title ?? section);
 
@@ -44,41 +39,6 @@ export default function ContentArticle({ section, entries, fixedSlug }: Props) {
     }
   }, [canonical, slug, article, section, search, hash, navigate]);
 
-  useEffect(() => {
-    let cancelled = false;
-    const cached = peekEntry(entries, slug);
-    if (cached) {
-      setState({ slug, article: cached, loading: false });
-      return;
-    }
-    setState({ slug, article: null, loading: true });
-    loadEntry(entries, slug)
-      .then((result) => {
-        if (!cancelled) setState({ slug, article: result, loading: false });
-      })
-      .catch(() => {
-        if (!cancelled) setState({ slug, article: null, loading: false });
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [slug, entries]);
-
-  const content = article?.content;
-  useEffect(() => {
-    if (content === undefined || articlePluginsReady(content)) return;
-    let cancelled = false;
-    loadArticlePlugins(content)
-      .then(() => {
-        if (!cancelled) setPluginsLoaded((n) => n + 1);
-      })
-      .catch(() => undefined);
-    return () => {
-      cancelled = true;
-    };
-  }, [content]);
-
-  if (loading) return <div>loading...</div>;
   if (!article) {
     return (
       <div>
@@ -90,6 +50,7 @@ export default function ContentArticle({ section, entries, fixedSlug }: Props) {
     );
   }
 
+  const markdown = processMarkdown(article.content, section);
   return (
     <div>
       <h1 className="article-title">{article.title}</h1>
@@ -103,10 +64,13 @@ export default function ContentArticle({ section, entries, fixedSlug }: Props) {
         </p>
       )}
       <div className="prose prose-content">
-        <ArticleMarkdown
-          markdown={processMarkdown(article.content, section)}
-          section={section}
-        />
+        <Suspense fallback={<ArticleMarkdown markdown={markdown} section={section} />}>
+          <StyledBody
+            markdown={markdown}
+            section={section}
+            pluginLoads={articlePluginLoads(article.content)}
+          />
+        </Suspense>
       </div>
     </div>
   );
