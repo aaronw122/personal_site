@@ -4,20 +4,12 @@ import Layout from "./components/Layout";
 import AvatarStage from "./components/AvatarStage";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
-import {
-  getWritingEntries,
-  getListsEntries,
-  loadEntry,
-  createIndexSource,
-} from "./lib/content";
-import { loadArticlePlugins } from "./lib/articlePlugins";
+import { getWritingEntries, getListsEntries, indexLoader } from "./lib/content";
 import { FIXED_ARTICLES } from "./data/fixedArticles";
 import useNavHaptics from "./hooks/useNavHaptics";
 
-const loadContentIndex = () => import("./pages/ContentIndex");
-const loadContentArticle = () => import("./pages/ContentArticle");
-const ContentIndex = lazy(loadContentIndex);
-const ContentArticle = lazy(loadContentArticle);
+const ContentIndex = lazy(() => import("./pages/ContentIndex"));
+const ContentArticle = lazy(() => import("./pages/ContentArticle"));
 const Era = lazy(() => import("./pages/Era"));
 const EraDevices = lazy(() => import("./pages/EraDevices"));
 const About = lazy(() => import("./pages/About"));
@@ -33,35 +25,12 @@ const PeekSpriteRender = import.meta.env.DEV ? lazy(() => import("./pages/PeekSp
 const writingEntries = getWritingEntries();
 const listsEntries = getListsEntries();
 
-const writingIndex = createIndexSource("writing", () =>
+const loadWritingIndex = indexLoader("writing", () =>
   import("@writing/index.md?raw").then((m) => m.default),
 );
-const listsIndex = createIndexSource("lists", () =>
+const loadListsIndex = indexLoader("lists", () =>
   import("@lists/index.md?raw").then((m) => m.default),
 );
-
-async function preloadArticle(entries: typeof writingEntries, slug: string) {
-  const [article] = await Promise.all([loadEntry(entries, slug), loadContentArticle()]);
-  if (article) await loadArticlePlugins(article.content);
-}
-
-export async function preloadRoute(pathname: string): Promise<void> {
-  const path = pathname.replace(/(.)\/$/, "$1");
-  const fixed = FIXED_ARTICLES.find((a) => a.path === path);
-  if (fixed) return preloadArticle(writingEntries, fixed.slug);
-  const index = path.match(/^\/(writing|lists)$/);
-  if (index) {
-    await Promise.all([
-      (index[1] === "writing" ? writingIndex : listsIndex).load(),
-      loadContentIndex(),
-    ]);
-    return;
-  }
-  const article = path.match(/^\/(writing|lists)\/([^/]+)$/);
-  if (article) {
-    await preloadArticle(article[1] === "writing" ? writingEntries : listsEntries, article[2]);
-  }
-}
 
 export default function App() {
   useNavHaptics();
@@ -102,7 +71,7 @@ export default function App() {
           <Route
             path="/writing"
             element={
-              <ContentIndex section="writing" index={writingIndex} />
+              <ContentIndex section="writing" load={loadWritingIndex} />
             }
           />
           <Route
@@ -114,7 +83,7 @@ export default function App() {
           <Route
             path="/lists"
             element={
-              <ContentIndex section="lists" index={listsIndex} />
+              <ContentIndex section="lists" load={loadListsIndex} />
             }
           />
           <Route

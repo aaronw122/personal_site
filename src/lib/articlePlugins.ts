@@ -5,6 +5,8 @@ export const SIM_LANGS: readonly string[] = [...WAVE_LANGS, "uwb-pulse", "ar-pos
 
 let math: PluggableList = [];
 let highlight: PluggableList = [];
+let mathLoad: Promise<void> | null = null;
+let highlightLoad: Promise<void> | null = null;
 
 function needsMath(markdown: string): boolean {
   const prose = markdown
@@ -19,22 +21,27 @@ function needsHighlight(markdown: string): boolean {
   );
 }
 
-export function articlePluginsReady(markdown: string): boolean {
-  return (!needsMath(markdown) || math.length > 0) &&
-    (!needsHighlight(markdown) || highlight.length > 0);
-}
-
-export async function loadArticlePlugins(markdown: string): Promise<void> {
-  await Promise.all([
-    needsMath(markdown) && !math.length &&
-      import("./katexPlugin").then((m) => {
+export function articlePluginLoads(markdown: string): Promise<void>[] {
+  const loads: Promise<void>[] = [];
+  if (needsMath(markdown)) {
+    mathLoad ??= import("./katexPlugin").then(
+      (m) => {
         math = [m.default];
-      }),
-    needsHighlight(markdown) && !highlight.length &&
-      import("./highlightPlugin").then((m) => {
+      },
+      () => undefined,
+    );
+    loads.push(mathLoad);
+  }
+  if (needsHighlight(markdown)) {
+    highlightLoad ??= import("./highlightPlugin").then(
+      (m) => {
         highlight = [[m.default, { plainText: SIM_LANGS }]];
-      }),
-  ]);
+      },
+      () => undefined,
+    );
+    loads.push(highlightLoad);
+  }
+  return loads;
 }
 
 export function articlePlugins(markdown: string): PluggableList {
