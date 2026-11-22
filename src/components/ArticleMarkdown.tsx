@@ -32,7 +32,7 @@ function childText(children: ReactNode): string {
     .join("");
 }
 
-function LightboxImage(props: React.ImgHTMLAttributes<HTMLImageElement>) {
+const LightboxImage: Components["img"] = ({ node: _node, ...props }) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -61,7 +61,7 @@ function LightboxImage(props: React.ImgHTMLAttributes<HTMLImageElement>) {
       />
     </>
   );
-}
+};
 
 function heading(Tag: "h1" | "h2" | "h3" | "h4" | "h5" | "h6") {
   return function Heading({ children }: { children?: ReactNode }) {
