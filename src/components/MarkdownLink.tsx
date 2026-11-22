@@ -1,9 +1,7 @@
+import type { Components } from "react-markdown";
 import { Link } from "react-router-dom";
 
-export default function MarkdownLink(
-  props: React.AnchorHTMLAttributes<HTMLAnchorElement>,
-) {
-  const { href, children, ...rest } = props;
+const MarkdownLink: Components["a"] = ({ node: _node, href, children, ...rest }) => {
   if (href && href.startsWith("/")) {
     return (
       <Link to={href} {...rest}>
@@ -12,4 +10,6 @@ export default function MarkdownLink(
     );
   }
   return <a href={href} {...rest}>{children}</a>;
-}
+};
+
+export default MarkdownLink;
