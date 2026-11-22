@@ -3,7 +3,9 @@ import react from "@vitejs/plugin-react";
 import { ogPrerender } from "./vite-plugin-og";
 import { syncWritingImages } from "./vite-plugin-writing-images";
 import { rssFeed } from "./vite-plugin-rss";
+import { tweets } from "./vite-plugin-tweets";
 import { show } from "./src/data/podcast";
+import { FIXED_ARTICLES } from "./src/data/fixedArticles";
 
 const VAULT = "/Users/aaron/Documents/Obsidian_AW";
 const WRITING = `${VAULT}/published/writing`;
@@ -14,6 +16,7 @@ export default defineConfig(({ isSsrBuild }) => ({
   base: "/",
   plugins: [
     react(),
+    tweets({ sourceDirs: [WRITING, LISTS], snapshot: "src/data/tweets.json" }),
     !isSsrBuild && [
       syncWritingImages({
         sourceDirs: [WRITING, LISTS],
@@ -27,11 +30,7 @@ export default defineConfig(({ isSsrBuild }) => ({
           { urlPrefix: "writing", dir: WRITING },
           { urlPrefix: "lists", dir: LISTS },
         ],
-        fixed: [
-          { route: "haystack-errw-proof", dir: WRITING, slug: "haystack-errw-proof" },
-          { route: "oboe", dir: WRITING, slug: "most inneficient way to find needle in a haystack" },
-          { route: "uwb-pt1", dir: WRITING, slug: "ultra-wideband pt. 1 - intuition" },
-        ],
+        fixed: FIXED_ARTICLES.map(({ path, slug }) => ({ route: path.slice(1), dir: WRITING, slug })),
         pages: [
           { route: "podcast", title: show.title, description: show.description, image: "/images/no-agendas.jpg" },
         ],
@@ -51,6 +50,7 @@ export default defineConfig(({ isSsrBuild }) => ({
   },
   build: {
     outDir: "dist",
+    manifest: !isSsrBuild,
   },
   server: {
     port: 4200,

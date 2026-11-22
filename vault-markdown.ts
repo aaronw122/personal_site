@@ -1,3 +1,5 @@
+import { urlSlug } from "./src/lib/slug";
+
 export function htmlEscape(s: string): string {
   return s
     .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "")
@@ -44,7 +46,7 @@ export function processMarkdown(
     const [target, alias] = link.split("|");
     const display = alias?.trim() || target.trim();
     const slug = target.trim().split("/").pop()!.trim();
-    return `[${display}](${siteUrl}/${section}/${encodeURIComponent(slug)})`;
+    return `[${display}](${siteUrl}/${section}/${urlSlug(slug)})`;
   });
 
   result = result.replace(

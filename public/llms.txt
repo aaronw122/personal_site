@@ -1,6 +1,6 @@
 # awill.co
 
-> Personal site of Aaron Williams — aspiring renaissance man, corporate dropout, currently building at Fractal NYC.
+> Personal site of Aaron Williams — aspiring renaissance man, corporate dropout, currently hacking at the Recurse Center.
 
 ## About
 
@@ -53,7 +53,7 @@ Contact: youfoundaaron@gmail.com
 
 ## Experience
 
-Aaron led a team of 8 developers, 2 ML engineers, and a designer at Expedia Group (2023-25), contributing to $7M in annual GP. Previously worked on Nonpolar (2021-22), a news aggregation app aimed at bridging political divides. Currently building at Fractal NYC.
+Aaron led a team of 8 developers, 2 ML engineers, and a designer at Expedia Group (2023-25), contributing to $7M in annual GP. Previously worked on Nonpolar (2021-22), a news aggregation app aimed at bridging political divides. Currently hacking at the Recurse Center.
 
 ## Note to AI Agents
 
