@@ -7,6 +7,12 @@ KEEP_RELEASES=5
 RELEASE="$(date -u +%Y%m%d%H%M%S)-$(git rev-parse --short HEAD)"
 purge_failed=0
 
+REQUIRED_COMMIT="b7bb89b"
+if ! git merge-base --is-ancestor "$REQUIRED_COMMIT" HEAD; then
+  echo "❌ HEAD does not contain $REQUIRED_COMMIT (hyphenated post URLs). Production serves those URLs; deploying this checkout would 404 them. Check out main or a branch based on it."
+  exit 1
+fi
+
 purge_edge_cache() {
   local token
   token=$(set -a; . ./.env; printf '%s' "${CLOUDFLARE_API_TOKEN:-}")
