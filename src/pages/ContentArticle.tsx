@@ -15,10 +15,11 @@ interface Props {
 interface BodyProps {
   markdown: string;
   section: Props["section"];
+  pluginLoads: Promise<void>[];
 }
 
-function StyledBody({ markdown, section }: BodyProps) {
-  for (const load of articlePluginLoads(markdown)) use(load);
+function StyledBody({ markdown, section, pluginLoads }: BodyProps) {
+  for (const load of pluginLoads) use(load);
   return <ArticleMarkdown markdown={markdown} section={section} />;
 }
 
@@ -64,7 +65,11 @@ export default function ContentArticle({ section, entries, fixedSlug }: Props) {
       )}
       <div className="prose prose-content">
         <Suspense fallback={<ArticleMarkdown markdown={markdown} section={section} />}>
-          <StyledBody markdown={markdown} section={section} />
+          <StyledBody
+            markdown={markdown}
+            section={section}
+            pluginLoads={articlePluginLoads(article.content)}
+          />
         </Suspense>
       </div>
     </div>

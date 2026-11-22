@@ -21,24 +21,22 @@ function needsHighlight(markdown: string): boolean {
   );
 }
 
+function clientOnlyFallback(error: Error): void {
+  if (import.meta.env.SSR) throw error;
+}
+
 export function articlePluginLoads(markdown: string): Promise<void>[] {
   const loads: Promise<void>[] = [];
   if (needsMath(markdown)) {
-    mathLoad ??= import("./katexPlugin").then(
-      (m) => {
-        math = [m.default];
-      },
-      () => undefined,
-    );
+    mathLoad ??= import("./katexPlugin").then((m) => {
+      math = [m.default];
+    }, clientOnlyFallback);
     loads.push(mathLoad);
   }
   if (needsHighlight(markdown)) {
-    highlightLoad ??= import("./highlightPlugin").then(
-      (m) => {
-        highlight = [[m.default, { plainText: SIM_LANGS }]];
-      },
-      () => undefined,
-    );
+    highlightLoad ??= import("./highlightPlugin").then((m) => {
+      highlight = [[m.default, { plainText: SIM_LANGS }]];
+    }, clientOnlyFallback);
     loads.push(highlightLoad);
   }
   return loads;

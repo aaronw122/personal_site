@@ -103,7 +103,12 @@ export function loadEntry(
   if (!entry) return NOT_FOUND;
   let load = entryLoads.get(entry);
   if (!load) {
-    load = fetchEntry(entry).catch(() => null);
+    load = fetchEntry(entry)
+      .catch(() => fetchEntry(entry))
+      .catch((error: Error) => {
+        if (import.meta.env.SSR) throw error;
+        return null;
+      });
     entryLoads.set(entry, load);
   }
   return load;
@@ -125,10 +130,15 @@ export function indexLoader(
 ): () => Promise<string> {
   let load: Promise<string> | null = null;
   return () => {
-    load ??= loader().then(
-      (raw) => processMarkdown(stripFrontmatter(raw), section),
-      () => "",
-    );
+    load ??= loader()
+      .catch(() => loader())
+      .then(
+        (raw) => processMarkdown(stripFrontmatter(raw), section),
+        (error: Error) => {
+          if (import.meta.env.SSR) throw error;
+          return "";
+        },
+      );
     return load;
   };
 }
