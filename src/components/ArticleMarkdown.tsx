@@ -12,6 +12,7 @@ import Nutshell from "./Nutshell";
 import ArPose from "./ArPose";
 import MermaidBlock from "./MermaidBlock";
 import UwbPulse from "./UwbPulse";
+import TweetCard from "./TweetCard";
 import WaveBlock from "./wave/WaveBlock";
 import { processMarkdown } from "../lib/content";
 import { headingSlug } from "../lib/nutshell";
@@ -86,6 +87,7 @@ const Pre: Components["pre"] = ({ node, children, ...rest }) => {
     ?.slice("language-".length);
   if (code && lang === "uwb-pulse") return <UwbPulse />;
   if (code && lang === "ar-pose") return <ArPose source={hastText(code)} />;
+  if (code && lang === "tweet") return <TweetCard source={hastText(code)} />;
   if (code && lang === "mermaid") return <MermaidBlock source={hastText(code).replace(/\n$/, "")} />;
   const waveLang = WAVE_LANGS.find((l) => l === lang);
   if (code && waveLang) {

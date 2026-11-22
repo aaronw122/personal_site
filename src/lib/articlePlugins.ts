@@ -1,7 +1,7 @@
 import type { PluggableList } from "unified";
 
 export const WAVE_LANGS = ["wave", "pulse", "slice"] as const;
-export const SIM_LANGS: readonly string[] = [...WAVE_LANGS, "uwb-pulse", "ar-pose", "mermaid"];
+export const SIM_LANGS: readonly string[] = [...WAVE_LANGS, "uwb-pulse", "ar-pose", "mermaid", "tweet"];
 
 let math: PluggableList = [];
 let highlight: PluggableList = [];

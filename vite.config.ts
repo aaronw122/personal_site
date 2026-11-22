@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import { ogPrerender } from "./vite-plugin-og";
 import { syncWritingImages } from "./vite-plugin-writing-images";
 import { rssFeed } from "./vite-plugin-rss";
+import { tweets } from "./vite-plugin-tweets";
 import { show } from "./src/data/podcast";
 import { FIXED_ARTICLES } from "./src/data/fixedArticles";
 
@@ -15,6 +16,7 @@ export default defineConfig(({ isSsrBuild }) => ({
   base: "/",
   plugins: [
     react(),
+    tweets({ sourceDirs: [WRITING, LISTS] }),
     !isSsrBuild && [
       syncWritingImages({
         sourceDirs: [WRITING, LISTS],
