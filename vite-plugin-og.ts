@@ -6,6 +6,7 @@ import {
   extractFrontmatter,
   htmlEscape,
 } from "./vault-markdown";
+import { urlSlug } from "./src/lib/slug";
 
 interface Section {
   urlPrefix: string;
@@ -117,14 +118,16 @@ export function ogPrerender(opts: Options): Plugin {
         }
         for (const file of fs.readdirSync(section.dir)) {
           if (!file.endsWith(".md") || file === "index.md") continue;
-          const slug = file.replace(/\.md$/, "");
-          const url = `${opts.siteUrl}/${section.urlPrefix}/${encodeURIComponent(slug)}`;
-          emit(
-            path.join(section.urlPrefix, slug),
-            path.join(section.dir, file),
-            url,
-          );
+          const name = file.replace(/\.md$/, "");
+          const slug = urlSlug(name);
+          const url = `${opts.siteUrl}/${section.urlPrefix}/${slug}`;
+          const sourceFile = path.join(section.dir, file);
+          emit(path.join(section.urlPrefix, slug), sourceFile, url);
           count++;
+          if (name !== slug) {
+            emit(path.join(section.urlPrefix, name), sourceFile, url);
+            count++;
+          }
         }
       }
 

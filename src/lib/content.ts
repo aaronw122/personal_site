@@ -1,4 +1,5 @@
 import { headingSlug, nutshellsToHtml } from "./nutshell";
+import { urlSlug } from "./slug";
 
 const writingModules = import.meta.glob<string>("@writing/**/*.md", {
   query: "?raw",
@@ -57,7 +58,7 @@ export function processMarkdown(
     const [target, alias] = link.split("|");
     const display = alias?.trim() || target.trim();
     const slug = target.trim().split("/").pop()!.trim();
-    return `[${display}](/${section}/${encodeURIComponent(slug)})`;
+    return `[${display}](/${section}/${urlSlug(slug)})`;
   });
 
   result = result.replace(
@@ -90,7 +91,8 @@ function findEntry(entries: ContentEntry[], slug: string): ContentEntry | undefi
   } catch {
     return undefined;
   }
-  return entries.find((e) => e.slug === decoded);
+  const wanted = urlSlug(decoded);
+  return entries.find((e) => urlSlug(e.slug) === wanted);
 }
 
 export function peekEntry(entries: ContentEntry[], slug: string): LoadedEntry | null {

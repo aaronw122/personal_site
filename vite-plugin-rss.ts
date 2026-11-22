@@ -17,6 +17,7 @@ import {
   processMarkdown,
   stripFrontmatter,
 } from "./vault-markdown";
+import { urlSlug } from "./src/lib/slug";
 
 const FEED_FILE = "rss.xml";
 
@@ -63,7 +64,7 @@ async function readItems(opts: Options, indexBody: string): Promise<Item[]> {
     if (Number.isNaN(date.getTime())) date = fs.statSync(file).birthtime;
     items.push({
       title,
-      url: `${opts.siteUrl}/${opts.urlPrefix}/${encodeURIComponent(slug)}`,
+      url: `${opts.siteUrl}/${opts.urlPrefix}/${urlSlug(slug)}`,
       date,
       description: deriveDescription(raw, title),
       html: await renderHtml(stripFrontmatter(raw), opts),
