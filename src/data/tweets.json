@@ -1,0 +1,25 @@
+{
+  "2117661092751024476": {
+    "url": "https://x.com/__drewface/status/2117661092751024476",
+    "name": "Andrew Rose",
+    "handle": "__drewface",
+    "avatar": "https://pbs.twimg.com/profile_images/2075587455139356673/-Nmp7XWr_bigger.jpg",
+    "verified": true,
+    "segments": [
+      {
+        "text": "3/ Take these four simple prompts, which generate:\n\nA: a generic claude website\nB: \"Pocketflap,\" a claude-slop clone of flappy bird\nC: an exact, good Flappy Bird, in a browser\nD: an exact, good Flappy Bird, as an App\n\nNotice how my word choice specifies a good outcome!"
+      }
+    ],
+    "media": [
+      {
+        "type": "photo",
+        "src": "https://pbs.twimg.com/media/HWNVGz5WcAADWzi.jpg?name=large",
+        "width": 1600,
+        "height": 1000
+      }
+    ],
+    "date": "10:52 AM · Nov 3, 2026",
+    "likes": 13,
+    "replies": 2
+  }
+}
