@@ -57,6 +57,7 @@ html {
   position: relative;
   min-height: 100%;
   overscroll-behavior: auto;
+  scrollbar-color: rgba(60, 50, 40, 0.28) transparent;
 }
 
 body {
