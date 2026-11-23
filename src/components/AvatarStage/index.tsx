@@ -5,7 +5,7 @@ import PeekSprite, { type PeekPose } from "./PeekSprite";
 import type { StageEngine, StageSnapshot, StageState } from "./runtime";
 
 const desktopQuery =
-  "(min-width: 1024px) and (hover: hover) and (pointer: fine)";
+  "(min-width: 840px) and (hover: hover) and (pointer: fine)";
 const coarsePointerQuery = "(hover: none), (pointer: coarse)";
 const reducedQuery = "(prefers-reduced-motion: reduce)";
 
