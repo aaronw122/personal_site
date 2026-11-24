@@ -18,6 +18,7 @@ Contact: youfoundaaron@gmail.com
 
 ## Writing
 
+- [Ultra-Wideband (UWB) Pt. 1 - How It Works](https://awill.co/uwb-pt1)
 - [Future of Personal Computing Pt 1](https://awill.co/writing/future%20of%20personal%20computing%20pt%201)
 - [Most Inneficient Way to Find Needle in a Haystack](https://awill.co/writing/most%20inneficient%20way%20to%20find%20needle%20in%20a%20haystack)
 - [Thera Copilot](https://awill.co/writing/thera%20copilot)

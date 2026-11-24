@@ -31,12 +31,32 @@ interface Options {
   fixed?: FixedRoute[];
   pages?: StaticPage[];
   siteUrl: string;
+  sitemapRoutes?: string[];
 }
 
-function buildHtml(
-  template: string,
-  meta: { title: string; description: string; url: string; image?: string },
-): string {
+interface PageMeta {
+  title: string;
+  description: string;
+  url: string;
+  image?: string;
+  published?: string;
+}
+
+function articleJsonLd(meta: PageMeta): string {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: meta.title,
+    description: meta.description,
+    datePublished: meta.published,
+    url: meta.url,
+    mainEntityOfPage: meta.url,
+    author: { "@type": "Person", name: "Aaron Williams", url: "https://awill.co/" },
+  };
+  return JSON.stringify(data).replace(/</g, "\\u003c");
+}
+
+function buildHtml(template: string, meta: PageMeta): string {
   const title = htmlEscape(meta.title);
   const desc = htmlEscape(meta.description);
   const url = htmlEscape(meta.url);
@@ -76,6 +96,12 @@ function buildHtml(
       `\n    <meta name="twitter:title" content="${title}" />` +
       `\n    <meta name="twitter:description" content="${desc}" />`,
   );
+  if (meta.published) {
+    html = html.replace(
+      "</head>",
+      `  <script type="application/ld+json">${articleJsonLd(meta)}</script>\n  </head>`,
+    );
+  }
   return html;
 }
 
@@ -89,22 +115,34 @@ export function ogPrerender(opts: Options): Plugin {
       if (!fs.existsSync(templatePath)) return;
       const template = fs.readFileSync(templatePath, "utf8");
 
-      const write = (relPath: string, meta: Parameters<typeof buildHtml>[1]) => {
+      const sitemap = new Set<string>([
+        `${opts.siteUrl}/`,
+        ...(opts.sitemapRoutes ?? []).map((route) => `${opts.siteUrl}/${route}`),
+      ]);
+      const fixedUrls = new Map(
+        (opts.fixed ?? []).map((fixed) => [
+          path.join(fixed.dir, `${fixed.slug}.md`),
+          `${opts.siteUrl}/${fixed.route}`,
+        ]),
+      );
+
+      const write = (relPath: string, meta: PageMeta) => {
         const outDir = path.join(distDir, relPath);
         fs.mkdirSync(outDir, { recursive: true });
         fs.writeFileSync(path.join(outDir, "index.html"), buildHtml(template, meta));
+        sitemap.add(meta.url);
       };
 
-      const emit = (relPath: string, sourceFile: string, url: string) => {
+      const emit = (relPath: string, sourceFile: string, url: string, isArticle: boolean) => {
         const raw = fs.readFileSync(sourceFile, "utf8");
         const fm = extractFrontmatter(raw);
         const slugTitle = path.basename(sourceFile).replace(/\.md$/, "");
         const title = fm.title || slugTitle;
-        const description = deriveDescription(
-          raw,
-          "aspiring renaissance man. building at fractal.",
-        );
-        write(relPath, { title, description, url });
+        const description =
+          fm.description ||
+          deriveDescription(raw, "aspiring renaissance man. building at fractal.");
+        const published = isArticle ? fm.creation_date : undefined;
+        write(relPath, { title, description, url, published });
       };
 
       let count = 0;
@@ -113,19 +151,20 @@ export function ogPrerender(opts: Options): Plugin {
         if (!fs.existsSync(section.dir)) continue;
         const sectionIndex = path.join(section.dir, "index.md");
         if (fs.existsSync(sectionIndex)) {
-          emit(section.urlPrefix, sectionIndex, `${opts.siteUrl}/${section.urlPrefix}`);
+          emit(section.urlPrefix, sectionIndex, `${opts.siteUrl}/${section.urlPrefix}`, false);
           count++;
         }
         for (const file of fs.readdirSync(section.dir)) {
           if (!file.endsWith(".md") || file === "index.md") continue;
           const name = file.replace(/\.md$/, "");
           const slug = urlSlug(name);
-          const url = `${opts.siteUrl}/${section.urlPrefix}/${slug}`;
           const sourceFile = path.join(section.dir, file);
-          emit(path.join(section.urlPrefix, slug), sourceFile, url);
+          const url =
+            fixedUrls.get(sourceFile) ?? `${opts.siteUrl}/${section.urlPrefix}/${slug}`;
+          emit(path.join(section.urlPrefix, slug), sourceFile, url, true);
           count++;
           if (name !== slug) {
-            emit(path.join(section.urlPrefix, name), sourceFile, url);
+            emit(path.join(section.urlPrefix, name), sourceFile, url, true);
             count++;
           }
         }
@@ -134,7 +173,7 @@ export function ogPrerender(opts: Options): Plugin {
       for (const fixed of opts.fixed ?? []) {
         const sourceFile = path.join(fixed.dir, `${fixed.slug}.md`);
         if (!fs.existsSync(sourceFile)) continue;
-        emit(fixed.route, sourceFile, `${opts.siteUrl}/${fixed.route}`);
+        emit(fixed.route, sourceFile, `${opts.siteUrl}/${fixed.route}`, true);
         count++;
       }
 
@@ -147,6 +186,14 @@ export function ogPrerender(opts: Options): Plugin {
         });
         count++;
       }
+
+      const urls = [...sitemap]
+        .map((url) => `  <url><loc>${htmlEscape(encodeURI(url))}</loc></url>`)
+        .join("\n");
+      fs.writeFileSync(
+        path.join(distDir, "sitemap.xml"),
+        `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`,
+      );
 
       console.log(`\n[og-prerender] wrote ${count} social-preview pages`);
     },

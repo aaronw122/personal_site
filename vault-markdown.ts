@@ -11,6 +11,7 @@ export function htmlEscape(s: string): string {
 
 interface Frontmatter {
   title?: string;
+  description?: string;
   creation_date?: string;
 }
 
@@ -25,7 +26,11 @@ export function extractFrontmatter(raw: string): Frontmatter {
     const val = line.slice(idx + 1).trim().replace(/^["']|["']$/g, "");
     if (key && val) values.set(key, val);
   }
-  return { title: values.get("title"), creation_date: values.get("creation_date") };
+  return {
+    title: values.get("title"),
+    description: values.get("description"),
+    creation_date: values.get("creation_date"),
+  };
 }
 
 export function stripFrontmatter(raw: string): string {

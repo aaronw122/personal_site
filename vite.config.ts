@@ -34,6 +34,7 @@ export default defineConfig(({ isSsrBuild }) => ({
         pages: [
           { route: "podcast", title: show.title, description: show.description, image: "/images/no-agendas.jpg" },
         ],
+        sitemapRoutes: ["about", "experience"],
       }),
       rssFeed({ siteUrl: "https://awill.co", urlPrefix: "writing", dir: WRITING }),
     ],
