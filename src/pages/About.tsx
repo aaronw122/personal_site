@@ -31,7 +31,7 @@ export default function About() {
           <a href="https://www.recurse.com" target="_blank" rel="noreferrer">
             recurse center
           </a>{" "}
-          working on an augmented reality project that lets people create/view digital art in 3d space!
+          working on an ultra-wideband positioning system!
           i also like to meditate, meet new people, and catch live music when i can.
         </p>
         <p>
